@@ -7,7 +7,7 @@ import {
   Stack,
   Chip,
   LinearProgress,
-  Grid2,
+  Grid as Grid2,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import EvStationOutlinedIcon from "@mui/icons-material/EvStationOutlined";

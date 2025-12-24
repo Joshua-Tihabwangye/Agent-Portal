@@ -88,8 +88,8 @@ export default function App() {
       <Route path="/agent/welcome" element={<AgentWelcomeTrainingGatePage />} />
 
       {/* System */}
-      <Route path="/agent/404" element={<AgentNotFoundPage />} />
-      <Route path="/agent/access-denied" element={<AgentAccessDeniedPage requiredRole="" />} />
+      <Route path="/agent/404" element={<AgentNotFoundPage onGoHome={() => window.location.href = '/agent/dashboard'} onGoBack={() => window.history.back()} />} />
+      <Route path="/agent/access-denied" element={<AgentAccessDeniedPage requiredRole="" onGoHome={() => window.location.href = '/agent/dashboard'} onRequestAccess={() => console.log('Request access')} />} />
 
       {/* Authenticated routes */}
       <Route element={<RequireAuth />}>
@@ -160,12 +160,12 @@ export default function App() {
           <Route path="/agent/profile" element={<AgentProfilePreferencesPage />} />
 
           {/* Catch-all inside shell */}
-          <Route path="/agent/*" element={<AgentNotFoundPage />} />
+          <Route path="/agent/*" element={<AgentNotFoundPage onGoHome={() => window.location.href = '/agent/dashboard'} onGoBack={() => window.history.back()} />} />
         </Route>
       </Route>
 
       {/* Catch-all */}
-      <Route path="*" element={<AgentNotFoundPage />} />
+      <Route path="*" element={<AgentNotFoundPage onGoHome={() => window.location.href = '/agent/dashboard'} onGoBack={() => window.history.back()} />} />
     </Routes>
   );
 }

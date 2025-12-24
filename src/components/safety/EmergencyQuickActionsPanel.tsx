@@ -175,6 +175,8 @@ export default function AgentEmergencyQuickActionsPanelPreview() {
             console.log("Calling from preview");
             setClicks((c) => c + 1);
           }}
+          onNotifySupervisor={() => console.log("Notify supervisor")}
+          onFlagAccount={() => console.log("Flag account")}
         />
       </Box>
       <Typography
