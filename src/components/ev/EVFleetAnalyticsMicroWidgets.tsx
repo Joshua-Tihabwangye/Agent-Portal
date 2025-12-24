@@ -7,7 +7,7 @@ import {
   Stack,
   Chip,
   LinearProgress,
-  Grid,
+  Grid as Grid2,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import EvStationOutlinedIcon from "@mui/icons-material/EvStationOutlined";
@@ -18,13 +18,17 @@ const EVZONE_GREEN = "#03cd8c";
 const EVZONE_ORANGE = "#f77f00";
 const EVZONE_GREY = "#6b7280";
 
-// 54. Analytics micro widgets (EV fleet utilization & safety)
-// Props: { utilization, lowBatteryShare, safetyIncidents }
+interface EVFleetAnalyticsProps {
+  utilization?: { inUsePct: number; onlinePct: number };
+  lowBatteryShare?: number;
+  safetyIncidents?: { last7Days: number; batteryRelated: number };
+}
+
 export function EVFleetAnalyticsMicroWidgets({
   utilization = { inUsePct: 68, onlinePct: 84 },
-  lowBatteryShare = 14, // % of EVs below 30%
+  lowBatteryShare = 14,
   safetyIncidents = { last7Days: 5, batteryRelated: 1 },
-}) {
+}: EVFleetAnalyticsProps) {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
 
@@ -32,9 +36,9 @@ export function EVFleetAnalyticsMicroWidgets({
   const inUsePct = utilization.inUsePct || 0;
 
   return (
-    <Grid container spacing={1.5}>
+    <Grid2 container spacing={1.5}>
       {/* Utilization widget */}
-      <Grid item xs={12} sm={4}>
+      <Grid2 size={{ xs: 12, sm: 4 }}>
         <Card
           elevation={1}
           sx={{
@@ -119,10 +123,10 @@ export function EVFleetAnalyticsMicroWidgets({
             </Stack>
           </CardContent>
         </Card>
-      </Grid>
+      </Grid2>
 
       {/* Low battery widget */}
-      <Grid item xs={12} sm={4}>
+      <Grid2 size={{ xs: 12, sm: 4 }}>
         <Card
           elevation={1}
           sx={{
@@ -176,10 +180,10 @@ export function EVFleetAnalyticsMicroWidgets({
             </Stack>
           </CardContent>
         </Card>
-      </Grid>
+      </Grid2>
 
       {/* Safety widget */}
-      <Grid item xs={12} sm={4}>
+      <Grid2 size={{ xs: 12, sm: 4 }}>
         <Card
           elevation={1}
           sx={{
@@ -241,8 +245,8 @@ export function EVFleetAnalyticsMicroWidgets({
             </Stack>
           </CardContent>
         </Card>
-      </Grid>
-    </Grid>
+      </Grid2>
+    </Grid2>
   );
 }
 

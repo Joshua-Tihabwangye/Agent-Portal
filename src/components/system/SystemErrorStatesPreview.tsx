@@ -249,8 +249,8 @@ export function AgentGlobalStatusBanner({ mode, message, onRetry }) {
             ? "rgba(15,23,42,0.95)"
             : "#fefce8"
           : isDark
-          ? "rgba(127,29,29,0.9)"
-          : "#fef2f2",
+            ? "rgba(127,29,29,0.9)"
+            : "#fef2f2",
       }}
     >
       <Box className="max-w-6xl mx-auto px-3 sm:px-6 py-2">
@@ -284,8 +284,8 @@ export function AgentGlobalStatusBanner({ mode, message, onRetry }) {
                     ? "#fef9c3"
                     : "#92400e"
                   : isDark
-                  ? "#fee2e2"
-                  : "#b91c1c",
+                    ? "#fee2e2"
+                    : "#b91c1c",
               }}
             >
               {message ||
@@ -333,6 +333,7 @@ export default function AgentSystemErrorStatesPreview() {
       <AgentGlobalStatusBanner
         mode="offline"
         onRetry={() => setOfflineClicks((c) => c + 1)}
+        message={undefined}
       />
       <AgentGlobalStatusBanner
         mode="error"
@@ -342,10 +343,17 @@ export default function AgentSystemErrorStatesPreview() {
 
       <Box className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 px-3 sm:px-6 py-4 max-w-6xl mx-auto w-full">
         <Box>
-          <AgentNotFoundPage />
+          <AgentNotFoundPage
+            onGoHome={() => console.log('Go Home')}
+            onGoBack={() => console.log('Go Back')}
+          />
         </Box>
         <Box>
-          <AgentAccessDeniedPage requiredRole="Supervisor" />
+          <AgentAccessDeniedPage
+            requiredRole="Supervisor"
+            onGoHome={() => console.log('Go Home')}
+            onRequestAccess={() => console.log('Request Access')}
+          />
         </Box>
       </Box>
 

@@ -135,7 +135,7 @@ export default function AgentDispatchNewDeliveryPage() {
             >
               <Grid container spacing={2.4}>
                 {/* Sender & recipient */}
-                <Grid item xs={12} md={6}>
+                <Grid size={{ xs: 12, md: 6 }}>
                   <Stack spacing={1.8}>
                     <Stack direction="row" spacing={1} alignItems="center">
                       <PersonOutlineOutlinedIcon
@@ -234,7 +234,7 @@ export default function AgentDispatchNewDeliveryPage() {
                 </Grid>
 
                 {/* Locations & parcel */}
-                <Grid item xs={12} md={6}>
+                <Grid size={{ xs: 12, md: 6 }}>
                   <Stack spacing={1.8}>
                     <Stack direction="row" spacing={1} alignItems="center">
                       <PlaceOutlinedIcon

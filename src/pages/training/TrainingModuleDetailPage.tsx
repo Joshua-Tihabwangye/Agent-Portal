@@ -164,8 +164,8 @@ function TrainingQuiz({ questions, passMark = 70, onComplete }) {
                       color: selected
                         ? "#020617"
                         : isDark
-                        ? "#e5e7eb"
-                        : "#111827",
+                          ? "#e5e7eb"
+                          : "#111827",
                       borderColor: selected
                         ? EVZONE_GREEN
                         : "rgba(203,213,225,0.9)",
@@ -307,7 +307,7 @@ export default function AgentTrainingModuleDetailPage() {
 
         <Grid container spacing={2.4}>
           {/* Video & quiz */}
-          <Grid item xs={12} md={7}>
+          <Grid size={{ xs: 12, md: 7 }}>
             <Card
               elevation={1}
               sx={{
@@ -402,7 +402,7 @@ export default function AgentTrainingModuleDetailPage() {
           </Grid>
 
           {/* Module info */}
-          <Grid item xs={12} md={5}>
+          <Grid size={{ xs: 12, md: 5 }}>
             <Card
               elevation={1}
               sx={{

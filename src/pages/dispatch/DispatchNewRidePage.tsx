@@ -130,7 +130,7 @@ export default function AgentDispatchNewRidePage() {
             >
               <Grid container spacing={2.4}>
                 {/* Caller / rider block */}
-                <Grid item xs={12} md={5}>
+                <Grid size={{ xs: 12, md: 5 }}>
                   <Stack spacing={1.6}>
                     <Stack direction="row" spacing={1} alignItems="center">
                       <PersonOutlineOutlinedIcon
@@ -252,7 +252,7 @@ export default function AgentDispatchNewRidePage() {
                 </Grid>
 
                 {/* Locations & time */}
-                <Grid item xs={12} md={7}>
+                <Grid size={{ xs: 12, md: 7 }}>
                   <Stack spacing={2}>
                     <Stack direction="row" spacing={1} alignItems="center">
                       <PlaceOutlinedIcon

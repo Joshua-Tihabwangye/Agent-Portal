@@ -150,7 +150,7 @@ export default function AgentDispatchNewStartPage() {
 
         <Grid container spacing={2}>
           {/* Client type */}
-          <Grid item xs={12} md={5}>
+          <Grid size={{ xs: 12, md: 5 }}>
             <Card
               elevation={1}
               sx={{
@@ -195,8 +195,8 @@ export default function AgentDispatchNewStartPage() {
                               ? "rgba(3,205,140,0.16)"
                               : "rgba(240,253,250,1)"
                             : isDark
-                            ? "rgba(15,23,42,0.9)"
-                            : "rgba(248,250,252,0.95)",
+                              ? "rgba(15,23,42,0.9)"
+                              : "rgba(248,250,252,0.95)",
                           border:
                             "1px solid " +
                             (isActive
@@ -218,8 +218,8 @@ export default function AgentDispatchNewStartPage() {
                             color: isActive
                               ? "#047857"
                               : isDark
-                              ? "#9ca3af"
-                              : "#6b7280",
+                                ? "#9ca3af"
+                                : "#6b7280",
                           }}
                         >
                           {type.icon}
@@ -250,7 +250,7 @@ export default function AgentDispatchNewStartPage() {
           </Grid>
 
           {/* Service type */}
-          <Grid item xs={12} md={7}>
+          <Grid size={{ xs: 12, md: 7 }}>
             <Card
               elevation={1}
               sx={{
@@ -287,7 +287,7 @@ export default function AgentDispatchNewStartPage() {
                     const isActive = serviceType === service.key;
                     const isPrimary = service.primary;
                     return (
-                      <Grid item xs={12} sm={6} key={service.key}>
+                      <Grid size={{ xs: 12, sm: 6 }} key={service.key}>
                         <Box
                           onClick={() =>
                             isPrimary ? setServiceType(service.key) : null
@@ -302,8 +302,8 @@ export default function AgentDispatchNewStartPage() {
                                 ? "rgba(3,205,140,0.16)"
                                 : "rgba(240,253,250,1)"
                               : isDark
-                              ? "rgba(15,23,42,0.9)"
-                              : "rgba(248,250,252,0.95)",
+                                ? "rgba(15,23,42,0.9)"
+                                : "rgba(248,250,252,0.95)",
                             border:
                               "1px solid " +
                               (isActive
@@ -325,8 +325,8 @@ export default function AgentDispatchNewStartPage() {
                               color: isActive
                                 ? "#047857"
                                 : isDark
-                                ? "#9ca3af"
-                                : "#6b7280",
+                                  ? "#9ca3af"
+                                  : "#6b7280",
                             }}
                           >
                             {service.icon}

@@ -140,7 +140,7 @@ export default function AgentDispatchAssignDriverPage() {
 
         <Grid container spacing={2}>
           {/* Map snippet */}
-          <Grid item xs={12} lg={6}>
+          <Grid size={{ xs: 12, lg: 6 }}>
             <Card
               elevation={1}
               sx={{
@@ -322,7 +322,7 @@ export default function AgentDispatchAssignDriverPage() {
           </Grid>
 
           {/* Driver list + EV suitability helper */}
-          <Grid item xs={12} lg={6}>
+          <Grid size={{ xs: 12, lg: 6 }}>
             <Stack spacing={2}>
               <DispatchEVSuitabilityHelper
                 request={request}
@@ -331,214 +331,214 @@ export default function AgentDispatchAssignDriverPage() {
                 onOverride={() => console.log("Override EV filter for this trip")}
               />
               <Card
-              elevation={1}
-              sx={{
-                borderRadius: 3,
-                backgroundColor: isDark ? "#020617" : "#ffffff",
-                border:
-                  "1px solid " +
-                  (isDark
-                    ? "rgba(30,64,175,0.7)"
-                    : "rgba(226,232,240,1)"),
-                height: "100%",
-              }}
+                elevation={1}
+                sx={{
+                  borderRadius: 3,
+                  backgroundColor: isDark ? "#020617" : "#ffffff",
+                  border:
+                    "1px solid " +
+                    (isDark
+                      ? "rgba(30,64,175,0.7)"
+                      : "rgba(226,232,240,1)"),
+                  height: "100%",
+                }}
               >
                 <CardContent sx={{ p: 2.2 }}>
-                <Stack
-                  direction="row"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  mb={1.5}
-                >
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <DirectionsCarOutlinedIcon
-                      sx={{ fontSize: 18, color: EVZONE_GREEN }}
-                    />
-                    <Typography
-                      variant="subtitle2"
-                      sx={{
-                        fontWeight: 700,
-                        color: isDark ? "#e5e7eb" : "#111827",
-                      }}
-                    >
-                      Suggested drivers
-                    </Typography>
-                  </Stack>
-
-                  <Chip
-                    size="small"
-                    label="Auto-sorted by score"
-                    sx={{
-                      borderRadius: 999,
-                      fontSize: 11,
-                      textTransform: "none",
-                      backgroundColor: "rgba(248,250,252,0.95)",
-                      color: EVZONE_GREY,
-                      border: "1px solid rgba(203,213,225,0.9)",
-                    }}
-                  />
-                </Stack>
-
-                <Stack spacing={1.2}>
-                  {candidateDrivers.map((driver) => {
-                    const isSelected = driver.id === selectedDriverId;
-                    const batteryColor =
-                      driver.battery >= 60
-                        ? "#16a34a"
-                        : driver.battery >= 30
-                        ? "#f97316"
-                        : "#b91c1c";
-                    return (
-                      <Box
-                        key={driver.id}
-                        onClick={() => setSelectedDriverId(driver.id)}
-                        className="flex items-center justify-between rounded-2xl px-3 py-2.5 cursor-pointer"
+                  <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    mb={1.5}
+                  >
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <DirectionsCarOutlinedIcon
+                        sx={{ fontSize: 18, color: EVZONE_GREEN }}
+                      />
+                      <Typography
+                        variant="subtitle2"
                         sx={{
-                          backgroundColor: isSelected
-                            ? isDark
-                              ? "rgba(3,205,140,0.16)"
-                              : "rgba(240,253,250,1)"
-                            : isDark
-                            ? "rgba(15,23,42,0.9)"
-                            : "rgba(248,250,252,0.95)",
-                          border:
-                            "1px solid " +
-                            (isSelected
-                              ? "rgba(34,197,94,0.8)"
-                              : "rgba(203,213,225,0.9)"),
+                          fontWeight: 700,
+                          color: isDark ? "#e5e7eb" : "#111827",
                         }}
                       >
-                        <Box className="flex items-center gap-2.5">
-                          <Avatar
-                            sx={{
-                              width: 28,
-                              height: 28,
-                              backgroundColor: "rgba(3,205,140,0.18)",
-                              color: "#047857",
-                              fontSize: 13,
-                              fontWeight: 700,
-                            }}
-                          >
-                            {driver.name
-                              .split(" ")
-                              .map((n) => n[0])
-                              .join("")}
-                          </Avatar>
-                          <Box>
-                            <Typography
-                              variant="body2"
+                        Suggested drivers
+                      </Typography>
+                    </Stack>
+
+                    <Chip
+                      size="small"
+                      label="Auto-sorted by score"
+                      sx={{
+                        borderRadius: 999,
+                        fontSize: 11,
+                        textTransform: "none",
+                        backgroundColor: "rgba(248,250,252,0.95)",
+                        color: EVZONE_GREY,
+                        border: "1px solid rgba(203,213,225,0.9)",
+                      }}
+                    />
+                  </Stack>
+
+                  <Stack spacing={1.2}>
+                    {candidateDrivers.map((driver) => {
+                      const isSelected = driver.id === selectedDriverId;
+                      const batteryColor =
+                        driver.battery >= 60
+                          ? "#16a34a"
+                          : driver.battery >= 30
+                            ? "#f97316"
+                            : "#b91c1c";
+                      return (
+                        <Box
+                          key={driver.id}
+                          onClick={() => setSelectedDriverId(driver.id)}
+                          className="flex items-center justify-between rounded-2xl px-3 py-2.5 cursor-pointer"
+                          sx={{
+                            backgroundColor: isSelected
+                              ? isDark
+                                ? "rgba(3,205,140,0.16)"
+                                : "rgba(240,253,250,1)"
+                              : isDark
+                                ? "rgba(15,23,42,0.9)"
+                                : "rgba(248,250,252,0.95)",
+                            border:
+                              "1px solid " +
+                              (isSelected
+                                ? "rgba(34,197,94,0.8)"
+                                : "rgba(203,213,225,0.9)"),
+                          }}
+                        >
+                          <Box className="flex items-center gap-2.5">
+                            <Avatar
                               sx={{
-                                fontWeight: 600,
-                                color: isDark ? "#e5e7eb" : "#111827",
+                                width: 28,
+                                height: 28,
+                                backgroundColor: "rgba(3,205,140,0.18)",
+                                color: "#047857",
+                                fontSize: 13,
+                                fontWeight: 700,
                               }}
                             >
-                              {driver.name}
-                            </Typography>
+                              {driver.name
+                                .split(" ")
+                                .map((n) => n[0])
+                                .join("")}
+                            </Avatar>
+                            <Box>
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  fontWeight: 600,
+                                  color: isDark ? "#e5e7eb" : "#111827",
+                                }}
+                              >
+                                {driver.name}
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                sx={{ color: EVZONE_GREY, display: "block" }}
+                              >
+                                {driver.vehicle}
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                sx={{ color: EVZONE_GREY }}
+                              >
+                                ~{driver.distanceKm} km from pickup · {" "}
+                                {driver.activeTrips} active trips
+                              </Typography>
+                            </Box>
+                          </Box>
+
+                          <Box className="text-right">
+                            <Stack
+                              direction="row"
+                              spacing={0.5}
+                              justifyContent="flex-end"
+                              alignItems="center"
+                            >
+                              <ElectricBoltOutlinedIcon
+                                sx={{ fontSize: 15, color: batteryColor }}
+                              />
+                              <Typography
+                                variant="caption"
+                                sx={{ color: batteryColor, fontWeight: 600 }}
+                              >
+                                {driver.battery}%
+                              </Typography>
+                            </Stack>
                             <Typography
                               variant="caption"
-                              sx={{ color: EVZONE_GREY, display: "block" }}
+                              sx={{
+                                color: isSelected ? EVZONE_GREEN : EVZONE_GREY,
+                                fontWeight: isSelected ? 600 : 500,
+                                mt: 0.3,
+                              }}
                             >
-                              {driver.vehicle}
-                            </Typography>
-                            <Typography
-                              variant="caption"
-                              sx={{ color: EVZONE_GREY }}
-                            >
-                              ~{driver.distanceKm} km from pickup · {" "}
-                              {driver.activeTrips} active trips
+                              Score {driver.score}
+                              {isSelected ? " · Selected" : ""}
                             </Typography>
                           </Box>
                         </Box>
-
-                        <Box className="text-right">
-                          <Stack
-                            direction="row"
-                            spacing={0.5}
-                            justifyContent="flex-end"
-                            alignItems="center"
-                          >
-                            <ElectricBoltOutlinedIcon
-                              sx={{ fontSize: 15, color: batteryColor }}
-                            />
-                            <Typography
-                              variant="caption"
-                              sx={{ color: batteryColor, fontWeight: 600 }}
-                            >
-                              {driver.battery}%
-                            </Typography>
-                          </Stack>
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              color: isSelected ? EVZONE_GREEN : EVZONE_GREY,
-                              fontWeight: isSelected ? 600 : 500,
-                              mt: 0.3,
-                            }}
-                          >
-                            Score {driver.score}
-                            {isSelected ? " · Selected" : ""}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    );
-                  })}
-                </Stack>
-
-                <Stack
-                  direction="row"
-                  justifyContent="space-between"
-                  sx={{ mt: 3 }}
-                >
-                  <Button
-                    variant="text"
-                    size="small"
-                    onClick={() => navigate(-1)}
-                    sx={{
-                      textTransform: "none",
-                      fontSize: 13,
-                      color: EVZONE_GREY,
-                    }}
-                  >
-                    Back to details
-                  </Button>
-
-                  <Stack direction="row" spacing={1.5}>
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      onClick={() => navigate("/agent/dispatch/board")}
-                      sx={{
-                        borderRadius: 999,
-                        textTransform: "none",
-                        fontSize: 13,
-                      }}
-                    >
-                      Assign later
-                    </Button>
-                    <Button
-                      onClick={handleAssign}
-                      disabled={!selectedDriverId}
-                      variant="contained"
-                      size="small"
-                      sx={{
-                        borderRadius: 999,
-                        textTransform: "none",
-                        fontSize: 13,
-                        fontWeight: 600,
-                        backgroundColor: selectedDriverId
-                          ? EVZONE_GREEN
-                          : "rgba(148,163,184,0.7)",
-                        "&:hover": {
-                          backgroundColor: selectedDriverId
-                            ? "#059669"
-                            : undefined,
-                        },
-                      }}
-                    >
-                      Continue to confirmation
-                    </Button>
+                      );
+                    })}
                   </Stack>
-                </Stack>
+
+                  <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    sx={{ mt: 3 }}
+                  >
+                    <Button
+                      variant="text"
+                      size="small"
+                      onClick={() => navigate(-1)}
+                      sx={{
+                        textTransform: "none",
+                        fontSize: 13,
+                        color: EVZONE_GREY,
+                      }}
+                    >
+                      Back to details
+                    </Button>
+
+                    <Stack direction="row" spacing={1.5}>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => navigate("/agent/dispatch/board")}
+                        sx={{
+                          borderRadius: 999,
+                          textTransform: "none",
+                          fontSize: 13,
+                        }}
+                      >
+                        Assign later
+                      </Button>
+                      <Button
+                        onClick={handleAssign}
+                        disabled={!selectedDriverId}
+                        variant="contained"
+                        size="small"
+                        sx={{
+                          borderRadius: 999,
+                          textTransform: "none",
+                          fontSize: 13,
+                          fontWeight: 600,
+                          backgroundColor: selectedDriverId
+                            ? EVZONE_GREEN
+                            : "rgba(148,163,184,0.7)",
+                          "&:hover": {
+                            backgroundColor: selectedDriverId
+                              ? "#059669"
+                              : undefined,
+                          },
+                        }}
+                      >
+                        Continue to confirmation
+                      </Button>
+                    </Stack>
+                  </Stack>
                 </CardContent>
               </Card>
             </Stack>

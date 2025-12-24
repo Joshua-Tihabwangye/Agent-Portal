@@ -142,7 +142,7 @@ export default function AgentDispatchNewSchoolShuttlePage() {
             >
               <Grid container spacing={2.4}>
                 {/* Student & school */}
-                <Grid item xs={12} md={6}>
+                <Grid size={{ xs: 12, md: 6 }}>
                   <Stack spacing={1.8}>
                     <Stack direction="row" spacing={1} alignItems="center">
                       <SchoolOutlinedIcon
@@ -223,7 +223,7 @@ export default function AgentDispatchNewSchoolShuttlePage() {
                 </Grid>
 
                 {/* Route & guardian */}
-                <Grid item xs={12} md={6}>
+                <Grid size={{ xs: 12, md: 6 }}>
                   <Stack spacing={1.8}>
                     <Stack direction="row" spacing={1} alignItems="center">
                       <DirectionsBusOutlinedIcon

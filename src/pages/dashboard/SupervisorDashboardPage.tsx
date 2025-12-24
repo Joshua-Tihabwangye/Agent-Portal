@@ -140,7 +140,7 @@ export default function AgentSupervisorDashboardPage() {
       {/* Team summary cards */}
       <Grid container spacing={2} className="mb-4">
         {teamSummary.map((card) => (
-          <Grid item xs={12} sm={6} lg={3} key={card.key}>
+          <Grid size={{ xs: 12, sm: 6, lg: 3 }} key={card.key}>
             <Card
               elevation={1}
               className="ev-gradient-soft"
@@ -206,23 +206,15 @@ export default function AgentSupervisorDashboardPage() {
       {/* Set 18: Analytics micro widgets (EV fleet utilization & safety) */}
       <Box className="mb-4">
         <EVFleetAnalyticsMicroWidgets
-          fleet={{
-            utilizationPct: 71,
-            avgBatteryPct: 58,
-            lowBatteryDrivers: 6,
-            chargingQueue: 3,
-          }}
-          safety={{
-            sosToday: 2,
-            sosUnresolved: 1,
-            incidentRate: 0.6,
-          }}
+          utilization={{ inUsePct: 71, onlinePct: 84 }}
+          lowBatteryShare={14}
+          safetyIncidents={{ last7Days: 5, batteryRelated: 1 }}
         />
       </Box>
 
       <Grid container spacing={2}>
         {/* Training and SLA distribution */}
-        <Grid item xs={12} md={7}>
+        <Grid size={{ xs: 12, md: 7 }}>
           <Card
             elevation={1}
             sx={{
@@ -328,7 +320,7 @@ export default function AgentSupervisorDashboardPage() {
               />
 
               <Grid container spacing={1.5}>
-                <Grid item xs={12} sm={6}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                   <Stack spacing={1}>
                     <Typography
                       variant="caption"
@@ -395,7 +387,7 @@ export default function AgentSupervisorDashboardPage() {
                   </Stack>
                 </Grid>
 
-                <Grid item xs={12} sm={6}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                   <Stack spacing={1}>
                     <Typography
                       variant="caption"
@@ -458,7 +450,7 @@ export default function AgentSupervisorDashboardPage() {
         </Grid>
 
         {/* Top agents & incidents */}
-        <Grid item xs={12} md={5}>
+        <Grid size={{ xs: 12, md: 5 }}>
           <Stack spacing={2}>
             <Card
               elevation={1}
@@ -615,7 +607,7 @@ export default function AgentSupervisorDashboardPage() {
 
                 <Grid container spacing={1.5}>
                   {incidentStats.map((stat) => (
-                    <Grid item xs={12} sm={4} key={stat.label}>
+                    <Grid size={{ xs: 12, sm: 4 }} key={stat.label}>
                       <Box
                         className="rounded-2xl px-3 py-2.5 h-full"
                         sx={{

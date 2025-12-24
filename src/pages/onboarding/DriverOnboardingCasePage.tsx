@@ -165,7 +165,7 @@ export default function AgentDriverOnboardingCasePage() {
             <Box sx={{ p: 2.4 }}>
               {tab === "summary" && (
                 <Grid container spacing={2.4}>
-                  <Grid item xs={12} md={6}>
+                  <Grid size={{ xs: 12, md: 6 }}>
                     <Stack spacing={1.6}>
                       <Typography
                         variant="subtitle2"
@@ -236,7 +236,7 @@ export default function AgentDriverOnboardingCasePage() {
                     </Stack>
                   </Grid>
 
-                  <Grid item xs={12} md={6}>
+                  <Grid size={{ xs: 12, md: 6 }}>
                     <Stack spacing={1.6}>
                       <Typography
                         variant="subtitle2"
@@ -305,7 +305,7 @@ export default function AgentDriverOnboardingCasePage() {
 
               {tab === "documents" && (
                 <Grid container spacing={2.4}>
-                  <Grid item xs={12} md={6}>
+                  <Grid size={{ xs: 12, md: 6 }}>
                     <Typography
                       variant="subtitle2"
                       sx={{
@@ -390,7 +390,7 @@ export default function AgentDriverOnboardingCasePage() {
                     </Stack>
                   </Grid>
 
-                  <Grid item xs={12} md={6}>
+                  <Grid size={{ xs: 12, md: 6 }}>
                     <Typography
                       variant="subtitle2"
                       sx={{
@@ -479,7 +479,7 @@ export default function AgentDriverOnboardingCasePage() {
 
               {tab === "identity" && (
                 <Grid container spacing={2.4}>
-                  <Grid item xs={12} md={6}>
+                  <Grid size={{ xs: 12, md: 6 }}>
                     <Typography
                       variant="subtitle2"
                       sx={{
@@ -517,7 +517,7 @@ export default function AgentDriverOnboardingCasePage() {
                     </Stack>
                   </Grid>
 
-                  <Grid item xs={12} md={6}>
+                  <Grid size={{ xs: 12, md: 6 }}>
                     <Typography
                       variant="subtitle2"
                       sx={{
@@ -558,7 +558,7 @@ export default function AgentDriverOnboardingCasePage() {
 
               {tab === "training" && (
                 <Grid container spacing={2.4}>
-                  <Grid item xs={12} md={6}>
+                  <Grid size={{ xs: 12, md: 6 }}>
                     <Typography
                       variant="subtitle2"
                       sx={{
@@ -651,7 +651,7 @@ export default function AgentDriverOnboardingCasePage() {
                     </Stack>
                   </Grid>
 
-                  <Grid item xs={12} md={6}>
+                  <Grid size={{ xs: 12, md: 6 }}>
                     <Typography
                       variant="subtitle2"
                       sx={{
@@ -699,7 +699,7 @@ export default function AgentDriverOnboardingCasePage() {
 
               {tab === "decision" && (
                 <Grid container spacing={2.4}>
-                  <Grid item xs={12} md={7}>
+                  <Grid size={{ xs: 12, md: 7 }}>
                     <Typography
                       variant="subtitle2"
                       sx={{
@@ -794,7 +794,7 @@ export default function AgentDriverOnboardingCasePage() {
                     </Typography>
                   </Grid>
 
-                  <Grid item xs={12} md={5}>
+                  <Grid size={{ xs: 12, md: 5 }}>
                     <Typography
                       variant="subtitle2"
                       sx={{

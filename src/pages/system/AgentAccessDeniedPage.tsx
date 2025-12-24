@@ -14,8 +14,14 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 const EVZONE_ORANGE = "#f77f00";
 const EVZONE_GREY = "#6b7280";
 
+interface AgentAccessDeniedPageProps {
+  requiredRole?: string;
+  onGoHome?: () => void;
+  onRequestAccess?: () => void;
+}
+
 // 50. /agent/access-denied – No Permission / Role mismatch
-export function AgentAccessDeniedPage({ requiredRole, onGoHome, onRequestAccess }) {
+export function AgentAccessDeniedPage({ requiredRole, onGoHome, onRequestAccess }: AgentAccessDeniedPageProps) {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
 

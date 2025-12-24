@@ -135,7 +135,7 @@ export default function AgentLiveOpsPage() {
 
       <Grid container spacing={2}>
         {/* Map column */}
-        <Grid item xs={12} lg={7}>
+        <Grid size={{ xs: 12, lg: 7 }}>
           <Card
             elevation={1}
             sx={{
@@ -386,7 +386,7 @@ export default function AgentLiveOpsPage() {
         </Grid>
 
         {/* Right panel: trips & drivers */}
-        <Grid item xs={12} lg={5}>
+        <Grid size={{ xs: 12, lg: 5 }}>
           <Stack spacing={2}>
             {/* Active trips */}
             <Card

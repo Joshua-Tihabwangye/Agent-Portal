@@ -128,7 +128,7 @@ export default function AgentDispatchNewEMSPage() {
             >
               <Grid container spacing={2.4}>
                 {/* Caller & patient */}
-                <Grid item xs={12} md={5}>
+                <Grid size={{ xs: 12, md: 5 }}>
                   <Stack spacing={1.8}>
                     <Stack direction="row" spacing={1} alignItems="center">
                       <PersonOutlineOutlinedIcon
@@ -314,7 +314,7 @@ export default function AgentDispatchNewEMSPage() {
                 </Grid>
 
                 {/* Location & hospital */}
-                <Grid item xs={12} md={7}>
+                <Grid size={{ xs: 12, md: 7 }}>
                   <Stack spacing={2}>
                     <Stack direction="row" spacing={1} alignItems="center">
                       <PlaceOutlinedIcon
