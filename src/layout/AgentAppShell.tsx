@@ -10,6 +10,8 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Menu,
+  MenuItem,
   TextField,
   Tooltip,
   Typography,
@@ -17,7 +19,8 @@ import {
 import Drawer from "@mui/material/Drawer";
 import { useTheme } from "@mui/material/styles";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
@@ -32,6 +35,10 @@ import ReportProblemOutlinedIcon from "@mui/icons-material/ReportProblemOutlined
 import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import SearchIcon from "@mui/icons-material/ManageSearch";
+import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
+import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
+import CloseIcon from "@mui/icons-material/Close";
+import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
 
 import { useAuth } from "../providers/AuthProvider";
 import { useThemeMode } from "../providers/ThemeModeProvider";
@@ -47,65 +54,27 @@ type NavItem = {
   key: string;
   label: string;
   href: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  icon: any;
+  icon: React.ReactNode;
 };
 
 const navItems: NavItem[] = [
-  {
-    key: "dashboard",
-    label: "Dashboard",
-    icon: <DashboardOutlinedIcon fontSize="small" />,
-    href: "/agent/dashboard",
-  },
-  {
-    key: "live-ops",
-    label: "Live Ops & Map",
-    icon: <MapOutlinedIcon fontSize="small" />,
-    href: "/agent/live-ops",
-  },
-  {
-    key: "dispatch",
-    label: "Manual Dispatch",
-    icon: <LocalShippingOutlinedIcon fontSize="small" />,
-    href: "/agent/dispatch/board",
-  },
-  {
-    key: "onboarding",
-    label: "Driver Onboarding",
-    icon: <AssignmentIndOutlinedIcon fontSize="small" />,
-    href: "/agent/onboarding/drivers",
-  },
-  {
-    key: "support",
-    label: "Support & Tickets",
-    icon: <SupportAgentOutlinedIcon fontSize="small" />,
-    href: "/agent/support/tickets",
-  },
-  {
-    key: "safety",
-    label: "Safety & Incidents",
-    icon: <ReportProblemOutlinedIcon fontSize="small" />,
-    href: "/agent/safety/sos",
-  },
-  {
-    key: "training",
-    label: "Training & QA",
-    icon: <SchoolOutlinedIcon fontSize="small" />,
-    href: "/agent/training",
-  },
-  {
-    key: "search",
-    label: "Search & Tools",
-    icon: <SearchIcon fontSize="small" />,
-    href: "/agent/search",
-  },
-  {
-    key: "settings",
-    label: "Settings",
-    icon: <SettingsOutlinedIcon fontSize="small" />,
-    href: "/agent/settings/teams",
-  },
+  { key: "dashboard", label: "Dashboard", icon: <DashboardOutlinedIcon fontSize="small" />, href: "/agent/dashboard" },
+  { key: "live-ops", label: "Live Ops & Map", icon: <MapOutlinedIcon fontSize="small" />, href: "/agent/live-ops" },
+  { key: "dispatch", label: "Manual Dispatch", icon: <LocalShippingOutlinedIcon fontSize="small" />, href: "/agent/dispatch/board" },
+  { key: "onboarding", label: "Driver Onboarding", icon: <AssignmentIndOutlinedIcon fontSize="small" />, href: "/agent/onboarding/drivers" },
+  { key: "support", label: "Support & Tickets", icon: <SupportAgentOutlinedIcon fontSize="small" />, href: "/agent/support/tickets" },
+  { key: "safety", label: "Safety & Incidents", icon: <ReportProblemOutlinedIcon fontSize="small" />, href: "/agent/safety/sos" },
+  { key: "training", label: "Training & QA", icon: <SchoolOutlinedIcon fontSize="small" />, href: "/agent/training" },
+  { key: "search", label: "Search & Tools", icon: <SearchIcon fontSize="small" />, href: "/agent/search" },
+  { key: "settings", label: "Settings", icon: <SettingsOutlinedIcon fontSize="small" />, href: "/agent/settings/teams" },
+];
+
+// Sample notifications data
+const sampleNotifications = [
+  { id: 1, title: "New ticket assigned", message: "Ticket #TCK-9015 has been assigned to you", time: "2 min ago", read: false },
+  { id: 2, title: "SOS Alert", message: "High priority incident INC-7004 needs attention", time: "15 min ago", read: false },
+  { id: 3, title: "Training reminder", message: "Complete EV Safety module by end of shift", time: "1 hour ago", read: true },
+  { id: 4, title: "Driver onboarding", message: "New driver documents ready for review", time: "2 hours ago", read: true },
 ];
 
 function pickActiveKey(pathname: string): string {
@@ -131,8 +100,12 @@ export default function AgentAppShell() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [desktopOpen, setDesktopOpen] = useState(true);
   const [query, setQuery] = useState("");
+  const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
+  const [notificationAnchor, setNotificationAnchor] = useState<null | HTMLElement>(null);
+  const [notifications, setNotifications] = useState(sampleNotifications);
 
   const activeKey = useMemo(() => pickActiveKey(location.pathname), [location.pathname]);
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   // Offline / basic network status
   const [online, setOnline] = useState<boolean>(() => (typeof navigator !== "undefined" ? navigator.onLine : true));
@@ -153,6 +126,32 @@ export default function AgentAppShell() {
   const handleNavClick = (item: NavItem) => {
     navigate(item.href);
     setMobileOpen(false);
+  };
+
+  const handleProfileClick = (event: React.MouseEvent<HTMLElement>) => {
+    setProfileAnchor(event.currentTarget);
+  };
+
+  const handleProfileClose = () => {
+    setProfileAnchor(null);
+  };
+
+  const handleNotificationClick = (event: React.MouseEvent<HTMLElement>) => {
+    setNotificationAnchor(event.currentTarget);
+  };
+
+  const handleNotificationClose = () => {
+    setNotificationAnchor(null);
+  };
+
+  const markAllRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  };
+
+  const handleLogout = () => {
+    handleProfileClose();
+    logout();
+    navigate("/agent/login");
   };
 
   const initials = (user?.name || "Agent")
@@ -186,14 +185,7 @@ export default function AgentAppShell() {
           </Box>
           {!collapsed && (
             <Box>
-              <Typography
-                variant="subtitle2"
-                sx={{
-                  fontWeight: 700,
-                  color: isDark ? "#e5e7eb" : "#111827",
-                  lineHeight: 1.1,
-                }}
-              >
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: isDark ? "#e5e7eb" : "#111827", lineHeight: 1.1 }}>
                 EVzone
               </Typography>
               <Typography variant="caption" sx={{ color: EVZONE_GREY, lineHeight: 1.1 }}>
@@ -220,22 +212,18 @@ export default function AgentAppShell() {
                   justifyContent: collapsed ? "center" : "flex-start",
                   px: collapsed ? 1.5 : 2,
                   backgroundColor: active
-                    ? isDark
-                      ? "rgba(3,205,140,0.16)"
-                      : "rgba(3,205,140,0.10)"
+                    ? isDark ? "rgba(3,205,140,0.16)" : "rgba(3,205,140,0.10)"
                     : "transparent",
                   "&:hover": {
                     backgroundColor: active
-                      ? isDark
-                        ? "rgba(3,205,140,0.20)"
-                        : "rgba(3,205,140,0.14)"
-                      : isDark
-                        ? "rgba(148,163,184,0.10)"
-                        : "rgba(226,232,240,0.70)",
+                      ? isDark ? "rgba(3,205,140,0.20)" : "rgba(3,205,140,0.14)"
+                      : isDark ? "rgba(148,163,184,0.10)" : "rgba(226,232,240,0.70)",
                   },
                 }}
               >
-                <ListItemIcon sx={{ minWidth: collapsed ? 0 : 34, color: active ? EVZONE_GREEN : EVZONE_GREY, justifyContent: "center" }}>{item.icon}</ListItemIcon>
+                <ListItemIcon sx={{ minWidth: collapsed ? 0 : 34, color: active ? EVZONE_GREEN : EVZONE_GREY, justifyContent: "center" }}>
+                  {item.icon}
+                </ListItemIcon>
                 {!collapsed && (
                   <ListItemText
                     primary={item.label}
@@ -254,24 +242,56 @@ export default function AgentAppShell() {
 
       <Divider sx={{ my: 2, borderColor: isDark ? "rgba(148,163,184,0.25)" : "rgba(226,232,240,1)" }} />
 
-      {/* Footer quick actions */}
-      <Box className="flex items-center" sx={{ justifyContent: collapsed ? "center" : "space-between" }}>
-        <Box className="flex items-center gap-2">
-          <Avatar sx={{ width: 28, height: 28, fontSize: 12, fontWeight: 800, bgcolor: "rgba(3,205,140,0.25)", color: EVZONE_GREEN }}>
+      {/* Footer with user info and toggle */}
+      <Box>
+        {/* User info */}
+        <Box className="flex items-center mb-2" sx={{ justifyContent: collapsed ? "center" : "flex-start", px: collapsed ? 0 : 0.5 }}>
+          <Avatar sx={{ width: 32, height: 32, fontSize: 13, fontWeight: 800, bgcolor: "rgba(3,205,140,0.25)", color: EVZONE_GREEN }}>
             {initials || "A"}
           </Avatar>
           {!collapsed && (
-            <Box>
-              <Typography variant="caption" sx={{ color: isDark ? "#e5e7eb" : "#111827", fontWeight: 700, lineHeight: 1.1 }}>
-                {user?.email || "agent@evzone"}
+            <Box sx={{ ml: 1.5, overflow: "hidden" }}>
+              <Typography variant="caption" sx={{ color: isDark ? "#e5e7eb" : "#111827", fontWeight: 700, lineHeight: 1.1, display: "block", whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" }}>
+                {user?.name || "Agent"}
               </Typography>
-              <Typography variant="caption" sx={{ color: EVZONE_GREY, lineHeight: 1.1, display: "block" }}>
-                {user?.role || "support_t1"}
+              <Typography variant="caption" sx={{ color: EVZONE_GREY, lineHeight: 1.1, display: "block", whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden", fontSize: 10 }}>
+                {user?.email || "agent@evzone.app"}
               </Typography>
             </Box>
           )}
         </Box>
-        {!collapsed && <ButtonLogout onLogout={() => { logout(); navigate("/agent/login"); }} />}
+
+        {/* Toggle button - Arrow on sidebar */}
+        <Tooltip title={collapsed ? "Expand sidebar" : "Collapse sidebar"} placement="right">
+          <Box
+            onClick={handleDesktopDrawerToggle}
+            sx={{
+              display: { xs: "none", md: "flex" },
+              alignItems: "center",
+              justifyContent: "center",
+              py: 1,
+              cursor: "pointer",
+              borderRadius: 2,
+              mx: collapsed ? 0.5 : 1,
+              backgroundColor: isDark ? "rgba(148,163,184,0.08)" : "rgba(226,232,240,0.5)",
+              "&:hover": {
+                backgroundColor: isDark ? "rgba(148,163,184,0.15)" : "rgba(226,232,240,0.9)",
+              },
+              transition: "all 0.2s",
+            }}
+          >
+            {collapsed ? (
+              <ChevronRightIcon sx={{ fontSize: 20, color: EVZONE_GREY }} />
+            ) : (
+              <>
+                <ChevronLeftIcon sx={{ fontSize: 20, color: EVZONE_GREY }} />
+                <Typography variant="caption" sx={{ color: EVZONE_GREY, ml: 0.5 }}>
+                  Collapse
+                </Typography>
+              </>
+            )}
+          </Box>
+        </Tooltip>
       </Box>
     </Box>
   );
@@ -339,7 +359,7 @@ export default function AgentAppShell() {
             backdropFilter: "blur(14px)",
           }}
         >
-          <Box className="flex items-center gap-2 w-full flex-wrap">
+          <Box className="flex items-center gap-2 w-full">
             {/* Mobile menu button */}
             <IconButton
               onClick={handleMobileDrawerToggle}
@@ -349,17 +369,7 @@ export default function AgentAppShell() {
               <MenuRoundedIcon fontSize="small" />
             </IconButton>
 
-            {/* Desktop sidebar toggle button */}
-            <Tooltip title={desktopOpen ? "Collapse sidebar" : "Expand sidebar"}>
-              <IconButton
-                onClick={handleDesktopDrawerToggle}
-                sx={{ display: { xs: "none", md: "inline-flex" }, color: "#fff" }}
-                size="small"
-              >
-                <MenuRoundedIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-
+            {/* Search */}
             <TextField
               size="small"
               value={query}
@@ -380,46 +390,40 @@ export default function AgentAppShell() {
               }}
               sx={{
                 flex: 1,
-                minWidth: { xs: "100%", md: 320 },
-                maxWidth: 560,
+                minWidth: { xs: 120, md: 320 },
+                maxWidth: 480,
                 "& .MuiOutlinedInput-root": {
                   bgcolor: isDark ? "rgba(15,23,42,0.25)" : "rgba(255,255,255,0.25)",
                   color: isDark ? "#e2e8f0" : "#0f172a",
-                  "& fieldset": {
-                    borderColor: "rgba(255,255,255,0.38)",
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "rgba(255,255,255,0.7)",
-                  },
+                  "& fieldset": { borderColor: "rgba(255,255,255,0.38)" },
+                  "&:hover fieldset": { borderColor: "rgba(255,255,255,0.7)" },
                 },
               }}
             />
 
+            {/* Spacer */}
+            <Box sx={{ flex: 1 }} />
+
+            {/* Notifications */}
             <Tooltip title="Notifications">
-              <IconButton
-                size="small"
-                onClick={() => navigate("/agent/safety/sos")}
-                sx={{ ml: 0.5, color: "#fff" }}
-              >
-                <Badge color="secondary" variant="dot" overlap="circular">
+              <IconButton size="small" onClick={handleNotificationClick} sx={{ color: "#fff" }}>
+                <Badge badgeContent={unreadCount} color="error" max={99}>
                   <NotificationsNoneOutlinedIcon fontSize="small" />
                 </Badge>
               </IconButton>
             </Tooltip>
 
+            {/* Theme toggle */}
             <Tooltip title={isDark ? "Switch to light" : "Switch to dark"}>
               <IconButton size="small" onClick={toggle} sx={{ color: "#fff" }}>
                 {isDark ? <LightModeOutlinedIcon fontSize="small" /> : <DarkModeOutlinedIcon fontSize="small" />}
               </IconButton>
             </Tooltip>
 
-            <Tooltip title="My profile">
-              <IconButton
-                size="small"
-                onClick={() => navigate("/agent/profile")}
-                sx={{ ml: 0.25, color: "#fff" }}
-              >
-                <Avatar sx={{ width: 28, height: 28, bgcolor: "rgba(3,205,140,0.22)", color: isDark ? "#e5e7eb" : "#0f172a", fontWeight: 800 }}>
+            {/* Profile Avatar - Extreme Right */}
+            <Tooltip title="My account">
+              <IconButton size="small" onClick={handleProfileClick} sx={{ ml: 0.5 }}>
+                <Avatar sx={{ width: 32, height: 32, bgcolor: "rgba(255,255,255,0.2)", color: "#fff", fontWeight: 700, fontSize: 13 }}>
                   {initials || <AccountCircleOutlinedIcon fontSize="small" />}
                 </Avatar>
               </IconButton>
@@ -427,21 +431,113 @@ export default function AgentAppShell() {
           </Box>
         </Box>
 
+        {/* Profile Menu */}
+        <Menu
+          anchorEl={profileAnchor}
+          open={Boolean(profileAnchor)}
+          onClose={handleProfileClose}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+          transformOrigin={{ vertical: "top", horizontal: "right" }}
+          PaperProps={{
+            sx: {
+              mt: 1,
+              minWidth: 200,
+              borderRadius: 2,
+              boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+            },
+          }}
+        >
+          <Box sx={{ px: 2, py: 1.5, borderBottom: "1px solid", borderColor: isDark ? "rgba(148,163,184,0.2)" : "rgba(226,232,240,1)" }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{user?.name || "Agent"}</Typography>
+            <Typography variant="caption" sx={{ color: EVZONE_GREY }}>{user?.email}</Typography>
+          </Box>
+          <MenuItem onClick={() => { handleProfileClose(); navigate("/agent/profile"); }}>
+            <ListItemIcon><PersonOutlineOutlinedIcon fontSize="small" /></ListItemIcon>
+            View Profile
+          </MenuItem>
+          <MenuItem onClick={() => { handleProfileClose(); navigate("/agent/settings/teams"); }}>
+            <ListItemIcon><SettingsOutlinedIcon fontSize="small" /></ListItemIcon>
+            Settings
+          </MenuItem>
+          <Divider />
+          <MenuItem onClick={handleLogout} sx={{ color: "#dc2626" }}>
+            <ListItemIcon><LogoutOutlinedIcon fontSize="small" sx={{ color: "#dc2626" }} /></ListItemIcon>
+            Logout
+          </MenuItem>
+        </Menu>
+
+        {/* Notifications Panel */}
+        <Menu
+          anchorEl={notificationAnchor}
+          open={Boolean(notificationAnchor)}
+          onClose={handleNotificationClose}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+          transformOrigin={{ vertical: "top", horizontal: "right" }}
+          PaperProps={{
+            sx: {
+              mt: 1,
+              width: 360,
+              maxHeight: 400,
+              borderRadius: 2,
+              boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+            },
+          }}
+        >
+          <Box sx={{ px: 2, py: 1.5, display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid", borderColor: isDark ? "rgba(148,163,184,0.2)" : "rgba(226,232,240,1)" }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Notifications</Typography>
+            <Box>
+              <Typography
+                variant="caption"
+                sx={{ color: EVZONE_GREEN, cursor: "pointer", "&:hover": { textDecoration: "underline" } }}
+                onClick={markAllRead}
+              >
+                Mark all read
+              </Typography>
+              <IconButton size="small" onClick={handleNotificationClose} sx={{ ml: 1 }}>
+                <CloseIcon sx={{ fontSize: 16 }} />
+              </IconButton>
+            </Box>
+          </Box>
+          {notifications.length === 0 ? (
+            <Box sx={{ p: 3, textAlign: "center" }}>
+              <Typography variant="body2" sx={{ color: EVZONE_GREY }}>No notifications</Typography>
+            </Box>
+          ) : (
+            notifications.map((notif) => (
+              <MenuItem
+                key={notif.id}
+                onClick={handleNotificationClose}
+                sx={{
+                  py: 1.5,
+                  px: 2,
+                  alignItems: "flex-start",
+                  bgcolor: notif.read ? "transparent" : isDark ? "rgba(3,205,140,0.05)" : "rgba(3,205,140,0.03)",
+                }}
+              >
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="body2" sx={{ fontWeight: notif.read ? 500 : 700, mb: 0.25 }}>
+                    {notif.title}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: EVZONE_GREY, display: "block" }}>
+                    {notif.message}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: EVZONE_GREY, fontSize: 10 }}>
+                    {notif.time}
+                  </Typography>
+                </Box>
+                {!notif.read && (
+                  <Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: EVZONE_GREEN, mt: 0.5, ml: 1, flexShrink: 0 }} />
+                )}
+              </MenuItem>
+            ))
+          )}
+        </Menu>
+
         {/* Content */}
         <Box sx={{ flex: 1, minWidth: 0, overflowX: "hidden" }}>
           <Outlet />
         </Box>
       </Box>
     </Box>
-  );
-}
-
-function ButtonLogout({ onLogout }: { onLogout: () => void }) {
-  return (
-    <Tooltip title="Log out">
-      <IconButton size="small" onClick={onLogout}>
-        <AccountCircleOutlinedIcon fontSize="small" />
-      </IconButton>
-    </Tooltip>
   );
 }

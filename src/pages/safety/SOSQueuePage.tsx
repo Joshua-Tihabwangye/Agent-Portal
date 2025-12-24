@@ -12,8 +12,14 @@ import {
   ListItemButton,
   ListItemText,
   ListItemIcon,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import { useNavigate } from "react-router-dom";
 import ReportProblemOutlinedIcon from "@mui/icons-material/ReportProblemOutlined";
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
 import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
@@ -21,6 +27,7 @@ import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import FilterListOutlinedIcon from "@mui/icons-material/FilterListOutlined";
 import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
+import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
 
 const EVZONE_GREEN = "#03cd8c";
 const EVZONE_ORANGE = "#f77f00";
@@ -69,15 +76,26 @@ const sampleSOS = [
   },
 ];
 
+const safetyAgents = [
+  { name: "Grace Nakato", status: "Online", queue: 3 },
+  { name: "Peter Ssemwanga", status: "Online", queue: 2 },
+  { name: "Rose Atim", status: "Busy", queue: 5 },
+  { name: "Moses Kizza", status: "Offline", queue: 0 },
+];
+
 // Route target: /agent/safety/sos
 export default function AgentSafetySOSQueuePage() {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
+  const navigate = useNavigate();
 
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [incidents, setIncidents] = useState(sampleSOS);
+  const [agentsDialogOpen, setAgentsDialogOpen] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const filtered = sampleSOS.filter((s) => {
+  const filtered = incidents.filter((s) => {
     const matchesQuery =
       !query ||
       s.id.toLowerCase().includes(query.toLowerCase()) ||
@@ -88,11 +106,24 @@ export default function AgentSafetySOSQueuePage() {
     return matchesQuery && matchesStatus;
   });
 
-  const handleStatusClick = (key) => {
+  const handleStatusClick = (key: string) => {
     setStatusFilter(key);
   };
 
-  const getSeverityChip = (severity) => {
+  const handleRefresh = () => {
+    setRefreshing(true);
+    // Simulate refresh
+    setTimeout(() => {
+      setIncidents([...sampleSOS]);
+      setRefreshing(false);
+    }, 800);
+  };
+
+  const handleIncidentClick = (incidentId: string) => {
+    navigate(`/agent/safety/incidents/${incidentId}`);
+  };
+
+  const getSeverityChip = (severity: string) => {
     if (severity === "High") {
       return (
         <Chip
@@ -162,21 +193,27 @@ export default function AgentSafetySOSQueuePage() {
             </Typography>
           </Box>
 
-          <Chip
-            label="Safety agents"
+          <Button
+            variant="contained"
             size="small"
+            startIcon={<GroupOutlinedIcon />}
+            onClick={() => setAgentsDialogOpen(true)}
             sx={{
               borderRadius: 999,
               fontSize: 11,
               textTransform: "none",
-              backgroundColor: isDark
-                ? "rgba(15,23,42,0.9)"
-                : "rgba(254,242,242,0.9)",
-              border: "1px solid rgba(248,113,113,0.6)",
+              backgroundColor: isDark ? "rgba(248,113,113,0.2)" : "rgba(254,242,242,0.9)",
               color: isDark ? "#fecaca" : "#b91c1c",
               fontWeight: 600,
+              boxShadow: "none",
+              "&:hover": {
+                backgroundColor: isDark ? "rgba(248,113,113,0.3)" : "rgba(254,226,226,1)",
+                boxShadow: "none",
+              },
             }}
-          />
+          >
+            Safety agents
+          </Button>
         </Box>
 
         <Card
@@ -234,7 +271,18 @@ export default function AgentSafetySOSQueuePage() {
                   <IconButton size="small">
                     <FilterListOutlinedIcon sx={{ fontSize: 18 }} />
                   </IconButton>
-                  <IconButton size="small">
+                  <IconButton
+                    size="small"
+                    onClick={handleRefresh}
+                    disabled={refreshing}
+                    sx={{
+                      animation: refreshing ? "spin 1s linear infinite" : "none",
+                      "@keyframes spin": {
+                        "0%": { transform: "rotate(0deg)" },
+                        "100%": { transform: "rotate(360deg)" },
+                      },
+                    }}
+                  >
                     <RefreshOutlinedIcon sx={{ fontSize: 18 }} />
                   </IconButton>
                 </Stack>
@@ -242,92 +290,35 @@ export default function AgentSafetySOSQueuePage() {
 
               {/* Status chips */}
               <Stack direction="row" spacing={1} flexWrap="wrap">
-                <Chip
-                  label="All"
-                  size="small"
-                  onClick={() => handleStatusClick("all")}
-                  sx={{
-                    borderRadius: 999,
-                    fontSize: 11,
-                    textTransform: "none",
-                    backgroundColor:
-                      statusFilter === "all"
-                        ? "rgba(3,205,140,0.16)"
-                        : "rgba(248,250,252,1)",
-                    color:
-                      statusFilter === "all" ? "#047857" : EVZONE_GREY,
-                  }}
-                />
-                <Chip
-                  label="New"
-                  size="small"
-                  onClick={() => handleStatusClick("new")}
-                  sx={{
-                    borderRadius: 999,
-                    fontSize: 11,
-                    textTransform: "none",
-                    backgroundColor:
-                      statusFilter === "new"
-                        ? "rgba(248,113,113,0.2)"
-                        : "rgba(248,250,252,1)",
-                    color:
-                      statusFilter === "new" ? "#b91c1c" : EVZONE_GREY,
-                  }}
-                />
-                <Chip
-                  label="Under review"
-                  size="small"
-                  onClick={() => handleStatusClick("under review")}
-                  sx={{
-                    borderRadius: 999,
-                    fontSize: 11,
-                    textTransform: "none",
-                    backgroundColor:
-                      statusFilter === "under review"
-                        ? "rgba(56,189,248,0.18)"
-                        : "rgba(248,250,252,1)",
-                    color:
-                      statusFilter === "under review"
-                        ? "#0369a1"
-                        : EVZONE_GREY,
-                  }}
-                />
-                <Chip
-                  label="Escalated"
-                  size="small"
-                  onClick={() => handleStatusClick("escalated")}
-                  sx={{
-                    borderRadius: 999,
-                    fontSize: 11,
-                    textTransform: "none",
-                    backgroundColor:
-                      statusFilter === "escalated"
-                        ? "rgba(129,140,248,0.2)"
-                        : "rgba(248,250,252,1)",
-                    color:
-                      statusFilter === "escalated"
-                        ? "#4f46e5"
-                        : EVZONE_GREY,
-                  }}
-                />
-                <Chip
-                  label="Resolved"
-                  size="small"
-                  onClick={() => handleStatusClick("resolved")}
-                  sx={{
-                    borderRadius: 999,
-                    fontSize: 11,
-                    textTransform: "none",
-                    backgroundColor:
-                      statusFilter === "resolved"
-                        ? "rgba(22,163,74,0.12)"
-                        : "rgba(248,250,252,1)",
-                    color:
-                      statusFilter === "resolved"
-                        ? "#166534"
-                        : EVZONE_GREY,
-                  }}
-                />
+                {["all", "new", "under review", "escalated", "resolved"].map((status) => (
+                  <Chip
+                    key={status}
+                    label={status.charAt(0).toUpperCase() + status.slice(1)}
+                    size="small"
+                    onClick={() => handleStatusClick(status)}
+                    sx={{
+                      borderRadius: 999,
+                      fontSize: 11,
+                      textTransform: "none",
+                      backgroundColor:
+                        statusFilter === status
+                          ? status === "all" ? "rgba(3,205,140,0.16)"
+                            : status === "new" ? "rgba(248,113,113,0.2)"
+                              : status === "under review" ? "rgba(56,189,248,0.18)"
+                                : status === "escalated" ? "rgba(129,140,248,0.2)"
+                                  : "rgba(22,163,74,0.12)"
+                          : "rgba(248,250,252,1)",
+                      color:
+                        statusFilter === status
+                          ? status === "all" ? "#047857"
+                            : status === "new" ? "#b91c1c"
+                              : status === "under review" ? "#0369a1"
+                                : status === "escalated" ? "#4f46e5"
+                                  : "#166534"
+                          : EVZONE_GREY,
+                    }}
+                  />
+                ))}
               </Stack>
 
               <List disablePadding>
@@ -343,6 +334,7 @@ export default function AgentSafetySOSQueuePage() {
                 {filtered.map((inc) => (
                   <ListItemButton
                     key={inc.id}
+                    onClick={() => handleIncidentClick(inc.id)}
                     sx={{
                       borderRadius: 3,
                       mb: 1,
@@ -352,6 +344,12 @@ export default function AgentSafetySOSQueuePage() {
                         ? "rgba(15,23,42,0.9)"
                         : "rgba(248,250,252,0.95)",
                       border: "1px solid rgba(203,213,225,0.9)",
+                      cursor: "pointer",
+                      "&:hover": {
+                        backgroundColor: isDark
+                          ? "rgba(30,41,59,0.9)"
+                          : "rgba(241,245,249,1)",
+                      },
                     }}
                   >
                     <ListItemIcon sx={{ minWidth: 32 }}>
@@ -428,6 +426,66 @@ export default function AgentSafetySOSQueuePage() {
           </CardContent>
         </Card>
       </Box>
+
+      {/* Safety Agents Dialog */}
+      <Dialog
+        open={agentsDialogOpen}
+        onClose={() => setAgentsDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ fontWeight: 700 }}>Safety Agents Online</DialogTitle>
+        <DialogContent dividers>
+          <Stack spacing={1.5}>
+            {safetyAgents.map((agent, index) => (
+              <Box
+                key={index}
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  p: 1.5,
+                  borderRadius: 2,
+                  backgroundColor: isDark ? "rgba(15,23,42,0.5)" : "rgba(248,250,252,1)",
+                  border: "1px solid rgba(203,213,225,0.5)",
+                }}
+              >
+                <Box>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    {agent.name}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: EVZONE_GREY }}>
+                    Queue: {agent.queue} incidents
+                  </Typography>
+                </Box>
+                <Chip
+                  label={agent.status}
+                  size="small"
+                  sx={{
+                    borderRadius: 999,
+                    fontSize: 10,
+                    backgroundColor:
+                      agent.status === "Online"
+                        ? "rgba(22,163,74,0.12)"
+                        : agent.status === "Busy"
+                          ? "rgba(250,204,21,0.18)"
+                          : "rgba(148,163,184,0.2)",
+                    color:
+                      agent.status === "Online"
+                        ? "#166534"
+                        : agent.status === "Busy"
+                          ? "#92400e"
+                          : EVZONE_GREY,
+                  }}
+                />
+              </Box>
+            ))}
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setAgentsDialogOpen(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

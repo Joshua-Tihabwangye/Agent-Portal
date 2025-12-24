@@ -140,7 +140,7 @@ export default function AgentLiveOpsPage() {
             elevation={1}
             sx={{
               borderRadius: 3,
-              height: { xs: 320, sm: 380, md: 420 },
+              height: { xs: 400, sm: 480, md: 560, lg: 600 },
               backgroundColor: isDark ? "#020617" : "#ffffff",
               border:
                 "1px solid " +
