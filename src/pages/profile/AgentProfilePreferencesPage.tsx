@@ -30,6 +30,7 @@ import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNone
 import LanguageOutlinedIcon from "@mui/icons-material/LanguageOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import { useThemeMode, type ThemePreference } from "../../providers/ThemeModeProvider";
+import { useAuth } from "../../providers/AuthProvider";
 
 const EVZONE_GREEN = "#03cd8c";
 const EVZONE_ORANGE = "#f77f00";
@@ -220,8 +221,12 @@ export function AgentProfilePage() {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   const { preference: themeMode, setPreference } = useThemeMode();
+  const { user, updateUser } = useAuth();
   const [language, setLanguage] = useState("en");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editName, setEditName] = useState(user?.name || "");
+  const [editPhone, setEditPhone] = useState(user?.phone || "");
+  const [saveMessage, setSaveMessage] = useState("");
   const [notificationPrefs, setNotificationPrefs] = useState({
     ticketAssignments: { email: true, mobilePush: true },
     sosAlerts: { sms: true, mobilePush: true },
@@ -232,7 +237,7 @@ export function AgentProfilePage() {
     setPreference(mode);
   };
 
-  const handleLanguageChange = (event) => {
+  const handleLanguageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setLanguage(event.target.value);
   };
 
@@ -240,7 +245,7 @@ export function AgentProfilePage() {
     setDialogOpen(true);
   };
 
-  const handleNotificationPrefsChange = (next) => {
+  const handleNotificationPrefsChange = (next: typeof notificationPrefs) => {
     setNotificationPrefs(next);
   };
 
@@ -249,11 +254,9 @@ export function AgentProfilePage() {
   };
 
   const handleSaveProfile = () => {
-    console.log("Save profile preferences", {
-      themeMode,
-      language,
-      notificationPrefs,
-    });
+    updateUser({ name: editName, phone: editPhone });
+    setSaveMessage("Profile saved successfully!");
+    setTimeout(() => setSaveMessage(""), 3000);
   };
 
   return (
@@ -361,8 +364,8 @@ export function AgentProfilePage() {
                           themeMode === "light"
                             ? "#020617"
                             : isDark
-                            ? "#e5e7eb"
-                            : "#111827",
+                              ? "#e5e7eb"
+                              : "#111827",
                         borderColor:
                           themeMode === "light"
                             ? EVZONE_GREEN
@@ -386,8 +389,8 @@ export function AgentProfilePage() {
                           themeMode === "dark"
                             ? "#e5e7eb"
                             : isDark
-                            ? "#e5e7eb"
-                            : "#111827",
+                              ? "#e5e7eb"
+                              : "#111827",
                         borderColor:
                           themeMode === "dark"
                             ? "rgba(30,64,175,0.8)"
@@ -415,8 +418,8 @@ export function AgentProfilePage() {
                               ? "#e5e7eb"
                               : "#111827"
                             : isDark
-                            ? "#e5e7eb"
-                            : "#111827",
+                              ? "#e5e7eb"
+                              : "#111827",
                         borderColor:
                           themeMode === "system"
                             ? "rgba(148,163,184,0.9)"

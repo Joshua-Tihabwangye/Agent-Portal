@@ -14,6 +14,7 @@ export type AgentUser = {
   name: string;
   email: string;
   role: AgentRole;
+  phone?: string;
 };
 
 type AuthContextValue = {
@@ -23,6 +24,7 @@ type AuthContextValue = {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   setRole: (role: AgentRole) => void;
+  updateUser: (updates: Partial<AgentUser>) => void;
   completeTrainingGate: () => void;
 };
 
@@ -30,6 +32,17 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 const STORAGE_KEY = "evzone_agent_auth";
 const TRAINING_GATE_KEY = "evzone_agent_training_gate_complete";
+
+function extractNameFromEmail(email: string): string {
+  const localPart = email.split("@")[0] || "Agent";
+  // Capitalize first letter and handle common patterns
+  const cleaned = localPart
+    .replace(/[._-]/g, " ")
+    .split(" ")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+  return cleaned || "Agent";
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AgentUser | null>(() => {
@@ -56,25 +69,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [trainingGateComplete]);
 
   const login = async (email: string, _password: string) => {
-    // Stub: replace with real auth service.
-    // Keep it deterministic for local dev.
+    // Determine role based on email keywords
     const role: AgentRole = email.toLowerCase().includes("super")
       ? "supervisor"
       : email.toLowerCase().includes("safety")
-      ? "safety"
-      : email.toLowerCase().includes("onboard")
-      ? "onboarding"
-      : email.toLowerCase().includes("qa")
-      ? "qa"
-      : email.toLowerCase().includes("t2")
-      ? "support_t2"
-      : email.toLowerCase().includes("dispatch")
-      ? "dispatch"
-      : "support_t1";
+        ? "safety"
+        : email.toLowerCase().includes("onboard")
+          ? "onboarding"
+          : email.toLowerCase().includes("qa")
+            ? "qa"
+            : email.toLowerCase().includes("t2")
+              ? "support_t2"
+              : email.toLowerCase().includes("dispatch")
+                ? "dispatch"
+                : "support_t1";
+
+    // Extract name from email
+    const name = extractNameFromEmail(email);
 
     setUser({
       id: "agt-001",
-      name: "Agent",
+      name,
       email,
       role,
     });
@@ -88,6 +103,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser((u) => (u ? { ...u, role } : u));
   };
 
+  const updateUser = (updates: Partial<AgentUser>) => {
+    setUser((u) => (u ? { ...u, ...updates } : u));
+  };
+
   const value = useMemo(
     () => ({
       user,
@@ -96,6 +115,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       login,
       logout,
       setRole,
+      updateUser,
       completeTrainingGate,
     }),
     [user, trainingGateComplete]

@@ -5,6 +5,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import EmojiEventsOutlinedIcon from "@mui/icons-material/EmojiEventsOutlined";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import { useAuth } from "../../providers/AuthProvider";
 
 const EVZONE_GREEN = "#03cd8c";
 const EVZONE_ORANGE = "#f77f00";
@@ -15,8 +17,47 @@ export default function TrainingCertificatePage() {
   const navigate = useNavigate();
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
+  const { user } = useAuth();
 
   const title = moduleId ? `Certificate for ${moduleId}` : "Training certificate";
+  const userName = user?.name || "Agent";
+  const moduleName = moduleId ? moduleId.replace(/-/g, " ").replace(/mod /i, "").split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ") : "EV basics & battery safety";
+
+  const handleDownloadPDF = () => {
+    // Create a simple certificate content for download
+    const certificateContent = `
+EVZONE ACADEMY CERTIFICATE
+
+This certifies that
+
+${userName}
+
+has successfully completed the module
+
+${moduleName}
+
+Issued on ${new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
+EVzone Agent Training
+    `.trim();
+
+    // Create blob and download
+    const blob = new Blob([certificateContent], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `certificate-${moduleId || "training"}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleShareWhatsApp = () => {
+    const message = encodeURIComponent(
+      `🎓 I just completed the "${moduleName}" training module at EVzone Academy!\n\nCertificate issued to: ${userName}\nDate: ${new Date().toLocaleDateString()}\n\n#EVzone #Training #Certificate`
+    );
+    window.open(`https://wa.me/?text=${message}`, "_blank");
+  };
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 py-4">
@@ -70,16 +111,16 @@ export default function TrainingCertificatePage() {
                   This certifies that
                 </Typography>
                 <Typography variant="h5" sx={{ textAlign: "center", fontWeight: 800, color: isDark ? "#e2e8f0" : "#0f172a" }}>
-                  Alex Agent
+                  {userName}
                 </Typography>
                 <Typography variant="body2" sx={{ color: EVZONE_GREY, textAlign: "center", mt: 1 }}>
                   successfully completed the module
                 </Typography>
                 <Typography variant="subtitle1" sx={{ textAlign: "center", fontWeight: 700, color: isDark ? "#e2e8f0" : "#0f172a", mt: 0.5 }}>
-                  EV basics & battery safety
+                  {moduleName}
                 </Typography>
                 <Typography variant="caption" sx={{ color: EVZONE_GREY, textAlign: "center", display: "block", mt: 1 }}>
-                  Issued on 21 Dec 2025 · EVzone Agent Training
+                  Issued on {new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })} · EVzone Agent Training
                 </Typography>
               </Box>
 
@@ -91,6 +132,7 @@ export default function TrainingCertificatePage() {
                   <Button
                     startIcon={<FileDownloadOutlinedIcon />}
                     variant="outlined"
+                    onClick={handleDownloadPDF}
                     sx={{
                       borderRadius: 999,
                       color: isDark ? "#e2e8f0" : "#0f172a",
@@ -100,15 +142,18 @@ export default function TrainingCertificatePage() {
                     Download PDF
                   </Button>
                   <Button
+                    startIcon={<WhatsAppIcon />}
                     variant="contained"
+                    onClick={handleShareWhatsApp}
                     sx={{
                       borderRadius: 999,
                       fontWeight: 700,
-                      backgroundImage: "linear-gradient(120deg, " + EVZONE_GREEN + ", " + EVZONE_ORANGE + ")",
-                      color: "#0f172a",
+                      backgroundColor: "#25D366",
+                      color: "#ffffff",
+                      "&:hover": { backgroundColor: "#128C7E" },
                     }}
                   >
-                    Share to Slack
+                    Share to WhatsApp
                   </Button>
                 </Stack>
               </Stack>
@@ -119,4 +164,3 @@ export default function TrainingCertificatePage() {
     </Box>
   );
 }
-

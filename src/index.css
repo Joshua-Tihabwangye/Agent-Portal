@@ -46,3 +46,32 @@ a {
   }
 }
 
+/* Global Card Shadows and Hover Effects */
+.MuiCard-root {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out !important;
+}
+
+.MuiCard-root:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18) !important;
+}
+
+/* Dark mode card shadows */
+.dark .MuiCard-root,
+[data-theme="dark"] .MuiCard-root {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+}
+
+.dark .MuiCard-root:hover,
+[data-theme="dark"] .MuiCard-root:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Clickable card cursor */
+.MuiCard-root[role="button"],
+.MuiCard-root[data-clickable="true"] {
+  cursor: pointer;
+}
+
+

@@ -11,6 +11,7 @@ import {
   IconButton,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import { useNavigate } from "react-router-dom";
 import ViewKanbanOutlinedIcon from "@mui/icons-material/ViewKanbanOutlined";
 import FilterListOutlinedIcon from "@mui/icons-material/FilterListOutlined";
 import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
@@ -117,11 +118,24 @@ const initialColumns = [
   },
 ];
 
-// Route target: /agent/dispatch/board
 export default function AgentDispatchBoardPage() {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
-  const [columns] = useState(initialColumns);
+  const navigate = useNavigate();
+  const [columns, setColumns] = useState(initialColumns);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setColumns([...initialColumns]);
+      setRefreshing(false);
+    }, 800);
+  };
+
+  const handleBookingClick = (bookingId: string) => {
+    navigate(`/agent/bookings/${bookingId}`);
+  };
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 py-4 overflow-x-auto">
@@ -165,7 +179,18 @@ export default function AgentDispatchBoardPage() {
           <IconButton size="small">
             <FilterListOutlinedIcon sx={{ fontSize: 18 }} />
           </IconButton>
-          <IconButton size="small">
+          <IconButton
+            size="small"
+            onClick={handleRefresh}
+            disabled={refreshing}
+            sx={{
+              animation: refreshing ? "spin 1s linear infinite" : "none",
+              "@keyframes spin": {
+                "0%": { transform: "rotate(0deg)" },
+                "100%": { transform: "rotate(360deg)" },
+              },
+            }}
+          >
             <RefreshOutlinedIcon sx={{ fontSize: 18 }} />
           </IconButton>
         </Stack>
@@ -275,6 +300,7 @@ export default function AgentDispatchBoardPage() {
                       {column.bookings.map((booking) => (
                         <Box
                           key={booking.id}
+                          onClick={() => handleBookingClick(booking.id)}
                           className="rounded-2xl px-3 py-2.5 cursor-pointer"
                           sx={{
                             backgroundColor: isDark
