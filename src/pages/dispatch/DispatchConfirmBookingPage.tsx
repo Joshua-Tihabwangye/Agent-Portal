@@ -117,7 +117,7 @@ export default function AgentDispatchConfirmBookingPage() {
           <CardContent sx={{ p: 2.4 }}>
             <Grid container spacing={2.4}>
               {/* Booking & rider */}
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Stack spacing={1.6}>
                   <Stack direction="row" spacing={1} alignItems="center">
                     {summary.type === "Ride" ? (
@@ -283,7 +283,7 @@ export default function AgentDispatchConfirmBookingPage() {
               </Grid>
 
               {/* Driver & final check */}
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Stack spacing={1.8}>
                   <Stack direction="row" spacing={1} alignItems="center">
                     <DirectionsCarOutlinedIcon

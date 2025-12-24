@@ -123,7 +123,7 @@ export default function AgentDriverProfilePage() {
 
         <Grid container spacing={2.4}>
           {/* Left column: personal & company */}
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Card
               elevation={1}
               sx={{
@@ -276,7 +276,7 @@ export default function AgentDriverProfilePage() {
           </Grid>
 
           {/* Right column: vehicle, docs, training */}
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Card
               elevation={1}
               sx={{

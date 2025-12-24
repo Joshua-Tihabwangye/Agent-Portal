@@ -109,7 +109,7 @@ export default function AgentRiderProfilePage() {
 
         <Grid container spacing={2.4}>
           {/* Left column: personal & usage */}
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Card
               elevation={1}
               sx={{
@@ -267,7 +267,7 @@ export default function AgentRiderProfilePage() {
           </Grid>
 
           {/* Right column: notes & tags */}
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <NotesTagsPanel
               isDark={isDark}
               entityType="rider"

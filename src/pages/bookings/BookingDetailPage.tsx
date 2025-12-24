@@ -45,41 +45,41 @@ export default function AgentBookingDetailPage() {
 
   const booking = stored?.summary
     ? {
-        id: stored.id,
-        type: stored.summary.type,
-        clientType: stored.summary.clientType,
-        createdAt: stored.createdAt ? new Date(stored.createdAt).toLocaleString() : "—",
-        status: stored.status || "New",
-        riderName: stored.summary.riderName,
-        riderPhone: stored.summary.riderPhone,
-        pickup: stored.summary.pickup,
-        dropoff: stored.summary.dropoff,
-        time: stored.summary.time,
-        passengers: stored.passengers || 1,
-        notes: stored.notes || stored.instructions || "",
-        driverName: stored.summary.driverName || stored?.assignedDriver?.name || "",
-        driverVehicle: stored.summary.driverVehicle || stored?.assignedDriver?.vehicle || "",
-        driverPhone: "—",
-        driverBattery: stored?.assignedDriver?.battery ?? 72,
-      }
+      id: stored.id,
+      type: stored.summary.type,
+      clientType: stored.summary.clientType,
+      createdAt: stored.createdAt ? new Date(stored.createdAt).toLocaleString() : "—",
+      status: stored.status || "New",
+      riderName: stored.summary.riderName,
+      riderPhone: stored.summary.riderPhone,
+      pickup: stored.summary.pickup,
+      dropoff: stored.summary.dropoff,
+      time: stored.summary.time,
+      passengers: stored.passengers || 1,
+      notes: stored.notes || stored.instructions || "",
+      driverName: stored.summary.driverName || stored?.assignedDriver?.name || "",
+      driverVehicle: stored.summary.driverVehicle || stored?.assignedDriver?.vehicle || "",
+      driverPhone: "—",
+      driverBattery: stored?.assignedDriver?.battery ?? 72,
+    }
     : {
-        id: bookingId || "BK-2048",
-        type: "Ride",
-        clientType: "Rider",
-        createdAt: "Today · 09:12",
-        status: "In progress",
-        riderName: "Sarah K.",
-        riderPhone: "+256 700 200 168",
-        pickup: "Nakasero Hill Road",
-        dropoff: "Bugolobi Flats, Block C",
-        time: "Now",
-        passengers: 1,
-        notes: "Rider requested quiet car.",
-        driverName: "Kato Robert",
-        driverVehicle: "Nissan Leaf · UBF 341X",
-        driverPhone: "+256 704 000 111",
-        driverBattery: 72,
-      };
+      id: bookingId || "BK-2048",
+      type: "Ride",
+      clientType: "Rider",
+      createdAt: "Today · 09:12",
+      status: "In progress",
+      riderName: "Sarah K.",
+      riderPhone: "+256 700 200 168",
+      pickup: "Nakasero Hill Road",
+      dropoff: "Bugolobi Flats, Block C",
+      time: "Now",
+      passengers: 1,
+      notes: "Rider requested quiet car.",
+      driverName: "Kato Robert",
+      driverVehicle: "Nissan Leaf · UBF 341X",
+      driverPhone: "+256 704 000 111",
+      driverBattery: 72,
+    };
 
   const timeline = [
     {
@@ -179,7 +179,7 @@ export default function AgentBookingDetailPage() {
           <CardContent sx={{ p: 2.4 }}>
             <Grid container spacing={2.4}>
               {/* Booking & rider */}
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Stack spacing={1.6}>
                   <Stack direction="row" spacing={1} alignItems="center">
                     {iconForType}
@@ -331,7 +331,7 @@ export default function AgentBookingDetailPage() {
               </Grid>
 
               {/* Driver & timeline */}
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Stack spacing={1.8}>
                   <Stack direction="row" spacing={1} alignItems="center">
                     <DirectionsCarOutlinedIcon

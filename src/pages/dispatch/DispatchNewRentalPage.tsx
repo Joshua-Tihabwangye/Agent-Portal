@@ -137,7 +137,7 @@ export default function AgentDispatchNewRentalPage() {
             >
               <Grid container spacing={2.4}>
                 {/* Customer */}
-                <Grid item xs={12} md={5}>
+                <Grid size={{ xs: 12, md: 5 }}>
                   <Stack spacing={1.6}>
                     <Stack direction="row" spacing={1} alignItems="center">
                       <PersonOutlineOutlinedIcon
@@ -276,7 +276,7 @@ export default function AgentDispatchNewRentalPage() {
                 </Grid>
 
                 {/* Branches & schedule */}
-                <Grid item xs={12} md={7}>
+                <Grid size={{ xs: 12, md: 7 }}>
                   <Stack spacing={2}>
                     <Stack direction="row" spacing={1} alignItems="center">
                       <PlaceOutlinedIcon
@@ -334,7 +334,7 @@ export default function AgentDispatchNewRentalPage() {
                       </Stack>
 
                       <Grid container spacing={1.5}>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                           <TextField
                             label="Start date & time"
                             placeholder="e.g. Today 10:00"
@@ -347,7 +347,7 @@ export default function AgentDispatchNewRentalPage() {
                             InputProps={{ sx: { borderRadius: 3 } }}
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                           <TextField
                             label="End date & time"
                             placeholder="e.g. Tomorrow 18:00"

@@ -111,7 +111,7 @@ export default function AgentTicketDetailPage() {
 
         <Grid container spacing={2.4}>
           {/* Left column: summary and user */}
-          <Grid item xs={12} md={5}>
+          <Grid size={{ xs: 12, md: 5 }}>
             <Card
               elevation={1}
               sx={{
@@ -322,7 +322,7 @@ export default function AgentTicketDetailPage() {
           </Grid>
 
           {/* Right column: conversation and notes */}
-          <Grid item xs={12} md={7}>
+          <Grid size={{ xs: 12, md: 7 }}>
             <Card
               elevation={1}
               sx={{

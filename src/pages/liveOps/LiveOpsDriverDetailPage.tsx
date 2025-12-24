@@ -71,8 +71,8 @@ export default function AgentLiveOpsDriverDetailPage() {
     driver.battery >= 60
       ? "#16a34a"
       : driver.battery >= 30
-      ? "#f97316"
-      : "#b91c1c";
+        ? "#f97316"
+        : "#b91c1c";
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 py-4">
@@ -143,7 +143,7 @@ export default function AgentLiveOpsDriverDetailPage() {
         </Box>
 
         <Grid container spacing={2}>
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Card
               elevation={1}
               sx={{
@@ -388,7 +388,7 @@ export default function AgentLiveOpsDriverDetailPage() {
           </Grid>
 
           {/* Right column: recent trips */}
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Card
               elevation={1}
               sx={{

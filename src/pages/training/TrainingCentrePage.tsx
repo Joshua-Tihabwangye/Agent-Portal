@@ -295,14 +295,14 @@ export default function AgentTrainingCentrePage() {
                                 mod.status === "Completed"
                                   ? "rgba(22,163,74,0.16)"
                                   : mod.status === "In progress"
-                                  ? "rgba(56,189,248,0.18)"
-                                  : "rgba(148,163,184,0.18)",
+                                    ? "rgba(56,189,248,0.18)"
+                                    : "rgba(148,163,184,0.18)",
                               color:
                                 mod.status === "Completed"
                                   ? "#166534"
                                   : mod.status === "In progress"
-                                  ? "#0369a1"
-                                  : EVZONE_GREY,
+                                    ? "#0369a1"
+                                    : EVZONE_GREY,
                             }}
                           />
                         </Stack>
@@ -441,7 +441,7 @@ export default function AgentTrainingCentrePage() {
                 <Stack spacing={2}>
                   <Box>
                     <Typography
-                      variant="substring" // you may want this to be "subtitle2"
+                      variant="subtitle2"
                       sx={{
                         fontWeight: 700,
                         color: isDark ? "#e5e7eb" : "#111827",
@@ -497,14 +497,14 @@ export default function AgentTrainingCentrePage() {
                                   assess.status === "Due"
                                     ? "rgba(248,113,113,0.18)"
                                     : assess.status === "Upcoming"
-                                    ? "rgba(191,219,254,0.2)"
-                                    : "rgba(22,163,74,0.16)",
+                                      ? "rgba(191,219,254,0.2)"
+                                      : "rgba(22,163,74,0.16)",
                                 color:
                                   assess.status === "Due"
                                     ? "#b91c1c"
                                     : assess.status === "Upcoming"
-                                    ? "#1d4ed8"
-                                    : "#166534",
+                                      ? "#1d4ed8"
+                                      : "#166534",
                               }}
                             />
                             <Chip

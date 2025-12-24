@@ -137,7 +137,7 @@ export default function AgentDispatchNewTourPage() {
             >
               <Grid container spacing={2.4}>
                 {/* Contact & group */}
-                <Grid item xs={12} md={5}>
+                <Grid size={{ xs: 12, md: 5 }}>
                   <Stack spacing={1.8}>
                     <Stack direction="row" spacing={1} alignItems="center">
                       <PersonOutlineOutlinedIcon
@@ -268,7 +268,7 @@ export default function AgentDispatchNewTourPage() {
                 </Grid>
 
                 {/* Package, dates & pickup */}
-                <Grid item xs={12} md={7}>
+                <Grid size={{ xs: 12, md: 7 }}>
                   <Stack spacing={2}>
                     <Stack direction="row" spacing={1} alignItems="center">
                       <TourOutlinedIcon
@@ -298,7 +298,7 @@ export default function AgentDispatchNewTourPage() {
                     />
 
                     <Grid container spacing={1.5}>
-                      <Grid item xs={12} sm={6}>
+                      <Grid size={{ xs: 12, sm: 6 }}>
                         <TextField
                           label="Start date"
                           placeholder="e.g. 12 Aug 2025"
@@ -311,7 +311,7 @@ export default function AgentDispatchNewTourPage() {
                           InputProps={{ sx: { borderRadius: 3 } }}
                         />
                       </Grid>
-                      <Grid item xs={12} sm={6}>
+                      <Grid size={{ xs: 12, sm: 6 }}>
                         <TextField
                           label="End date"
                           placeholder="e.g. 14 Aug 2025"

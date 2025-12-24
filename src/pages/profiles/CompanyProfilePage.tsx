@@ -113,7 +113,7 @@ export default function AgentCompanyProfilePage() {
 
         <Grid container spacing={2.4}>
           {/* Left column: contact & billing */}
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Card
               elevation={1}
               sx={{
@@ -274,7 +274,7 @@ export default function AgentCompanyProfilePage() {
           </Grid>
 
           {/* Right column: usage & notes/tags */}
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Card
               elevation={1}
               sx={{

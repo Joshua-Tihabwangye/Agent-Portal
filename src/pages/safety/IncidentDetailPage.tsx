@@ -97,7 +97,7 @@ export default function AgentIncidentDetailPage() {
 
         <Grid container spacing={2.4}>
           {/* Left column: summary & user */}
-          <Grid item xs={12} md={5}>
+          <Grid size={{ xs: 12, md: 5 }}>
             <Card
               elevation={1}
               sx={{
@@ -143,14 +143,14 @@ export default function AgentIncidentDetailPage() {
                           incident.severity === "High"
                             ? "rgba(248,113,113,0.2)"
                             : incident.severity === "Medium"
-                            ? "rgba(250,204,21,0.18)"
-                            : "rgba(22,163,74,0.12)",
+                              ? "rgba(250,204,21,0.18)"
+                              : "rgba(22,163,74,0.12)",
                         color:
                           incident.severity === "High"
                             ? "#b91c1c"
                             : incident.severity === "Medium"
-                            ? "#92400e"
-                            : "#166534",
+                              ? "#92400e"
+                              : "#166534",
                       }}
                     />
                     <Typography
@@ -279,7 +279,7 @@ export default function AgentIncidentDetailPage() {
           </Grid>
 
           {/* Right column: timeline & quick actions */}
-          <Grid item xs={12} md={7}>
+          <Grid size={{ xs: 12, md: 7 }}>
             <Card
               elevation={1}
               sx={{
@@ -343,8 +343,8 @@ export default function AgentIncidentDetailPage() {
                                 idx === 0
                                   ? "#b91c1c"
                                   : idx === arr.length - 1
-                                  ? EVZONE_ORANGE
-                                  : EVZONE_GREEN,
+                                    ? EVZONE_ORANGE
+                                    : EVZONE_GREEN,
                             }}
                           />
                           {idx !== arr.length - 1 && (
@@ -375,8 +375,8 @@ export default function AgentIncidentDetailPage() {
                             {idx === 0
                               ? "09:05"
                               : idx === 1
-                              ? "09:06"
-                              : "09:07"}
+                                ? "09:06"
+                                : "09:07"}
                           </Typography>
                         </Box>
                       </Stack>

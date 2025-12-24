@@ -211,7 +211,7 @@ export default function AgentDispatchBoardPage() {
               sx={{ minWidth: 720 }}
             >
               {columns.map((column) => (
-                <Grid item xs={12} sm={6} md={3} key={column.key}>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }} key={column.key}>
                   <Box
                     sx={{
                       borderRadius: 3,
@@ -282,7 +282,7 @@ export default function AgentDispatchBoardPage() {
                               : "#ffffff",
                             border: "1px solid rgba(203,213,225,0.9)",
                             transition:
-                              "border-color 0.15s ease, box-shadow 0.15s ease", 
+                              "border-color 0.15s ease, box-shadow 0.15s ease",
                             "&:hover": {
                               borderColor: EVZONE_GREEN,
                               boxShadow:
