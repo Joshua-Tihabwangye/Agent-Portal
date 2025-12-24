@@ -9,7 +9,7 @@ import {
   TextField,
   IconButton,
   Button,
-  Grid,
+  Grid as Grid2,
   Divider,
   Table,
   TableHead,
@@ -175,7 +175,7 @@ const rolePermissionMatrix = {
   },
 };
 
-function permissionChip(level) {
+function permissionChip(level: string) {
   if (level === "full") {
     return (
       <Chip
@@ -346,9 +346,9 @@ export function AgentTeamsSettingsPage() {
                 </Stack>
               </Stack>
 
-              <Grid container spacing={1.5}>
+              <Grid2 container spacing={1.5}>
                 {filteredTeams.map((team) => (
-                  <Grid item xs={12} key={team.id}>
+                  <Grid2 size={12} key={team.id}>
                     <Card
                       elevation={0}
                       sx={{
@@ -489,20 +489,20 @@ export function AgentTeamsSettingsPage() {
                         </Stack>
                       </CardContent>
                     </Card>
-                  </Grid>
+                  </Grid2>
                 ))}
 
                 {filteredTeams.length === 0 && (
-                  <Grid item xs={12}>
+                  <Grid2 size={12}>
                     <Typography
                       variant="caption"
                       sx={{ color: EVZONE_GREY, fontStyle: "italic" }}
                     >
                       No teams match your search.
                     </Typography>
-                  </Grid>
+                  </Grid2>
                 )}
-              </Grid>
+              </Grid2>
             </Stack>
           </CardContent>
         </Card>
@@ -516,11 +516,11 @@ export function AgentShiftsSettingsPage() {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
 
-  const handleEditPattern = (patternId) => {
+  const handleEditPattern = (patternId: string) => {
     console.log("Edit shift pattern", patternId);
   };
 
-  const handleDuplicatePattern = (patternId) => {
+  const handleDuplicatePattern = (patternId: string) => {
     console.log("Duplicate pattern", patternId);
   };
 
@@ -589,9 +589,9 @@ export function AgentShiftsSettingsPage() {
                 </Typography>
               </Stack>
 
-              <Grid container spacing={1.5}>
+              <Grid2 container spacing={1.5}>
                 {shiftPatterns.map((pattern) => (
-                  <Grid item xs={12} key={pattern.id}>
+                  <Grid2 size={12} key={pattern.id}>
                     <Card
                       elevation={0}
                       sx={{
@@ -700,20 +700,20 @@ export function AgentShiftsSettingsPage() {
                         </Stack>
                       </CardContent>
                     </Card>
-                  </Grid>
+                  </Grid2>
                 ))}
 
                 {shiftPatterns.length === 0 && (
-                  <Grid item xs={12}>
+                  <Grid2 size={12}>
                     <Typography
                       variant="caption"
                       sx={{ color: EVZONE_GREY, fontStyle: "italic" }}
                     >
                       No shift patterns defined yet.
                     </Typography>
-                  </Grid>
+                  </Grid2>
                 )}
-              </Grid>
+              </Grid2>
             </Stack>
           </CardContent>
         </Card>

@@ -14,7 +14,13 @@ import Alert from "@mui/material/Alert";
 const EVZONE_GREY = "#6b7280";
 
 // 51. Global error / offline banner & retry states
-export function AgentGlobalStatusBanner({ mode, message, onRetry }) {
+interface AgentGlobalStatusBannerProps {
+  mode?: "offline" | "error";
+  message?: string;
+  onRetry?: () => void;
+}
+
+export function AgentGlobalStatusBanner({ mode, message, onRetry }: AgentGlobalStatusBannerProps) {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   const finalMode = mode || "offline"; // offline | error
@@ -36,8 +42,8 @@ export function AgentGlobalStatusBanner({ mode, message, onRetry }) {
             ? "rgba(15,23,42,0.95)"
             : "#fefce8"
           : isDark
-          ? "rgba(127,29,29,0.9)"
-          : "#fef2f2",
+            ? "rgba(127,29,29,0.9)"
+            : "#fef2f2",
       }}
     >
       <Box className="max-w-6xl mx-auto px-3 sm:px-6 py-2">
@@ -71,8 +77,8 @@ export function AgentGlobalStatusBanner({ mode, message, onRetry }) {
                     ? "#fef9c3"
                     : "#92400e"
                   : isDark
-                  ? "#fee2e2"
-                  : "#b91c1c",
+                    ? "#fee2e2"
+                    : "#b91c1c",
               }}
             >
               {message ||

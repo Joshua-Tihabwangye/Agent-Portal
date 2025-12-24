@@ -1,5 +1,6 @@
 import React from "react";
-import { Box, Card, CardActionArea, CardContent, Typography, Stack, Chip, LinearProgress, Divider, Grid } from "@mui/material";
+import { Box, Card, CardActionArea, CardContent, Typography, Stack, Chip, LinearProgress, Divider } from "@mui/material";
+import Grid from "@mui/material/Grid";
 import { useTheme } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
@@ -123,7 +124,7 @@ export default function AgentDashboardPage() {
       {/* Summary cards */}
       <Grid container spacing={2} className="mb-4">
         {summaryCards.map((card) => (
-          <Grid item xs={12} sm={6} lg={3} key={card.key}>
+          <Grid size={{ xs: 12, sm: 6, lg: 3 }} key={card.key}>
             <Card
               elevation={1}
               className="ev-gradient-soft"
@@ -199,7 +200,7 @@ export default function AgentDashboardPage() {
 
       <Grid container spacing={2}>
         {/* Workload & SLA block */}
-        <Grid item xs={12} lg={6}>
+        <Grid size={{ xs: 12, lg: 6 }}>
           <Card
             elevation={1}
             sx={{
@@ -362,7 +363,7 @@ export default function AgentDashboardPage() {
         </Grid>
 
         {/* Today timeline */}
-        <Grid item xs={12} lg={6}>
+        <Grid size={{ xs: 12, lg: 6 }}>
           <Card
             elevation={1}
             sx={{
