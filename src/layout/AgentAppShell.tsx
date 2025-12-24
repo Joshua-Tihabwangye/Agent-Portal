@@ -40,7 +40,8 @@ import { AgentGlobalStatusBanner } from "../components/system/GlobalStatusBanner
 const EVZONE_GREEN = "#03cd8c";
 const EVZONE_GREY = "#6b7280";
 
-const drawerWidth = 280;
+const drawerWidthExpanded = 240;
+const drawerWidthCollapsed = 72;
 
 type NavItem = {
   key: string;
@@ -128,6 +129,7 @@ export default function AgentAppShell() {
   const location = useLocation();
 
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [desktopOpen, setDesktopOpen] = useState(true);
   const [query, setQuery] = useState("");
 
   const activeKey = useMemo(() => pickActiveKey(location.pathname), [location.pathname]);
@@ -145,7 +147,8 @@ export default function AgentAppShell() {
     };
   }, []);
 
-  const handleDrawerToggle = () => setMobileOpen((v) => !v);
+  const handleMobileDrawerToggle = () => setMobileOpen((v) => !v);
+  const handleDesktopDrawerToggle = () => setDesktopOpen((v) => !v);
 
   const handleNavClick = (item: NavItem) => {
     navigate(item.href);
@@ -159,82 +162,92 @@ export default function AgentAppShell() {
     .map((x) => x[0]?.toUpperCase())
     .join("");
 
-  const drawerContent = (
-    <Box sx={{ display: "flex", flexDirection: "column", height: "100%", px: 2, py: 2.5 }}>
+  const currentDrawerWidth = desktopOpen ? drawerWidthExpanded : drawerWidthCollapsed;
+
+  const drawerContent = (collapsed: boolean) => (
+    <Box sx={{ display: "flex", flexDirection: "column", height: "100%", px: collapsed ? 1 : 2, py: 2 }}>
       {/* Brand */}
-      <Box className="flex items-center justify-between mb-4">
+      <Box className="flex items-center justify-center mb-3" sx={{ minHeight: 48 }}>
         <Box className="flex items-center gap-2">
           <Box
-            className="flex items-center justify-center rounded-2xl"
+            className="flex items-center justify-center rounded-xl"
             sx={{
-              width: 40,
-              height: 40,
+              width: 36,
+              height: 36,
               backgroundColor: EVZONE_GREEN,
               color: "#020617",
               fontWeight: 800,
               letterSpacing: 0.5,
-              fontSize: 18,
+              fontSize: 16,
+              flexShrink: 0,
             }}
           >
             EV
           </Box>
-          <Box>
-            <Typography
-              variant="subtitle2"
-              sx={{
-                fontWeight: 700,
-                color: isDark ? "#e5e7eb" : "#111827",
-                lineHeight: 1.1,
-              }}
-            >
-              EVzone
-            </Typography>
-            <Typography variant="caption" sx={{ color: EVZONE_GREY, lineHeight: 1.1 }}>
-              Agent Portal
-            </Typography>
-          </Box>
+          {!collapsed && (
+            <Box>
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  fontWeight: 700,
+                  color: isDark ? "#e5e7eb" : "#111827",
+                  lineHeight: 1.1,
+                }}
+              >
+                EVzone
+              </Typography>
+              <Typography variant="caption" sx={{ color: EVZONE_GREY, lineHeight: 1.1 }}>
+                Agent Portal
+              </Typography>
+            </Box>
+          )}
         </Box>
       </Box>
 
-      <Divider sx={{ mb: 2.5, borderColor: isDark ? "rgba(148,163,184,0.25)" : "rgba(226,232,240,1)" }} />
+      <Divider sx={{ mb: 2, borderColor: isDark ? "rgba(148,163,184,0.25)" : "rgba(226,232,240,1)" }} />
 
       {/* Nav */}
       <List sx={{ flex: 1 }}>
         {navItems.map((item) => {
           const active = activeKey === item.key;
           return (
-            <ListItemButton
-              key={item.key}
-              onClick={() => handleNavClick(item)}
-              sx={{
-                borderRadius: 2,
-                mb: 0.5,
-                backgroundColor: active
-                  ? isDark
-                    ? "rgba(3,205,140,0.16)"
-                    : "rgba(3,205,140,0.10)"
-                  : "transparent",
-                "&:hover": {
+            <Tooltip key={item.key} title={collapsed ? item.label : ""} placement="right" arrow>
+              <ListItemButton
+                onClick={() => handleNavClick(item)}
+                sx={{
+                  borderRadius: 2,
+                  mb: 0.5,
+                  justifyContent: collapsed ? "center" : "flex-start",
+                  px: collapsed ? 1.5 : 2,
                   backgroundColor: active
                     ? isDark
-                      ? "rgba(3,205,140,0.20)"
-                      : "rgba(3,205,140,0.14)"
-                    : isDark
-                      ? "rgba(148,163,184,0.10)"
-                      : "rgba(226,232,240,0.70)",
-                },
-              }}
-            >
-              <ListItemIcon sx={{ minWidth: 34, color: active ? EVZONE_GREEN : EVZONE_GREY }}>{item.icon}</ListItemIcon>
-              <ListItemText
-                primary={item.label}
-                primaryTypographyProps={{
-                  fontSize: 13,
-                  fontWeight: active ? 700 : 600,
-                  color: isDark ? "#e5e7eb" : "#111827",
+                      ? "rgba(3,205,140,0.16)"
+                      : "rgba(3,205,140,0.10)"
+                    : "transparent",
+                  "&:hover": {
+                    backgroundColor: active
+                      ? isDark
+                        ? "rgba(3,205,140,0.20)"
+                        : "rgba(3,205,140,0.14)"
+                      : isDark
+                        ? "rgba(148,163,184,0.10)"
+                        : "rgba(226,232,240,0.70)",
+                  },
                 }}
-              />
-            </ListItemButton>
+              >
+                <ListItemIcon sx={{ minWidth: collapsed ? 0 : 34, color: active ? EVZONE_GREEN : EVZONE_GREY, justifyContent: "center" }}>{item.icon}</ListItemIcon>
+                {!collapsed && (
+                  <ListItemText
+                    primary={item.label}
+                    primaryTypographyProps={{
+                      fontSize: 13,
+                      fontWeight: active ? 700 : 600,
+                      color: isDark ? "#e5e7eb" : "#111827",
+                    }}
+                  />
+                )}
+              </ListItemButton>
+            </Tooltip>
           );
         })}
       </List>
@@ -242,65 +255,79 @@ export default function AgentAppShell() {
       <Divider sx={{ my: 2, borderColor: isDark ? "rgba(148,163,184,0.25)" : "rgba(226,232,240,1)" }} />
 
       {/* Footer quick actions */}
-      <Box className="flex items-center justify-between">
+      <Box className="flex items-center" sx={{ justifyContent: collapsed ? "center" : "space-between" }}>
         <Box className="flex items-center gap-2">
           <Avatar sx={{ width: 28, height: 28, fontSize: 12, fontWeight: 800, bgcolor: "rgba(3,205,140,0.25)", color: EVZONE_GREEN }}>
             {initials || "A"}
           </Avatar>
-          <Box>
-            <Typography variant="caption" sx={{ color: isDark ? "#e5e7eb" : "#111827", fontWeight: 700, lineHeight: 1.1 }}>
-              {user?.email || "agent@evzone"}
-            </Typography>
-            <Typography variant="caption" sx={{ color: EVZONE_GREY, lineHeight: 1.1, display: "block" }}>
-              {user?.role || "support_t1"}
-            </Typography>
-          </Box>
+          {!collapsed && (
+            <Box>
+              <Typography variant="caption" sx={{ color: isDark ? "#e5e7eb" : "#111827", fontWeight: 700, lineHeight: 1.1 }}>
+                {user?.email || "agent@evzone"}
+              </Typography>
+              <Typography variant="caption" sx={{ color: EVZONE_GREY, lineHeight: 1.1, display: "block" }}>
+                {user?.role || "support_t1"}
+              </Typography>
+            </Box>
+          )}
         </Box>
-        <ButtonLogout onLogout={() => { logout(); navigate("/agent/login"); }} />
+        {!collapsed && <ButtonLogout onLogout={() => { logout(); navigate("/agent/login"); }} />}
       </Box>
     </Box>
   );
 
   return (
     <Box className="min-h-screen w-full bg-slate-50 dark:bg-slate-950" sx={{ display: "flex" }}>
-      {/* Mobile drawer */}
+      {/* Mobile drawer (overlay) */}
       <Drawer
         variant="temporary"
         open={mobileOpen}
-        onClose={handleDrawerToggle}
+        onClose={handleMobileDrawerToggle}
         ModalProps={{ keepMounted: true }}
         sx={{
           display: { xs: "block", md: "none" },
           "& .MuiDrawer-paper": {
-            width: drawerWidth,
+            width: drawerWidthExpanded,
             boxSizing: "border-box",
             bgcolor: isDark ? "#020617" : "#ffffff",
           },
         }}
       >
-        {drawerContent}
+        {drawerContent(false)}
       </Drawer>
 
-      {/* Desktop drawer */}
-      <Drawer
-        variant="permanent"
-        open
+      {/* Desktop drawer (permanent, collapsible) */}
+      <Box
+        component="nav"
         sx={{
+          width: { md: currentDrawerWidth },
+          flexShrink: { md: 0 },
+          transition: "width 0.2s ease-in-out",
           display: { xs: "none", md: "block" },
-          "& .MuiDrawer-paper": {
-            width: drawerWidth,
-            boxSizing: "border-box",
-            bgcolor: isDark ? "#020617" : "#ffffff",
-            borderRight: isDark ? "1px solid rgba(148,163,184,0.25)" : "1px solid rgba(226,232,240,1)",
-          },
         }}
       >
-        {drawerContent}
-      </Drawer>
+        <Drawer
+          variant="permanent"
+          open
+          sx={{
+            display: { xs: "none", md: "block" },
+            "& .MuiDrawer-paper": {
+              width: currentDrawerWidth,
+              boxSizing: "border-box",
+              bgcolor: isDark ? "#020617" : "#ffffff",
+              borderRight: isDark ? "1px solid rgba(148,163,184,0.25)" : "1px solid rgba(226,232,240,1)",
+              transition: "width 0.2s ease-in-out",
+              overflowX: "hidden",
+            },
+          }}
+        >
+          {drawerContent(!desktopOpen)}
+        </Drawer>
+      </Box>
 
       {/* Main */}
-      <Box sx={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
-        {!online && <AgentGlobalStatusBanner mode="offline" onRetry={() => window.location.reload()} />}
+      <Box sx={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0, width: { md: `calc(100% - ${currentDrawerWidth}px)` } }}>
+        {!online && <AgentGlobalStatusBanner mode="offline" onRetry={() => window.location.reload()} message={undefined} />}
 
         {/* Header */}
         <Box
@@ -313,13 +340,25 @@ export default function AgentAppShell() {
           }}
         >
           <Box className="flex items-center gap-2 w-full flex-wrap">
+            {/* Mobile menu button */}
             <IconButton
-              onClick={handleDrawerToggle}
-              sx={{ display: { xs: "inline-flex", md: "none" } }}
+              onClick={handleMobileDrawerToggle}
+              sx={{ display: { xs: "inline-flex", md: "none" }, color: "#fff" }}
               size="small"
             >
               <MenuRoundedIcon fontSize="small" />
             </IconButton>
+
+            {/* Desktop sidebar toggle button */}
+            <Tooltip title={desktopOpen ? "Collapse sidebar" : "Expand sidebar"}>
+              <IconButton
+                onClick={handleDesktopDrawerToggle}
+                sx={{ display: { xs: "none", md: "inline-flex" }, color: "#fff" }}
+                size="small"
+              >
+                <MenuRoundedIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
 
             <TextField
               size="small"
@@ -341,8 +380,8 @@ export default function AgentAppShell() {
               }}
               sx={{
                 flex: 1,
-                minWidth: { xs: "100%", md: 360 },
-                maxWidth: 620,
+                minWidth: { xs: "100%", md: 320 },
+                maxWidth: 560,
                 "& .MuiOutlinedInput-root": {
                   bgcolor: isDark ? "rgba(15,23,42,0.25)" : "rgba(255,255,255,0.25)",
                   color: isDark ? "#e2e8f0" : "#0f172a",
@@ -389,7 +428,7 @@ export default function AgentAppShell() {
         </Box>
 
         {/* Content */}
-        <Box sx={{ flex: 1, minWidth: 0 }}>
+        <Box sx={{ flex: 1, minWidth: 0, overflowX: "hidden" }}>
           <Outlet />
         </Box>
       </Box>
