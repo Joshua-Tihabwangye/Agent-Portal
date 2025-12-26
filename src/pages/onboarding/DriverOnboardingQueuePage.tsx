@@ -15,6 +15,7 @@ import {
   Avatar,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import { useNavigate } from "react-router-dom";
 import AssignmentIndOutlinedIcon from "@mui/icons-material/AssignmentIndOutlined";
 import FilterListOutlinedIcon from "@mui/icons-material/FilterListOutlined";
 import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
@@ -56,6 +57,7 @@ const sampleDrivers = [
 export default function AgentDriverOnboardingQueuePage() {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
+  const navigate = useNavigate();
 
   const [query, setQuery] = useState("");
   const [stageFilter, setStageFilter] = useState("all");
@@ -254,6 +256,7 @@ export default function AgentDriverOnboardingQueuePage() {
                 {filtered.map((driver) => (
                   <ListItemButton
                     key={driver.id}
+                    onClick={() => navigate(`/agent/onboarding/drivers/${encodeURIComponent(driver.id)}`)}
                     sx={{
                       borderRadius: 3,
                       mb: 1,

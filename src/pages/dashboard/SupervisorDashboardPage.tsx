@@ -1,645 +1,307 @@
-import React from "react";
-import { Box, Card, CardActionArea, CardContent, Typography, Stack, Chip, LinearProgress, Divider, Grid, Avatar } from "@mui/material";
+import React, { useState } from "react";
+import { Box, Card, CardContent, Typography, Stack, Avatar, Button, Chip, Grid } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
-import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import GroupAddOutlinedIcon from "@mui/icons-material/GroupAddOutlined";
+import SupportAgentOutlinedIcon from "@mui/icons-material/SupportAgentOutlined";
 import SpeedOutlinedIcon from "@mui/icons-material/SpeedOutlined";
-import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
-import WorkspacePremiumOutlinedIcon from "@mui/icons-material/WorkspacePremiumOutlined";
-import ReportProblemOutlinedIcon from "@mui/icons-material/ReportProblemOutlined";
-import { EVFleetAnalyticsMicroWidgets } from "../../components/ev/EVFleetAnalyticsMicroWidgets";
+import AssignmentLateOutlinedIcon from "@mui/icons-material/AssignmentLateOutlined";
+import PeriodSelector from "../../components/shared/PeriodSelector";
+import type { PeriodValue } from "../../components/shared/PeriodSelector";
+import { RevenuePieChart, TrendBarChart, TrendLineChart, CHART_COLORS } from "../../components/shared/AnalyticsCharts";
 
 const EVZONE_GREEN = "#03cd8c";
-const EVZONE_ORANGE = "#f77f00";
 const EVZONE_GREY = "#6b7280";
 
-const teamSummary = [
+const statCards = [
   {
-    key: "tickets-today",
-    label: "Tickets handled today",
-    value: 124,
-    meta: "+18 vs yesterday",
-    icon: <GroupOutlinedIcon fontSize="small" />,
-    href: "/agent/support/tickets",
+    key: "cases",
+    label: "Total cases",
+    value: 142,
+    trend: "+12%",
+    icon: <SupportAgentOutlinedIcon fontSize="small" />,
+    color: CHART_COLORS[0], // Green
   },
   {
     key: "sla",
-    label: "Overall SLA",
-    value: "95%",
-    meta: "Target 92%",
+    label: "SLA Breach Risk",
+    value: 8,
+    trend: "-2%",
     icon: <SpeedOutlinedIcon fontSize="small" />,
-    href: "/agent/dashboard/supervisor",
+    color: CHART_COLORS[4], // Red
   },
   {
-    key: "aht",
-    label: "Avg handle time",
-    value: "5m 48s",
-    meta: "Improved by 9%",
-    icon: <TimelineOutlinedIcon fontSize="small" />,
-    href: "/agent/support/tickets",
+    key: "unassigned",
+    label: "Unassigned",
+    value: 15,
+    trend: "+5",
+    icon: <AssignmentLateOutlinedIcon fontSize="small" />,
+    color: CHART_COLORS[6], // Amber
   },
   {
-    key: "training",
-    label: "Training completion",
-    value: "88%",
-    meta: "Core modules",
-    icon: <WorkspacePremiumOutlinedIcon fontSize="small" />,
-    href: "/agent/training",
+    key: "agents",
+    label: "Agents online",
+    value: 12,
+    trend: "14 total",
+    icon: <GroupAddOutlinedIcon fontSize="small" />,
+    color: CHART_COLORS[2], // Blue
   },
 ];
 
-const topAgents = [
-  {
-    initials: "AK",
-    name: "Amina K.",
-    role: "Support Tier 1",
-    handled: 32,
-    sla: "98%",
-  },
-  {
-    initials: "JM",
-    name: "James M.",
-    role: "Dispatch",
-    handled: 21,
-    sla: "96%",
-  },
-  {
-    initials: "LN",
-    name: "Linda N.",
-    role: "Onboarding",
-    handled: 18,
-    sla: "94%",
-  },
+// Mock analytics data
+const mockSupervisorData = {
+  performanceTrend: [
+    { name: "Mon", value: 85, target: 80 }, { name: "Tue", value: 88, target: 80 },
+    { name: "Wed", value: 92, target: 80 }, { name: "Thu", value: 78, target: 80 },
+    { name: "Fri", value: 84, target: 80 }, { name: "Sat", value: 90, target: 80 },
+    { name: "Sun", value: 95, target: 80 }
+  ],
+  categoryVolume: [
+    { name: "Driver", value: 350 }, { name: "Rider", value: 420 },
+    { name: "Payment", value: 150 }, { name: "Tech", value: 80 }
+  ],
+  hourlyVolume: [
+    { name: "8am", value: 45 }, { name: "10am", value: 120 }, { name: "12pm", value: 160 },
+    { name: "2pm", value: 140 }, { name: "4pm", value: 110 }, { name: "6pm", value: 90 }
+  ]
+};
+
+const teamMembers = [
+  { id: 1, name: "Sarah Williams", role: "Senior Agent", status: "online", metrics: "98% CSAT" },
+  { id: 2, name: "Michael Chen", role: "Dispatch Specialist", status: "busy", metrics: "15 Cases" },
+  { id: 3, name: "Jessica Taylor", role: "Support Agent", status: "online", metrics: "95% CSAT" },
+  { id: 4, name: "David Miller", role: "Onboarding", status: "offline", metrics: "Last seen 2h ago" },
 ];
 
-const incidentStats = [
-  {
-    label: "Open safety incidents",
-    value: 4,
-    color: "#b91c1c",
-  },
-  {
-    label: "Resolved last 7 days",
-    value: 19,
-    color: "#16a34a",
-  },
-  {
-    label: "Avg time to close",
-    value: "2h 14m",
-    color: "#fb923c",
-  },
-];
-
-export default function AgentSupervisorDashboardPage() {
+export default function SupervisorDashboardPage() {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   const navigate = useNavigate();
-
-  const trainingCompletion = 88; // placeholder
+  const [period, setPeriod] = useState<PeriodValue>("week");
 
   return (
-    <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 py-4">
+    <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 md:px-8 py-4 w-full">
       {/* Header */}
-      <Box className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+      <Box className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <Box>
           <Typography
-            variant="h6"
+            variant="h5"
             sx={{
-              fontWeight: 700,
+              fontWeight: 800,
               color: isDark ? "#e5e7eb" : "#111827",
+              mb: 0.5,
             }}
           >
-            Supervisor dashboard
+            Team Overview
           </Typography>
           <Typography
             variant="body2"
-            sx={{ color: EVZONE_GREY, maxWidth: 520 }}
+            sx={{ color: EVZONE_GREY, maxWidth: 500 }}
           >
-            Monitor your team&apos;s workload, SLA performance, training and
-            safety incidents across all Agent queues.
+            Monitor team performance, SLA compliance, and support volume.
           </Typography>
         </Box>
 
-        <Chip
-          label="Supervisor view"
-          size="small"
-          sx={{
-            borderRadius: 999,
-            fontSize: 11,
-            textTransform: "none",
-            backgroundColor: isDark
-              ? "rgba(15,23,42,0.9)"
-              : "rgba(254,249,195,0.9)",
-            border: "1px solid rgba(234,179,8,0.6)",
-            color: isDark ? "#e5e7eb" : "#92400e",
-            fontWeight: 600,
-          }}
-        />
+        <Stack direction="row" spacing={2} alignItems="center">
+          <PeriodSelector value={period} onChange={setPeriod} compact />
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<FilterListIcon />}
+            sx={{
+              borderRadius: 2,
+              borderColor: isDark ? "rgba(148,163,184,0.3)" : "rgba(226,232,240,1)",
+              color: isDark ? "#cbd5e1" : "#475569",
+              textTransform: "none",
+              fontWeight: 600,
+            }}
+          >
+            Filter
+          </Button>
+        </Stack>
       </Box>
 
-      {/* Team summary cards */}
-      <Grid container spacing={2} className="mb-4">
-        {teamSummary.map((card) => (
+      {/* Stats Overview */}
+      <Grid container spacing={2} className="mb-6">
+        {statCards.map((card) => (
           <Grid size={{ xs: 12, sm: 6, lg: 3 }} key={card.key}>
             <Card
-              elevation={1}
-              className="ev-gradient-soft"
+              elevation={0}
               sx={{
                 borderRadius: 3,
-                backgroundColor: "transparent",
-                boxShadow: "0 10px 30px rgba(2,6,23,0.12)",
-                border: "1px solid " + (isDark ? "rgba(59,130,246,0.25)" : "rgba(255,255,255,0.65)"),
-                overflow: "hidden",
+                backgroundColor: isDark ? "rgba(2,6,23,0.6)" : "rgba(255,255,255,0.8)",
+                border: `1px solid ${isDark ? "rgba(148,163,184,0.1)" : "rgba(226,232,240,1)"}`,
+                transition: "all 0.2s ease",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: `0 12px 24px ${card.color}15`,
+                  borderColor: `${card.color}40`,
+                },
               }}
             >
-              <CardActionArea onClick={() => navigate(card.href)} sx={{ height: "100%" }}>
-                <CardContent sx={{ py: 1.8, px: 2.2 }}>
-                  <Stack direction="row" justifyContent="space-between" mb={1}>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        color: isDark ? "#cbd5e1" : "#0f172a",
-                        textTransform: "uppercase",
-                        letterSpacing: 0.4,
-                        fontWeight: 700,
-                      }}
-                    >
-                      {card.label}
-                    </Typography>
-                    <Box
-                      className="flex items-center justify-center rounded-full"
-                      sx={{
-                        width: 30,
-                        height: 30,
-                        backgroundColor: "rgba(255,255,255,0.32)",
-                        border: "1px solid rgba(255,255,255,0.5)",
-                        color: "#0f172a",
-                      }}
-                    >
-                      {card.icon}
-                    </Box>
-                  </Stack>
-                  <Stack direction="row" alignItems="baseline" spacing={1}>
-                    <Typography
-                      variant="h5"
-                      sx={{
-                        fontWeight: 800,
-                        color: isDark ? "#e2e8f0" : "#0f172a",
-                      }}
-                    >
-                      {card.value}
-                    </Typography>
-                  </Stack>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: isDark ? "#cbd5e1" : "#1f2937", display: "block", mt: 0.75 }}
+              <CardContent sx={{ p: 2.5 }}>
+                <Stack direction="row" justifyContent="space-between" mb={2}>
+                  <Box
+                    sx={{
+                      p: 1,
+                      borderRadius: 2,
+                      bgcolor: `${card.color}15`,
+                      color: card.color,
+                      display: "flex"
+                    }}
                   >
-                    {card.meta} · tap to open
-                  </Typography>
-                </CardContent>
-              </CardActionArea>
+                    {card.icon}
+                  </Box>
+                  <Chip
+                    label={card.trend}
+                    size="small"
+                    sx={{
+                      height: 20,
+                      fontSize: 10,
+                      fontWeight: 700,
+                      bgcolor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
+                      color: isDark ? "#94a3b8" : "#64748b"
+                    }}
+                  />
+                </Stack>
+                <Typography variant="h3" fontWeight={800} sx={{ color: isDark ? "#e5e7eb" : "#0f172a", mb: 0.5 }}>
+                  {card.value}
+                </Typography>
+                <Typography variant="body2" sx={{ color: EVZONE_GREY, fontWeight: 500 }}>
+                  {card.label}
+                </Typography>
+              </CardContent>
             </Card>
           </Grid>
         ))}
       </Grid>
 
-      {/* Set 18: Analytics micro widgets (EV fleet utilization & safety) */}
-      <Box className="mb-4">
-        <EVFleetAnalyticsMicroWidgets
-          utilization={{ inUsePct: 71, onlinePct: 84 }}
-          lowBatteryShare={14}
-          safetyIncidents={{ last7Days: 5, batteryRelated: 1 }}
-        />
-      </Box>
-
-      <Grid container spacing={2}>
-        {/* Training and SLA distribution */}
-        <Grid size={{ xs: 12, md: 7 }}>
+      {/* Charts Grid */}
+      <Grid container spacing={3}>
+        {/* Main Performance Chart */}
+        <Grid size={{ xs: 12, lg: 8 }}>
           <Card
-            elevation={1}
+            elevation={0}
             sx={{
               borderRadius: 3,
-              backgroundColor: isDark ? "#020617" : "#ffffff",
-              border: "1px solid " +
-                (isDark
-                  ? "rgba(30,64,175,0.7)"
-                  : "rgba(226,232,240,1)"),
+              backgroundColor: isDark ? "rgba(2,6,23,0.6)" : "rgba(255,255,255,0.8)",
+              border: `1px solid ${isDark ? "rgba(148,163,184,0.1)" : "rgba(226,232,240,1)"}`,
               height: "100%",
+              p: 2
             }}
           >
-            <CardContent sx={{ p: 2.4 }}>
-              <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-                mb={2}
-              >
-                <Box>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{
-                      fontWeight: 700,
-                      color: isDark ? "#e5e7eb" : "#111827",
-                    }}
-                  >
-                    Training &amp; SLA overview
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: EVZONE_GREY }}
-                  >
-                    Track completion of mandatory modules and SLA tiers.
-                  </Typography>
-                </Box>
-
-                <Chip
-                  size="small"
-                  label="Team of 18 agents"
-                  sx={{
-                    borderRadius: 999,
-                    fontSize: 11,
-                    textTransform: "none",
-                    backgroundColor: "rgba(191,219,254,0.25)",
-                    color: "#1d4ed8",
-                    border: "1px solid rgba(59,130,246,0.45)",
-                  }}
-                />
-              </Stack>
-
-              <Box sx={{ mb: 2.5 }}>
-                <Stack
-                  direction="row"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  mb={1}
-                >
-                  <Typography
-                    variant="body2"
-                    sx={{ color: EVZONE_GREY }}
-                  >
-                    Training completion (core modules)
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: 600,
-                      color: isDark ? "#e5e7eb" : "#111827",
-                    }}
-                  >
-                    {trainingCompletion}%
-                  </Typography>
-                </Stack>
-                <LinearProgress
-                  variant="determinate"
-                  value={trainingCompletion}
-                  sx={{
-                    height: 8,
-                    borderRadius: 999,
-                    backgroundColor: isDark
-                      ? "rgba(30,64,175,0.5)"
-                      : "rgba(226,232,240,0.9)",
-                    "& .MuiLinearProgress-bar": {
-                      backgroundImage:
-                        "linear-gradient(90deg, " +
-                        EVZONE_GREEN +
-                        ", " +
-                        EVZONE_ORANGE +
-                        ")",
-                    },
-                  }}
-                />
-              </Box>
-
-              <Divider
-                sx={{
-                  my: 2,
-                  borderColor: isDark
-                    ? "rgba(30,64,175,0.7)"
-                    : "rgba(226,232,240,1)",
-                }}
-              />
-
-              <Grid container spacing={1.5}>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <Stack spacing={1}>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        textTransform: "uppercase",
-                        letterSpacing: 0.4,
-                        color: EVZONE_GREY,
-                        fontWeight: 600,
-                      }}
-                    >
-                      Queue distribution
-                    </Typography>
-                    <Stack direction="row" justifyContent="space-between">
-                      <Typography
-                        variant="body2"
-                        sx={{ color: EVZONE_GREY }}
-                      >
-                        Support Tier 1
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          fontWeight: 600,
-                          color: isDark ? "#e5e7eb" : "#111827",
-                        }}
-                      >
-                        52 tickets
-                      </Typography>
-                    </Stack>
-                    <Stack direction="row" justifyContent="space-between">
-                      <Typography
-                        variant="body2"
-                        sx={{ color: EVZONE_GREY }}
-                      >
-                        Dispatch
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          fontWeight: 600,
-                          color: isDark ? "#e5e7eb" : "#111827",
-                        }}
-                      >
-                        28 bookings
-                      </Typography>
-                    </Stack>
-                    <Stack direction="row" justifyContent="space-between">
-                      <Typography
-                        variant="body2"
-                        sx={{ color: EVZONE_GREY }}
-                      >
-                        Onboarding
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          fontWeight: 600,
-                          color: isDark ? "#e5e7eb" : "#111827",
-                        }}
-                      >
-                        17 drivers
-                      </Typography>
-                    </Stack>
-                  </Stack>
-                </Grid>
-
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <Stack spacing={1}>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        textTransform: "uppercase",
-                        letterSpacing: 0.4,
-                        color: EVZONE_GREY,
-                        fontWeight: 600,
-                      }}
-                    >
-                      SLA tiers
-                    </Typography>
-                    <Stack direction="row" justifyContent="space-between">
-                      <Typography
-                        variant="body2"
-                        sx={{ color: EVZONE_GREY }}
-                      >
-                        &lt; 5 min
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{ fontWeight: 600, color: "#16a34a" }}
-                      >
-                        63%
-                      </Typography>
-                    </Stack>
-                    <Stack direction="row" justifyContent="space-between">
-                      <Typography
-                        variant="body2"
-                        sx={{ color: EVZONE_GREY }}
-                      >
-                        5–10 min
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{ fontWeight: 600, color: "#ea580c" }}
-                      >
-                        27%
-                      </Typography>
-                    </Stack>
-                    <Stack direction="row" justifyContent="space-between">
-                      <Typography
-                        variant="body2"
-                        sx={{ color: EVZONE_GREY }}
-                      >
-                        &gt; 10 min
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{ fontWeight: 600, color: "#b91c1c" }}
-                      >
-                        10%
-                      </Typography>
-                    </Stack>
-                  </Stack>
-                </Grid>
-              </Grid>
-            </CardContent>
+            <TrendLineChart
+              title="Team Performance vs Target"
+              data={mockSupervisorData.performanceTrend}
+              dataKeys={["value", "target"]}
+              height={320}
+            />
           </Card>
         </Grid>
 
-        {/* Top agents & incidents */}
-        <Grid size={{ xs: 12, md: 5 }}>
-          <Stack spacing={2}>
-            <Card
-              elevation={1}
-              sx={{
-                borderRadius: 3,
-                backgroundColor: isDark ? "#020617" : "#ffffff",
-                border: "1px solid " +
-                  (isDark
-                    ? "rgba(30,64,175,0.7)"
-                    : "rgba(226,232,240,1)"),
-              }}
-            >
-              <CardContent sx={{ p: 2.4 }}>
-                <Stack
-                  direction="row"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  mb={2}
+        {/* Categories Pie */}
+        <Grid size={{ xs: 12, lg: 4 }}>
+          <Card
+            elevation={0}
+            sx={{
+              borderRadius: 3,
+              backgroundColor: isDark ? "rgba(2,6,23,0.6)" : "rgba(255,255,255,0.8)",
+              border: `1px solid ${isDark ? "rgba(148,163,184,0.1)" : "rgba(226,232,240,1)"}`,
+              height: "100%",
+              p: 2
+            }}
+          >
+            <RevenuePieChart
+              title="Work Volume by Type"
+              data={mockSupervisorData.categoryVolume}
+              height={320}
+              showLegend={true}
+            />
+          </Card>
+        </Grid>
+
+        {/* Hourly Volume Bar Chart */}
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Card
+            elevation={0}
+            sx={{
+              borderRadius: 3,
+              backgroundColor: isDark ? "rgba(2,6,23,0.6)" : "rgba(255,255,255,0.8)",
+              border: `1px solid ${isDark ? "rgba(148,163,184,0.1)" : "rgba(226,232,240,1)"}`,
+              height: "100%",
+              p: 2
+            }}
+          >
+            <TrendBarChart
+              title="Hourly Ticket Volume"
+              data={mockSupervisorData.hourlyVolume}
+              height={250}
+            />
+          </Card>
+        </Grid>
+
+        {/* Team Members List */}
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Card
+            elevation={0}
+            sx={{
+              borderRadius: 3,
+              backgroundColor: isDark ? "rgba(2,6,23,0.6)" : "rgba(255,255,255,0.8)",
+              border: `1px solid ${isDark ? "rgba(148,163,184,0.1)" : "rgba(226,232,240,1)"}`,
+              height: "100%",
+              p: 2
+            }}
+          >
+            <Box className="flex items-center justify-between mb-4">
+              <Typography variant="subtitle1" fontWeight={700} color={isDark ? "#e5e7eb" : "#111827"}>
+                Team Status
+              </Typography>
+              <Button size="small" sx={{ color: EVZONE_GREEN, fontWeight: 600 }}>View All</Button>
+            </Box>
+
+            <Stack spacing={2}>
+              {teamMembers.map((member) => (
+                <Box
+                  key={member.id}
+                  className="flex items-center justify-between p-2 rounded-xl"
+                  sx={{
+                    "&:hover": { bgcolor: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)" }
+                  }}
                 >
-                  <Typography
-                    variant="subtitle2"
-                    sx={{
-                      fontWeight: 700,
-                      color: isDark ? "#e5e7eb" : "#111827",
-                    }}
-                  >
-                    Top agents today
-                  </Typography>
-                  <Chip
-                    size="small"
-                    label="By volume &amp; SLA"
-                    sx={{
-                      borderRadius: 999,
-                      fontSize: 11,
-                      textTransform: "none",
-                      backgroundColor: "rgba(191,219,254,0.3)",
-                      color: "#1d4ed8",
-                    }}
-                  />
-                </Stack>
-
-                <Stack spacing={1.2}>
-                  {topAgents.map((agent) => (
-                    <Box
-                      key={agent.name}
-                      className="flex items-center justify-between rounded-2xl px-3 py-2.5"
-                      sx={{
-                        backgroundColor: isDark
-                          ? "rgba(15,23,42,0.9)"
-                          : "rgba(248,250,252,0.95)",
-                        border: "1px solid rgba(203,213,225,0.8)",
-                      }}
-                    >
-                      <Box className="flex items-center gap-3">
-                        <Avatar
-                          sx={{
-                            width: 28,
-                            height: 28,
-                            backgroundColor: "rgba(3,205,140,0.18)",
-                            color: "#047857",
-                            fontSize: 13,
-                            fontWeight: 700,
-                          }}
-                        >
-                          {agent.initials}
-                        </Avatar>
-                        <Box>
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              fontWeight: 600,
-                              color: isDark ? "#e5e7eb" : "#111827",
-                            }}
-                          >
-                            {agent.name}
-                          </Typography>
-                          <Typography
-                            variant="caption"
-                            sx={{ color: EVZONE_GREY }}
-                          >
-                            {agent.role}
-                          </Typography>
-                        </Box>
-                      </Box>
-
-                      <Box className="text-right">
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            fontWeight: 600,
-                            color: isDark ? "#e5e7eb" : "#111827",
-                          }}
-                        >
-                          {agent.handled} items
-                        </Typography>
-                        <Typography
-                          variant="caption"
-                          sx={{ color: "#16a34a", fontWeight: 600 }}
-                        >
-                          SLA {agent.sla}
-                        </Typography>
-                      </Box>
+                  <Box className="flex items-center gap-3">
+                    <Avatar sx={{ width: 40, height: 40, bgcolor: isDark ? "#1e293b" : "#e2e8f0", color: isDark ? "#94a3b8" : "#64748b", fontWeight: 700, fontSize: 14 }}>
+                      {member.name.split(" ").map(n => n[0]).join("")}
+                    </Avatar>
+                    <Box>
+                      <Typography variant="body2" fontWeight={600} color={isDark ? "#e5e7eb" : "#1e293b"}>
+                        {member.name}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {member.role}
+                      </Typography>
                     </Box>
-                  ))}
-                </Stack>
-              </CardContent>
-            </Card>
-
-            <Card
-              elevation={1}
-              sx={{
-                borderRadius: 3,
-                backgroundColor: isDark ? "#020617" : "#ffffff",
-                border: "1px solid " +
-                  (isDark
-                    ? "rgba(30,64,175,0.7)"
-                    : "rgba(226,232,240,1)"),
-              }}
-            >
-              <CardContent sx={{ p: 2.4 }}>
-                <Stack
-                  direction="row"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  mb={2}
-                >
-                  <Box className="flex items-center gap-1.5">
-                    <ReportProblemOutlinedIcon
-                      sx={{ fontSize: 20, color: "#f97316" }}
-                    />
-                    <Typography
-                      variant="subtitle2"
+                  </Box>
+                  <Box className="flex flex-col items-end">
+                    <Chip
+                      label={member.status}
+                      size="small"
                       sx={{
+                        height: 20,
+                        fontSize: 10,
                         fontWeight: 700,
-                        color: isDark ? "#e5e7eb" : "#111827",
+                        bgcolor: member.status === "online" ? "rgba(3,205,140,0.1)" : member.status === "busy" ? "rgba(245,158,11,0.1)" : "rgba(100,116,139,0.1)",
+                        color: member.status === "online" ? EVZONE_GREEN : member.status === "busy" ? "#f59e0b" : "#64748b"
                       }}
-                    >
-                      Safety &amp; incidents
+                    />
+                    <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
+                      {member.metrics}
                     </Typography>
                   </Box>
-
-                  <Chip
-                    size="small"
-                    label="View SOS queue"
-                    sx={{
-                      borderRadius: 999,
-                      fontSize: 11,
-                      textTransform: "none",
-                      backgroundColor: "rgba(254,226,226,0.7)",
-                      color: "#991b1b",
-                    }}
-                  />
-                </Stack>
-
-                <Grid container spacing={1.5}>
-                  {incidentStats.map((stat) => (
-                    <Grid size={{ xs: 12, sm: 4 }} key={stat.label}>
-                      <Box
-                        className="rounded-2xl px-3 py-2.5 h-full"
-                        sx={{
-                          backgroundColor: isDark
-                            ? "rgba(15,23,42,0.9)"
-                            : "rgba(248,250,252,0.95)",
-                          border: "1px solid rgba(203,213,225,0.9)",
-                        }}
-                      >
-                        <Typography
-                          variant="caption"
-                          sx={{ color: EVZONE_GREY, display: "block" }}
-                        >
-                          {stat.label}
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            mt: 0.5,
-                            fontWeight: 700,
-                            color: stat.color,
-                          }}
-                        >
-                          {stat.value}
-                        </Typography>
-                      </Box>
-                    </Grid>
-                  ))}
-                </Grid>
-              </CardContent>
-            </Card>
-          </Stack>
+                </Box>
+              ))}
+            </Stack>
+          </Card>
         </Grid>
       </Grid>
     </Box>

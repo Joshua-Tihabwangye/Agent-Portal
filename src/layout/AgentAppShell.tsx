@@ -39,10 +39,12 @@ import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import CloseIcon from "@mui/icons-material/Close";
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
+import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
 
 import { useAuth } from "../providers/AuthProvider";
 import { useThemeMode } from "../providers/ThemeModeProvider";
 import { AgentGlobalStatusBanner } from "../components/system/GlobalStatusBanner";
+import { FooterNav } from "../components/shared/FooterNav";
 
 const EVZONE_GREEN = "#03cd8c";
 const EVZONE_GREY = "#6b7280";
@@ -59,6 +61,7 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { key: "dashboard", label: "Dashboard", icon: <DashboardOutlinedIcon fontSize="small" />, href: "/agent/dashboard" },
+  { key: "analytics", label: "Analytics", icon: <BarChartOutlinedIcon fontSize="small" />, href: "/agent/dashboard/analytics" },
   { key: "live-ops", label: "Live Ops & Map", icon: <MapOutlinedIcon fontSize="small" />, href: "/agent/live-ops" },
   { key: "dispatch", label: "Manual Dispatch", icon: <LocalShippingOutlinedIcon fontSize="small" />, href: "/agent/dispatch/board" },
   { key: "onboarding", label: "Driver Onboarding", icon: <AssignmentIndOutlinedIcon fontSize="small" />, href: "/agent/onboarding/drivers" },
@@ -78,6 +81,7 @@ const sampleNotifications = [
 ];
 
 function pickActiveKey(pathname: string): string {
+  if (pathname.includes("/dashboard/analytics")) return "analytics";
   if (pathname.startsWith("/agent/live-ops")) return "live-ops";
   if (pathname.startsWith("/agent/dispatch")) return "dispatch";
   if (pathname.startsWith("/agent/onboarding")) return "onboarding";
@@ -165,34 +169,62 @@ export default function AgentAppShell() {
 
   const drawerContent = (collapsed: boolean) => (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%", px: collapsed ? 1 : 2, py: 2 }}>
-      {/* Brand */}
-      <Box className="flex items-center justify-center mb-3" sx={{ minHeight: 48 }}>
-        <Box className="flex items-center gap-2">
-          <Box
-            className="flex items-center justify-center rounded-xl"
-            sx={{
-              width: 36,
-              height: 36,
-              backgroundColor: EVZONE_GREEN,
-              color: "#020617",
-              fontWeight: 800,
-              letterSpacing: 0.5,
-              fontSize: 16,
-              flexShrink: 0,
-            }}
-          >
-            EV
-          </Box>
-          {!collapsed && (
-            <Box>
-              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: isDark ? "#e5e7eb" : "#111827", lineHeight: 1.1 }}>
-                EVzone
-              </Typography>
-              <Typography variant="caption" sx={{ color: EVZONE_GREY, lineHeight: 1.1 }}>
-                Agent Portal
-              </Typography>
+      {/* Brand and Toggle */}
+      <Box className="mb-3">
+        <Box className="flex items-center justify-between" sx={{ minHeight: 48 }}>
+          <Box className="flex items-center gap-2">
+            <Box
+              className="flex items-center justify-center rounded-xl"
+              sx={{
+                width: 36,
+                height: 36,
+                backgroundColor: EVZONE_GREEN,
+                color: "#020617",
+                fontWeight: 800,
+                letterSpacing: 0.5,
+                fontSize: 16,
+                flexShrink: 0,
+              }}
+            >
+              EV
             </Box>
-          )}
+            {!collapsed && (
+              <Box>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: isDark ? "#e5e7eb" : "#111827", lineHeight: 1.1 }}>
+                  EVzone
+                </Typography>
+                <Typography variant="caption" sx={{ color: EVZONE_GREY, lineHeight: 1.1 }}>
+                  Agent Portal
+                </Typography>
+              </Box>
+            )}
+          </Box>
+
+          {/* Toggle button - Now at top */}
+          <Tooltip title={collapsed ? "Expand sidebar" : "Collapse sidebar"} placement="right">
+            <Box
+              onClick={handleDesktopDrawerToggle}
+              sx={{
+                display: { xs: "none", md: "flex" },
+                alignItems: "center",
+                justifyContent: "center",
+                p: 0.75,
+                cursor: "pointer",
+                borderRadius: 1.5,
+                backgroundColor: isDark ? "rgba(148,163,184,0.08)" : "rgba(226,232,240,0.5)",
+                "&:hover": {
+                  backgroundColor: isDark ? "rgba(148,163,184,0.15)" : "rgba(226,232,240,0.9)",
+                },
+                transition: "all 0.2s",
+              }}
+            >
+              {collapsed ? (
+                <ChevronRightIcon sx={{ fontSize: 18, color: EVZONE_GREY }} />
+              ) : (
+                <ChevronLeftIcon sx={{ fontSize: 18, color: EVZONE_GREY }} />
+              )}
+            </Box>
+          </Tooltip>
         </Box>
       </Box>
 
@@ -242,56 +274,21 @@ export default function AgentAppShell() {
 
       <Divider sx={{ my: 2, borderColor: isDark ? "rgba(148,163,184,0.25)" : "rgba(226,232,240,1)" }} />
 
-      {/* Footer with user info and toggle */}
-      <Box>
-        {/* User info */}
-        <Box className="flex items-center mb-2" sx={{ justifyContent: collapsed ? "center" : "flex-start", px: collapsed ? 0 : 0.5 }}>
-          <Avatar sx={{ width: 32, height: 32, fontSize: 13, fontWeight: 800, bgcolor: "rgba(3,205,140,0.25)", color: EVZONE_GREEN }}>
-            {initials || "A"}
-          </Avatar>
-          {!collapsed && (
-            <Box sx={{ ml: 1.5, overflow: "hidden" }}>
-              <Typography variant="caption" sx={{ color: isDark ? "#e5e7eb" : "#111827", fontWeight: 700, lineHeight: 1.1, display: "block", whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" }}>
-                {user?.name || "Agent"}
-              </Typography>
-              <Typography variant="caption" sx={{ color: EVZONE_GREY, lineHeight: 1.1, display: "block", whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden", fontSize: 10 }}>
-                {user?.email || "agent@evzone.app"}
-              </Typography>
-            </Box>
-          )}
-        </Box>
-
-        {/* Toggle button - Arrow on sidebar */}
-        <Tooltip title={collapsed ? "Expand sidebar" : "Collapse sidebar"} placement="right">
-          <Box
-            onClick={handleDesktopDrawerToggle}
-            sx={{
-              display: { xs: "none", md: "flex" },
-              alignItems: "center",
-              justifyContent: "center",
-              py: 1,
-              cursor: "pointer",
-              borderRadius: 2,
-              mx: collapsed ? 0.5 : 1,
-              backgroundColor: isDark ? "rgba(148,163,184,0.08)" : "rgba(226,232,240,0.5)",
-              "&:hover": {
-                backgroundColor: isDark ? "rgba(148,163,184,0.15)" : "rgba(226,232,240,0.9)",
-              },
-              transition: "all 0.2s",
-            }}
-          >
-            {collapsed ? (
-              <ChevronRightIcon sx={{ fontSize: 20, color: EVZONE_GREY }} />
-            ) : (
-              <>
-                <ChevronLeftIcon sx={{ fontSize: 20, color: EVZONE_GREY }} />
-                <Typography variant="caption" sx={{ color: EVZONE_GREY, ml: 0.5 }}>
-                  Collapse
-                </Typography>
-              </>
-            )}
+      {/* User info at bottom */}
+      <Box className="flex items-center" sx={{ justifyContent: collapsed ? "center" : "flex-start", px: collapsed ? 0 : 0.5 }}>
+        <Avatar sx={{ width: 32, height: 32, fontSize: 13, fontWeight: 800, bgcolor: "rgba(3,205,140,0.25)", color: EVZONE_GREEN }}>
+          {initials || "A"}
+        </Avatar>
+        {!collapsed && (
+          <Box sx={{ ml: 1.5, overflow: "hidden" }}>
+            <Typography variant="caption" sx={{ color: isDark ? "#e5e7eb" : "#111827", fontWeight: 700, lineHeight: 1.1, display: "block", whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" }}>
+              {user?.name || "Agent"}
+            </Typography>
+            <Typography variant="caption" sx={{ color: EVZONE_GREY, lineHeight: 1.1, display: "block", whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden", fontSize: 10 }}>
+              {user?.email || "agent@evzone.app"}
+            </Typography>
           </Box>
-        </Tooltip>
+        )}
       </Box>
     </Box>
   );
@@ -534,8 +531,11 @@ export default function AgentAppShell() {
         </Menu>
 
         {/* Content */}
-        <Box sx={{ flex: 1, minWidth: 0, overflowX: "hidden" }}>
-          <Outlet />
+        <Box sx={{ flex: 1, minWidth: 0, overflowX: "hidden", display: "flex", flexDirection: "column", width: "100%" }}>
+          <Box sx={{ flex: 1, width: "100%" }}>
+            <Outlet />
+          </Box>
+          <FooterNav />
         </Box>
       </Box>
     </Box>

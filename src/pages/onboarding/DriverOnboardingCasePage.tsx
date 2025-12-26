@@ -11,6 +11,7 @@ import {
   Divider,
   Tabs,
   Tab,
+  Alert,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
@@ -99,6 +100,23 @@ export default function AgentDriverOnboardingCasePage() {
             </Typography>
           </Stack>
         </Box>
+
+        {/* Decision Status Banner */}
+        {decision !== "pending" && (
+          <Alert
+            severity={decision === "approve" ? "success" : decision === "reject" ? "error" : "info"}
+            sx={{
+              mb: 2,
+              borderRadius: 2,
+              fontWeight: 600,
+              "& .MuiAlert-icon": { fontSize: 20 },
+            }}
+          >
+            {decision === "approve" && `Driver ${driver.name} has been APPROVED and can now go online.`}
+            {decision === "reject" && `Driver ${driver.name} has been REJECTED. They will be notified via email.`}
+            {decision === "more-info" && `More information requested from ${driver.name}. Driver will receive a notification.`}
+          </Alert>
+        )}
 
         <Card
           elevation={1}
