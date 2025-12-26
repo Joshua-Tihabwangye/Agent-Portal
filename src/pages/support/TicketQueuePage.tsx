@@ -14,6 +14,7 @@ import {
   ListItemIcon,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import { useNavigate } from "react-router-dom";
 import SupportAgentOutlinedIcon from "@mui/icons-material/SupportAgentOutlined";
 import FilterListOutlinedIcon from "@mui/icons-material/FilterListOutlined";
 import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
@@ -77,6 +78,7 @@ const sampleTickets = [
 export default function AgentTicketQueuePage() {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
+  const navigate = useNavigate();
 
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -299,6 +301,7 @@ export default function AgentTicketQueuePage() {
                 {filtered.map((ticket) => (
                   <ListItemButton
                     key={ticket.id}
+                    onClick={() => navigate(`/agent/support/tickets/${encodeURIComponent(ticket.id)}`)}
                     sx={{
                       borderRadius: 3,
                       mb: 1,

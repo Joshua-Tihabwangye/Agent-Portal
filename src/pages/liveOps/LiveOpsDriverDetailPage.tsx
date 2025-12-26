@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Card,
@@ -10,13 +10,19 @@ import {
   Divider,
   Avatar,
   Grid,
+  Button,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import { useNavigate } from "react-router-dom";
 import DirectionsCarOutlinedIcon from "@mui/icons-material/DirectionsCarOutlined";
 import BoltOutlinedIcon from "@mui/icons-material/BoltOutlined";
 import PhoneEnabledOutlinedIcon from "@mui/icons-material/PhoneEnabledOutlined";
 import StarBorderOutlinedIcon from "@mui/icons-material/StarBorderOutlined";
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
+import ChatOutlinedIcon from "@mui/icons-material/ChatOutlined";
+import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 
 const EVZONE_GREEN = "#03cd8c";
 const EVZONE_ORANGE = "#f77f00";
@@ -25,6 +31,8 @@ const EVZONE_GREY = "#6b7280";
 export default function AgentLiveOpsDriverDetailPage() {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
+  const navigate = useNavigate();
+  const [callSnackbar, setCallSnackbar] = useState(false);
 
   // Placeholder driver data – normally fetched by :driverId
   const driver = {
@@ -276,15 +284,51 @@ export default function AgentLiveOpsDriverDetailPage() {
                     </Box>
                   </Stack>
 
-                  <Stack direction="row" spacing={1.2}>
+                  <Stack direction="row" spacing={1.2} flexWrap="wrap">
                     <Chip
                       size="small"
                       icon={<PhoneEnabledOutlinedIcon sx={{ fontSize: 16 }} />}
                       label="Call driver"
+                      onClick={() => {
+                        window.open(`tel:${driver.phone.replace(/\s/g, "")}`, "_self");
+                        setCallSnackbar(true);
+                      }}
                       sx={{
                         borderRadius: 999,
                         textTransform: "none",
                         fontSize: 12,
+                        cursor: "pointer",
+                        backgroundColor: EVZONE_GREEN,
+                        color: "#020617",
+                        border: "1px solid " + EVZONE_GREEN,
+                        "&:hover": { backgroundColor: "#059669" },
+                      }}
+                    />
+                    <Chip
+                      size="small"
+                      icon={<PersonOutlineOutlinedIcon sx={{ fontSize: 16 }} />}
+                      label="Driver profile"
+                      onClick={() => navigate(`/agent/drivers/${driver.id}`)}
+                      sx={{
+                        borderRadius: 999,
+                        textTransform: "none",
+                        fontSize: 12,
+                        cursor: "pointer",
+                        backgroundColor: "rgba(219,234,254,0.9)",
+                        color: "#1d4ed8",
+                        border: "1px solid rgba(59,130,246,0.5)",
+                      }}
+                    />
+                    <Chip
+                      size="small"
+                      icon={<DirectionsCarOutlinedIcon sx={{ fontSize: 16 }} />}
+                      label="View trips"
+                      onClick={() => navigate(`/agent/bookings?driverId=${driver.id}`)}
+                      sx={{
+                        borderRadius: 999,
+                        textTransform: "none",
+                        fontSize: 12,
+                        cursor: "pointer",
                         backgroundColor: "rgba(248,250,252,0.95)",
                         color: EVZONE_GREY,
                         border: "1px solid rgba(203,213,225,0.9)",
@@ -292,14 +336,17 @@ export default function AgentLiveOpsDriverDetailPage() {
                     />
                     <Chip
                       size="small"
-                      label="Open in Driver profile"
+                      icon={<ChatOutlinedIcon sx={{ fontSize: 16 }} />}
+                      label="Open chat"
+                      onClick={() => navigate(`/agent/support/tickets/new?driverId=${driver.id}`)}
                       sx={{
                         borderRadius: 999,
                         textTransform: "none",
                         fontSize: 12,
-                        backgroundColor: "rgba(219,234,254,0.9)",
-                        color: "#1d4ed8",
-                        border: "1px solid rgba(59,130,246,0.5)",
+                        cursor: "pointer",
+                        backgroundColor: "rgba(248,250,252,0.95)",
+                        color: EVZONE_GREY,
+                        border: "1px solid rgba(203,213,225,0.9)",
                       }}
                     />
                   </Stack>
@@ -501,6 +548,18 @@ export default function AgentLiveOpsDriverDetailPage() {
           </Grid>
         </Grid>
       </Box>
+
+      {/* Call Snackbar */}
+      <Snackbar
+        open={callSnackbar}
+        autoHideDuration={4000}
+        onClose={() => setCallSnackbar(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert severity="success" onClose={() => setCallSnackbar(false)} sx={{ width: "100%" }}>
+          Initiating call to {driver.phone}...
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

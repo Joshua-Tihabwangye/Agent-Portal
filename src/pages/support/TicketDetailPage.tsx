@@ -10,8 +10,18 @@ import {
   Grid,
   Divider,
   TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  List,
+  ListItemButton,
+  ListItemText,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import { useNavigate } from "react-router-dom";
 import SupportAgentOutlinedIcon from "@mui/icons-material/SupportAgentOutlined";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import DirectionsCarOutlinedIcon from "@mui/icons-material/DirectionsCarOutlined";
@@ -19,10 +29,19 @@ import PaymentsOutlinedIcon from "@mui/icons-material/PaymentsOutlined";
 import ReportProblemOutlinedIcon from "@mui/icons-material/ReportProblemOutlined";
 import NoteAltOutlinedIcon from "@mui/icons-material/NoteAltOutlined";
 import PhoneEnabledOutlinedIcon from "@mui/icons-material/PhoneEnabledOutlined";
+import CallOutlinedIcon from "@mui/icons-material/CallOutlined";
 
 const EVZONE_GREEN = "#03cd8c";
 const EVZONE_ORANGE = "#f77f00";
 const EVZONE_GREY = "#6b7280";
+
+// Macros for quick responses
+const macros = [
+  { id: 1, name: "Apology - Late Arrival", text: "We sincerely apologize for the inconvenience caused by the late arrival. We take this seriously and are reviewing the trip details." },
+  { id: 2, name: "Refund Process", text: "Your refund request has been submitted. Please allow 3-5 business days for the amount to reflect in your account." },
+  { id: 3, name: "Driver Follow-up", text: "We have contacted the driver regarding this issue and will update you once we have more information." },
+  { id: 4, name: "Escalation Notice", text: "This issue has been escalated to our safety team for further review. We will contact you within 24 hours." },
+];
 
 // Placeholder ticket; in a real app load via ticketId.
 const ticket = {
@@ -41,17 +60,45 @@ const ticket = {
     "Rider reports that the driver took more than 20 minutes to arrive at pickup despite being nearby.",
 };
 
+interface ChatMessage {
+  sender: "rider" | "agent";
+  text: string;
+  time: string;
+}
+
 export default function AgentTicketDetailPage() {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
+  const navigate = useNavigate();
 
   const [reply, setReply] = useState("");
   const [internalNote, setInternalNote] = useState("");
+  const [macroDialogOpen, setMacroDialogOpen] = useState(false);
+  const [callSnackbar, setCallSnackbar] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    { sender: "rider", text: "Driver kept changing the pickup point and arrived very late. I almost missed my appointment.", time: "09:22" },
+    { sender: "agent", text: "Thanks for explaining. I will review the trip timeline and get back to you with an update.", time: "09:25" },
+  ]);
 
   const handleSendReply = () => {
     if (!reply.trim()) return;
-    console.log("Send reply", { ticketId: ticket.id, reply });
+    const newMessage: ChatMessage = {
+      sender: "agent",
+      text: reply,
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    };
+    setMessages([...messages, newMessage]);
     setReply("");
+  };
+
+  const handleInsertMacro = (macroText: string) => {
+    setReply(macroText);
+    setMacroDialogOpen(false);
+  };
+
+  const handleCall = () => {
+    window.open(`tel:${ticket.userPhone.replace(/\s/g, "")}`, "_self");
+    setCallSnackbar(true);
   };
 
   const handleAddNote = () => {
@@ -289,6 +336,7 @@ export default function AgentTicketDetailPage() {
                       <Button
                         variant="outlined"
                         size="small"
+                        onClick={() => navigate(`/agent/live-ops/trips/${ticket.tripId}`)}
                         startIcon={
                           <DirectionsCarOutlinedIcon sx={{ fontSize: 16 }} />
                         }
@@ -303,6 +351,7 @@ export default function AgentTicketDetailPage() {
                       <Button
                         variant="outlined"
                         size="small"
+                        onClick={() => navigate(`/agent/safety/incidents/new?ticketId=${ticket.id}`)}
                         startIcon={
                           <ReportProblemOutlinedIcon sx={{ fontSize: 16 }} />
                         }
@@ -313,6 +362,21 @@ export default function AgentTicketDetailPage() {
                         }}
                       >
                         Open incident
+                      </Button>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={handleCall}
+                        startIcon={<CallOutlinedIcon sx={{ fontSize: 16 }} />}
+                        sx={{
+                          borderRadius: 999,
+                          textTransform: "none",
+                          fontSize: 12,
+                          backgroundColor: EVZONE_GREEN,
+                          "&:hover": { backgroundColor: "#059669" },
+                        }}
+                      >
+                        Call user
                       </Button>
                     </Stack>
                   </Stack>
@@ -378,31 +442,37 @@ export default function AgentTicketDetailPage() {
                       : "rgba(248,250,252,0.95)",
                     p: 1.5,
                     minHeight: 120,
+                    maxHeight: 280,
+                    overflowY: "auto",
                   }}
                 >
                   <Typography
                     variant="caption"
-                    sx={{ color: EVZONE_GREY, display: "block", mb: 0.5 }}
+                    sx={{ color: EVZONE_GREY, display: "block", mb: 1 }}
                   >
-                    Conversation history (placeholder)
+                    Conversation history
                   </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ color: isDark ? "#e5e7eb" : "#111827" }}
-                  >
-                    Rider: "Driver kept changing the pickup point and arrived
-                    very late. I almost missed my appointment."
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: isDark ? "#e5e7eb" : "#111827",
-                      mt: 0.8,
-                    }}
-                  >
-                    Agent: "Thanks for explaining. I will review the trip
-                    timeline and get back to you with an update."
-                  </Typography>
+                  {messages.map((msg, idx) => (
+                    <Box
+                      key={idx}
+                      sx={{
+                        mb: 1,
+                        p: 1,
+                        borderRadius: 2,
+                        backgroundColor: msg.sender === "agent"
+                          ? (isDark ? "rgba(3,205,140,0.15)" : "rgba(3,205,140,0.1)")
+                          : (isDark ? "rgba(30,41,59,0.8)" : "rgba(241,245,249,0.8)"),
+                        textAlign: msg.sender === "agent" ? "right" : "left",
+                      }}
+                    >
+                      <Typography variant="caption" sx={{ color: EVZONE_GREY, display: "block", mb: 0.3 }}>
+                        {msg.sender === "agent" ? "Agent" : "Rider"} · {msg.time}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: isDark ? "#e5e7eb" : "#111827" }}>
+                        {msg.text}
+                      </Typography>
+                    </Box>
+                  ))}
                 </Box>
 
                 <Stack spacing={0.8}>
@@ -430,6 +500,7 @@ export default function AgentTicketDetailPage() {
                     <Button
                       variant="outlined"
                       size="small"
+                      onClick={() => setMacroDialogOpen(true)}
                       sx={{
                         borderRadius: 999,
                         textTransform: "none",
@@ -561,6 +632,45 @@ export default function AgentTicketDetailPage() {
           </Grid>
         </Grid>
       </Box>
+
+      {/* Macro Dialog */}
+      <Dialog open={macroDialogOpen} onClose={() => setMacroDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ fontWeight: 700 }}>Insert Macro</DialogTitle>
+        <DialogContent dividers>
+          <Typography variant="body2" color="text.secondary" mb={2}>
+            Select a pre-written response to insert into your reply.
+          </Typography>
+          <List disablePadding>
+            {macros.map((macro) => (
+              <ListItemButton
+                key={macro.id}
+                onClick={() => handleInsertMacro(macro.text)}
+                sx={{ borderRadius: 2, mb: 0.5, border: "1px solid rgba(203,213,225,0.5)" }}
+              >
+                <ListItemText
+                  primary={<Typography variant="subtitle2" fontWeight={600}>{macro.name}</Typography>}
+                  secondary={macro.text.substring(0, 80) + "..."}
+                />
+              </ListItemButton>
+            ))}
+          </List>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setMacroDialogOpen(false)}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Call Snackbar */}
+      <Snackbar
+        open={callSnackbar}
+        autoHideDuration={4000}
+        onClose={() => setCallSnackbar(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert severity="success" onClose={() => setCallSnackbar(false)} sx={{ width: "100%" }}>
+          Initiating call to {ticket.userPhone}...
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

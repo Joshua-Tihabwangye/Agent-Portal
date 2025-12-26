@@ -11,6 +11,7 @@ import AgentWelcomeTrainingGatePage from "../pages/auth/AgentWelcomeTrainingGate
 // Dashboards
 import AgentDashboardPage from "../pages/dashboard/AgentDashboardPage";
 import SupervisorDashboardPage from "../pages/dashboard/SupervisorDashboardPage";
+import AnalyticsDashboardPage from "../pages/dashboard/AnalyticsDashboardPage";
 
 // Live ops
 import LiveOpsMapViewPage from "../pages/liveOps/LiveOpsMapViewPage";
@@ -96,6 +97,7 @@ export default function App() {
         <Route element={<AgentAppShell />}>
           {/* Dashboards */}
           <Route path="/agent/dashboard" element={<AgentDashboardPage />} />
+          <Route path="/agent/dashboard/analytics" element={<AnalyticsDashboardPage />} />
           <Route path="/agent/dashboard/supervisor" element={<SupervisorDashboardPage />} />
 
           {/* Live Ops */}

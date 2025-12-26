@@ -193,7 +193,7 @@ export default function AgentLiveOpsPage() {
                 sx={{
                   position: "relative",
                   flex: 1,
-                  borderRadius: 20,
+                  borderRadius: 2,
                   overflow: "hidden",
                   background:
                     "radial-gradient(circle at 0 0, rgba(59,130,246,0.18), transparent 55%)," +

@@ -1,6 +1,5 @@
-import React from "react";
-import { Box, Card, CardActionArea, CardContent, Typography, Stack, Chip, LinearProgress, Divider } from "@mui/material";
-import Grid from "@mui/material/Grid";
+import React, { useState } from "react";
+import { Box, Card, CardActionArea, CardContent, Typography, Stack, Chip, LinearProgress, Divider, Grid } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
@@ -8,6 +7,9 @@ import SupportAgentOutlinedIcon from "@mui/icons-material/SupportAgentOutlined";
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
+import PeriodSelector from "../../components/shared/PeriodSelector";
+import type { PeriodValue } from "../../components/shared/PeriodSelector";
+import { RevenuePieChart, TrendLineChart, CHART_COLORS } from "../../components/shared/AnalyticsCharts";
 
 const EVZONE_GREEN = "#03cd8c";
 const EVZONE_ORANGE = "#f77f00";
@@ -21,6 +23,7 @@ const summaryCards = [
     chip: "+2 today",
     icon: <SupportAgentOutlinedIcon fontSize="small" />,
     href: "/agent/support/tickets",
+    color: CHART_COLORS[2], // Blue
   },
   {
     key: "tickets-due",
@@ -29,6 +32,7 @@ const summaryCards = [
     chip: "Within 1 hour",
     icon: <AccessTimeOutlinedIcon fontSize="small" />,
     href: "/agent/support/tickets",
+    color: CHART_COLORS[4], // Red
   },
   {
     key: "onboarding",
@@ -37,6 +41,7 @@ const summaryCards = [
     chip: "Drivers awaiting review",
     icon: <AssignmentTurnedInOutlinedIcon fontSize="small" />,
     href: "/agent/onboarding/drivers",
+    color: CHART_COLORS[5], // Teal
   },
   {
     key: "dispatch",
@@ -45,6 +50,7 @@ const summaryCards = [
     chip: "In progress",
     icon: <LocalShippingOutlinedIcon fontSize="small" />,
     href: "/agent/dispatch/board",
+    color: CHART_COLORS[1], // Orange
   },
 ];
 
@@ -75,23 +81,49 @@ const todayTimeline = [
   },
 ];
 
+// Mock analytics data - comprehensive agent metrics
+const mockAnalytics = {
+  ticketTrend: [
+    { name: "Mon", value: 12, resolved: 10 }, { name: "Tue", value: 18, resolved: 15 }, { name: "Wed", value: 14, resolved: 12 },
+    { name: "Thu", value: 22, resolved: 18 }, { name: "Fri", value: 16, resolved: 14 }, { name: "Sat", value: 8, resolved: 7 }, { name: "Sun", value: 5, resolved: 4 }
+  ],
+  ticketCategory: [
+    { name: "Tech", value: 45 }, { name: "Billing", value: 25 }, { name: "Safety", value: 10 }, { name: "Other", value: 20 }
+  ],
+  responseTime: [
+    { name: "Mon", value: 4.2 }, { name: "Tue", value: 3.8 }, { name: "Wed", value: 5.1 },
+    { name: "Thu", value: 3.5 }, { name: "Fri", value: 4.0 }, { name: "Sat", value: 2.8 }, { name: "Sun", value: 2.2 }
+  ],
+  slaCompliance: [
+    { name: "On Time", value: 92 }, { name: "Breached", value: 8 }
+  ],
+  performanceMetrics: {
+    avgHandleTime: "6m 12s",
+    firstResponseTime: "2m 45s",
+    ticketsResolved: 14,
+    customerSatisfaction: 4.7
+  }
+};
+
 export default function AgentDashboardPage() {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   const navigate = useNavigate();
+  const [period, setPeriod] = useState<PeriodValue>("today");
 
   const workloadCompletion = 65; // placeholder
 
   return (
-    <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 md:px-8 py-4">
+    <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 md:px-8 py-4 w-full">
       {/* Header */}
-      <Box className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+      <Box className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <Box>
           <Typography
-            variant="h6"
+            variant="h5"
             sx={{
-              fontWeight: 700,
+              fontWeight: 800,
               color: isDark ? "#e5e7eb" : "#111827",
+              mb: 0.5,
             }}
           >
             My dashboard
@@ -100,383 +132,252 @@ export default function AgentDashboardPage() {
             variant="body2"
             sx={{ color: EVZONE_GREY, maxWidth: 460 }}
           >
-            See your tickets, onboarding cases and dispatch workload for today.
+            Overview of your daily tasks, tickets, and performance metrics.
           </Typography>
         </Box>
 
-        <Chip
-          label="Agent view"
-          size="small"
-          sx={{
-            borderRadius: 999,
-            fontSize: 11,
-            textTransform: "none",
-            backgroundColor: isDark
-              ? "rgba(15,23,42,0.9)"
-              : "rgba(219,234,254,0.9)",
-            border: "1px solid rgba(148,163,184,0.4)",
-            color: isDark ? "#e5e7eb" : "#1e3a8a",
-            fontWeight: 600,
-          }}
-        />
+        <Stack direction="row" spacing={2} alignItems="center">
+          <PeriodSelector value={period} onChange={setPeriod} compact />
+          <Chip
+            label="Agent view"
+            size="small"
+            sx={{
+              borderRadius: 2,
+              fontWeight: 700,
+              backgroundColor: isDark ? "rgba(30,58,138,0.3)" : "rgba(219,234,254,0.7)",
+              color: "#3b82f6",
+              border: `1px solid ${isDark ? "#1e40af" : "#93c5fd"}`,
+            }}
+          />
+        </Stack>
       </Box>
 
-      {/* Summary cards */}
-      <Grid container spacing={2} className="mb-4">
+      {/* Summary cards - Full Width */}
+      <Grid container spacing={2} className="mb-6">
         {summaryCards.map((card) => (
           <Grid size={{ xs: 12, sm: 6, lg: 3 }} key={card.key}>
             <Card
-              elevation={1}
-              className="ev-gradient-soft"
+              elevation={0}
               sx={{
                 borderRadius: 3,
-                backgroundColor: "transparent",
-                boxShadow: "0 10px 30px rgba(2,6,23,0.12)",
-                overflow: "hidden",
-                border: "1px solid " + (isDark ? "rgba(59,130,246,0.25)" : "rgba(255,255,255,0.65)"),
-                transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                backgroundColor: isDark ? "rgba(2,6,23,0.6)" : "rgba(255,255,255,0.8)",
+                border: `1px solid ${isDark ? "rgba(148,163,184,0.1)" : "rgba(226,232,240,1)"}`,
+                transition: "all 0.2s ease",
                 "&:hover": {
                   transform: "translateY(-4px)",
-                  boxShadow: "0 16px 40px rgba(2,6,23,0.18)",
+                  boxShadow: `0 12px 24px ${card.color}15`,
+                  borderColor: `${card.color}40`,
                 },
               }}
             >
-              <CardActionArea onClick={() => navigate(card.href)} sx={{ height: "100%" }}>
-                <CardContent sx={{ py: 1.8, px: 2.2 }}>
-                  <Stack direction="row" justifyContent="space-between" mb={1}>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        color: isDark ? "#cbd5e1" : "#0f172a",
-                        textTransform: "uppercase",
-                        letterSpacing: 0.4,
-                        fontWeight: 700,
-                      }}
-                    >
-                      {card.label}
-                    </Typography>
-                    <Box
-                      className="flex items-center justify-center rounded-full"
-                      sx={{
-                        width: 30,
-                        height: 30,
-                        backgroundColor: "rgba(255,255,255,0.32)",
-                        border: "1px solid rgba(255,255,255,0.5)",
-                        color: "#0f172a",
-                      }}
-                    >
-                      {card.icon}
-                    </Box>
-                  </Stack>
-                  <Stack direction="row" alignItems="baseline" spacing={1}>
-                    <Typography
-                      variant="h5"
-                      sx={{
-                        fontWeight: 800,
-                        color: isDark ? "#e2e8f0" : "#0f172a",
-                      }}
-                    >
-                      {card.value}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{ color: isDark ? "#cbd5e1" : "#1e293b" }}
-                    >
-                      items
-                    </Typography>
-                  </Stack>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: isDark ? "#cbd5e1" : "#1f2937", display: "block", mt: 0.75 }}
+              <CardActionArea onClick={() => navigate(card.href)} sx={{ height: "100%", p: 2 }}>
+                <Stack direction="row" justifyContent="space-between" mb={2}>
+                  <Box
+                    sx={{
+                      p: 1,
+                      borderRadius: 2,
+                      bgcolor: `${card.color}15`,
+                      color: card.color,
+                      display: "flex"
+                    }}
                   >
-                    {card.chip} · tap to open
-                  </Typography>
-                </CardContent>
+                    {card.icon}
+                  </Box>
+                  <Chip
+                    label={card.chip}
+                    size="small"
+                    sx={{
+                      height: 20,
+                      fontSize: 10,
+                      fontWeight: 700,
+                      bgcolor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
+                      color: isDark ? "#94a3b8" : "#64748b"
+                    }}
+                  />
+                </Stack>
+                <Typography variant="h4" fontWeight={800} sx={{ color: isDark ? "#e5e7eb" : "#0f172a", mb: 0.5 }}>
+                  {card.value}
+                </Typography>
+                <Typography variant="body2" sx={{ color: EVZONE_GREY, fontWeight: 500 }}>
+                  {card.label}
+                </Typography>
               </CardActionArea>
             </Card>
           </Grid>
         ))}
       </Grid>
 
-      <Grid container spacing={2}>
+      <Grid container spacing={3}>
         {/* Workload & SLA block */}
-        <Grid size={{ xs: 12, lg: 6 }}>
+        <Grid size={{ xs: 12, md: 6, lg: 4 }}>
           <Card
-            elevation={1}
+            elevation={0}
             sx={{
               borderRadius: 3,
-              backgroundColor: isDark ? "#020617" : "#ffffff",
-              border: "1px solid " +
-                (isDark
-                  ? "rgba(30,64,175,0.7)"
-                  : "rgba(226,232,240,1)"),
+              backgroundColor: isDark ? "rgba(2,6,23,0.6)" : "rgba(255,255,255,0.8)",
+              border: `1px solid ${isDark ? "rgba(148,163,184,0.1)" : "rgba(226,232,240,1)"}`,
               height: "100%",
             }}
           >
-            <CardContent sx={{ p: 2.4 }}>
-              <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-                mb={2}
-              >
-                <Box>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{
-                      fontWeight: 700,
-                      color: isDark ? "#e5e7eb" : "#111827",
-                    }}
-                  >
-                    Today&apos;s workload
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: EVZONE_GREY }}
-                  >
-                    Progress across your current assigned items.
-                  </Typography>
-                </Box>
-
-                <Chip
-                  size="small"
-                  label="SLA 92%"
-                  sx={{
-                    borderRadius: 999,
-                    fontSize: 11,
-                    textTransform: "none",
-                    backgroundColor: "rgba(22,163,74,0.12)",
-                    color: "#166534",
-                    border: "1px solid rgba(34,197,94,0.5)",
-                  }}
-                />
+            <CardContent sx={{ p: 2.5 }}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
+                <Typography variant="subtitle1" fontWeight={700}>
+                  Workload Progress
+                </Typography>
+                <Typography variant="h6" fontWeight={800} color={EVZONE_GREEN}>
+                  {workloadCompletion}%
+                </Typography>
               </Stack>
 
-              <Box sx={{ mb: 2 }}>
-                <Stack
-                  direction="row"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  mb={1}
-                >
-                  <Typography
-                    variant="body2"
-                    sx={{ color: EVZONE_GREY }}
-                  >
-                    Completion towards end of shift
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: 600,
-                      color: isDark ? "#e5e7eb" : "#111827",
-                    }}
-                  >
-                    {workloadCompletion}%
-                  </Typography>
-                </Stack>
+              <Box sx={{ mb: 4 }}>
                 <LinearProgress
                   variant="determinate"
                   value={workloadCompletion}
                   sx={{
-                    height: 8,
+                    height: 10,
                     borderRadius: 999,
-                    backgroundColor: isDark
-                      ? "rgba(30,64,175,0.5)"
-                      : "rgba(226,232,240,0.9)",
+                    backgroundColor: isDark ? "rgba(148,163,184,0.1)" : "rgba(226,232,240,0.6)",
                     "& .MuiLinearProgress-bar": {
-                      backgroundImage:
-                        "linear-gradient(90deg, " +
-                        EVZONE_GREEN +
-                        ", " +
-                        EVZONE_ORANGE +
-                        ")",
+                      backgroundImage: `linear-gradient(90deg, ${EVZONE_GREEN}, ${EVZONE_ORANGE})`,
                     },
                   }}
                 />
               </Box>
 
-              <Divider
-                sx={{
-                  my: 2,
-                  borderColor: isDark
-                    ? "rgba(30,64,175,0.7)"
-                    : "rgba(226,232,240,1)",
-                }}
-              />
-
-              <Stack spacing={1.5}>
+              <Stack spacing={2} divider={<Divider flexItem sx={{ borderColor: isDark ? "rgba(148,163,184,0.1)" : "rgba(226,232,240,0.8)" }} />}>
                 <Stack direction="row" justifyContent="space-between">
-                  <Typography
-                    variant="body2"
-                    sx={{ color: EVZONE_GREY }}
-                  >
-                    Tickets resolved today
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: 600,
-                      color: isDark ? "#e5e7eb" : "#111827",
-                    }}
-                  >
-                    14
-                  </Typography>
+                  <Typography variant="body2" color="text.secondary">Tickets Resolved</Typography>
+                  <Typography variant="body2" fontWeight={700}>14</Typography>
                 </Stack>
                 <Stack direction="row" justifyContent="space-between">
-                  <Typography
-                    variant="body2"
-                    sx={{ color: EVZONE_GREY }}
-                  >
-                    Average handle time
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: 600,
-                      color: isDark ? "#e5e7eb" : "#111827",
-                    }}
-                  >
-                    6m 12s
-                  </Typography>
+                  <Typography variant="body2" color="text.secondary">Avg Handle Time</Typography>
+                  <Typography variant="body2" fontWeight={700}>6m 12s</Typography>
                 </Stack>
                 <Stack direction="row" justifyContent="space-between">
-                  <Typography
-                    variant="body2"
-                    sx={{ color: EVZONE_GREY }}
-                  >
-                    Oldest pending ticket
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: 600,
-                      color: "#b45309",
-                    }}
-                  >
-                    38 min
-                  </Typography>
+                  <Typography variant="body2" color="text.secondary">SLA Compliance</Typography>
+                  <Typography variant="body2" fontWeight={700} color={EVZONE_GREEN}>98%</Typography>
                 </Stack>
               </Stack>
             </CardContent>
           </Card>
         </Grid>
 
-        {/* Today timeline */}
-        <Grid size={{ xs: 12, lg: 6 }}>
+        {/* Analytics Section - New */}
+        <Grid size={{ xs: 12, md: 6, lg: 4 }}>
           <Card
-            elevation={1}
+            elevation={0}
             sx={{
               borderRadius: 3,
-              backgroundColor: isDark ? "#020617" : "#ffffff",
-              border: "1px solid " +
-                (isDark
-                  ? "rgba(30,64,175,0.7)"
-                  : "rgba(226,232,240,1)"),
+              backgroundColor: isDark ? "rgba(2,6,23,0.6)" : "rgba(255,255,255,0.8)",
+              border: `1px solid ${isDark ? "rgba(148,163,184,0.1)" : "rgba(226,232,240,1)"}`,
               height: "100%",
+              p: 2
             }}
           >
-            <CardContent sx={{ p: 2.4 }}>
+            <TrendLineChart
+              title="Ticket Volume"
+              data={mockAnalytics.ticketTrend}
+              dataKeys={["value"]}
+              height={220}
+            />
+          </Card>
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 12, lg: 4 }}>
+          <Card
+            elevation={0}
+            sx={{
+              borderRadius: 3,
+              backgroundColor: isDark ? "rgba(2,6,23,0.6)" : "rgba(255,255,255,0.8)",
+              border: `1px solid ${isDark ? "rgba(148,163,184,0.1)" : "rgba(226,232,240,1)"}`,
+              height: "100%",
+              p: 2
+            }}
+          >
+            <RevenuePieChart
+              title="Work Distribution"
+              data={mockAnalytics.ticketCategory}
+              height={220}
+              showLegend={true}
+            />
+          </Card>
+        </Grid>
+
+        {/* Timeline - Full Width Row */}
+        <Grid size={{ xs: 12 }}>
+          <Card
+            elevation={0}
+            sx={{
+              borderRadius: 3,
+              backgroundColor: isDark ? "rgba(2,6,23,0.6)" : "rgba(255,255,255,0.8)",
+              border: `1px solid ${isDark ? "rgba(148,163,184,0.1)" : "rgba(226,232,240,1)"}`,
+            }}
+          >
+            <CardContent sx={{ p: 2.5 }}>
               <Stack
                 direction="row"
                 justifyContent="space-between"
                 alignItems="center"
                 mb={2}
               >
-                <Box>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{
-                      fontWeight: 700,
-                      color: isDark ? "#e5e7eb" : "#111827",
-                    }}
-                  >
-                    Today&apos;s focus
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: EVZONE_GREY }}
-                  >
-                    Upcoming tasks and checkpoints
-                  </Typography>
-                </Box>
-
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <EventAvailableOutlinedIcon
-                    sx={{ fontSize: 18, color: EVZONE_ORANGE }}
-                  />
-                  <Typography
-                    variant="caption"
-                    sx={{ color: EVZONE_GREY }}
-                  >
-                    Shift ends in 5h 20m
-                  </Typography>
-                </Stack>
+                <Typography variant="subtitle1" fontWeight={700}>
+                  Today&apos;s Schedule
+                </Typography>
+                <Chip
+                  icon={<EventAvailableOutlinedIcon sx={{ fontSize: "16px !important" }} />}
+                  label="Shift ends: 17:00"
+                  size="small"
+                  color="warning"
+                  variant="outlined"
+                />
               </Stack>
 
-              <Stack spacing={1.6}>
+              <Grid container spacing={2}>
                 {todayTimeline.map((item) => (
-                  <Box
-                    key={item.time}
-                    className="flex gap-3 cursor-pointer"
-                    onClick={() => navigate(item.href)}
-                    sx={{
-                      "&:hover .timeline-item": {
-                        backgroundColor: isDark
-                          ? "rgba(3,205,140,0.08)"
-                          : "rgba(3,205,140,0.06)",
-                        borderColor: EVZONE_GREEN,
-                      },
-                    }}
-                  >
-                    <Box className="flex flex-col items-center mt-0.5">
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: EVZONE_GREY,
-                          fontVariantNumeric: "tabular-nums",
-                        }}
-                      >
-                        {item.time}
-                      </Typography>
-                      <Box
-                        className="w-px flex-1 mt-1"
-                        sx={{
-                          background:
-                            "linear-gradient(to bottom, rgba(148,163,184,0.7), transparent)",
-                        }}
-                      />
-                    </Box>
-
+                  <Grid size={{ xs: 12, md: 6, lg: 3 }} key={item.time}>
                     <Box
-                      className="timeline-item flex-1 rounded-2xl px-3 py-2.5"
+                      onClick={() => navigate(item.href)}
                       sx={{
-                        backgroundColor: isDark
-                          ? "rgba(15,23,42,0.9)"
-                          : "rgba(248,250,252,0.9)",
-                        border: "1px solid rgba(203,213,225,0.7)",
-                        transition: "background-color 0.2s ease, border-color 0.2s ease",
+                        p: 2,
+                        borderRadius: 2,
+                        cursor: "pointer",
+                        border: `1px solid ${isDark ? "rgba(148,163,184,0.1)" : "rgba(226,232,240,0.8)"}`,
+                        backgroundColor: isDark ? "rgba(15,23,42,0.4)" : "rgba(248,250,252,0.6)",
+                        transition: "all 0.2s",
+                        "&:hover": {
+                          borderColor: EVZONE_GREEN,
+                          backgroundColor: isDark ? "rgba(3,205,140,0.05)" : "rgba(3,205,140,0.02)",
+                        }
                       }}
                     >
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          fontWeight: 600,
-                          color: isDark ? "#e5e7eb" : "#111827",
-                        }}
-                      >
-                        {item.title}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        sx={{ color: EVZONE_GREY }}
-                      >
-                        {item.meta}
-                      </Typography>
+                      <Stack direction="row" spacing={1.5}>
+                        <Box
+                          sx={{
+                            px: 1,
+                            py: 0.5,
+                            borderRadius: 1,
+                            bgcolor: isDark ? "rgba(255,255,255,0.05)" : "#f1f5f9",
+                            color: "text.secondary",
+                            fontSize: 12,
+                            fontWeight: 700,
+                            height: "fit-content"
+                          }}
+                        >
+                          {item.time}
+                        </Box>
+                        <Box>
+                          <Typography variant="body2" fontWeight={600} mb={0.5}>
+                            {item.title}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {item.meta}
+                          </Typography>
+                        </Box>
+                      </Stack>
                     </Box>
-                  </Box>
+                  </Grid>
                 ))}
-              </Stack>
+              </Grid>
             </CardContent>
           </Card>
         </Grid>

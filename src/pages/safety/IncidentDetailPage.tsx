@@ -9,8 +9,11 @@ import {
   Button,
   Grid,
   Divider,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import { useNavigate } from "react-router-dom";
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
 import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
@@ -20,6 +23,7 @@ import PhoneEnabledOutlinedIcon from "@mui/icons-material/PhoneEnabledOutlined";
 import NotificationsActiveOutlinedIcon from "@mui/icons-material/NotificationsActiveOutlined";
 import BlockOutlinedIcon from "@mui/icons-material/BlockOutlined";
 import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
+import ConfirmationNumberOutlinedIcon from "@mui/icons-material/ConfirmationNumberOutlined";
 
 const EVZONE_GREEN = "#03cd8c";
 const EVZONE_ORANGE = "#f77f00";
@@ -44,6 +48,9 @@ const incident = {
 export default function AgentIncidentDetailPage() {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
+  const navigate = useNavigate();
+  const [callSnackbar, setCallSnackbar] = useState(false);
+  const [actionSnackbar, setActionSnackbar] = useState<{ open: boolean; message: string }>({ open: false, message: "" });
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 py-4">
@@ -390,27 +397,71 @@ export default function AgentIncidentDetailPage() {
               isDark={isDark}
               userName={incident.userName}
               userPhone={incident.userPhone}
+              incidentId={incident.id}
+              tripId={incident.tripId}
+              onCall={() => {
+                window.open(`tel:${incident.userPhone.replace(/\s/g, "")}`, "_self");
+                setCallSnackbar(true);
+              }}
+              onAttachToTicket={() => navigate(`/agent/support/tickets/new?incidentId=${incident.id}`)}
+              onViewTrip={() => navigate(`/agent/live-ops/trips/${incident.tripId}`)}
+              onNotify={() => setActionSnackbar({ open: true, message: "Supervisor has been notified." })}
+              onFlag={() => setActionSnackbar({ open: true, message: "Account flagged for review." })}
             />
           </Grid>
         </Grid>
       </Box>
+
+      {/* Call Snackbar */}
+      <Snackbar
+        open={callSnackbar}
+        autoHideDuration={4000}
+        onClose={() => setCallSnackbar(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert severity="success" onClose={() => setCallSnackbar(false)} sx={{ width: "100%" }}>
+          Initiating call to {incident.userPhone}...
+        </Alert>
+      </Snackbar>
+
+      {/* Action Snackbar */}
+      <Snackbar
+        open={actionSnackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setActionSnackbar({ open: false, message: "" })}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert severity="info" onClose={() => setActionSnackbar({ open: false, message: "" })} sx={{ width: "100%" }}>
+          {actionSnackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
 
-function EmergencyQuickActionsPanel({ isDark, userName, userPhone }) {
-  const handleCall = () => {
-    console.log("Call user", { userName, userPhone });
-  };
-
-  const handleNotifySupervisor = () => {
-    console.log("Notify supervisor about incident");
-  };
-
-  const handleFlagAccount = () => {
-    console.log("Flag account for review", { userName });
-  };
-
+function EmergencyQuickActionsPanel({
+  isDark,
+  userName,
+  userPhone,
+  incidentId,
+  tripId,
+  onCall,
+  onAttachToTicket,
+  onViewTrip,
+  onNotify,
+  onFlag,
+}: {
+  isDark: boolean;
+  userName: string;
+  userPhone: string;
+  incidentId: string;
+  tripId: string;
+  onCall: () => void;
+  onAttachToTicket: () => void;
+  onViewTrip: () => void;
+  onNotify: () => void;
+  onFlag: () => void;
+}) {
   return (
     <Card
       elevation={1}
@@ -469,7 +520,7 @@ function EmergencyQuickActionsPanel({ isDark, userName, userPhone }) {
             fullWidth
             variant="contained"
             startIcon={<PhoneEnabledOutlinedIcon sx={{ fontSize: 18 }} />}
-            onClick={handleCall}
+            onClick={onCall}
             sx={{
               borderRadius: 999,
               textTransform: "none",
@@ -484,13 +535,42 @@ function EmergencyQuickActionsPanel({ isDark, userName, userPhone }) {
             Call {userName}
           </Button>
 
+          <Stack direction="row" spacing={1}>
+            <Button
+              fullWidth
+              variant="outlined"
+              startIcon={<DirectionsCarOutlinedIcon sx={{ fontSize: 18 }} />}
+              onClick={onViewTrip}
+              sx={{
+                borderRadius: 999,
+                textTransform: "none",
+                fontSize: 13,
+              }}
+            >
+              View trip
+            </Button>
+            <Button
+              fullWidth
+              variant="outlined"
+              startIcon={<ConfirmationNumberOutlinedIcon sx={{ fontSize: 18 }} />}
+              onClick={onAttachToTicket}
+              sx={{
+                borderRadius: 999,
+                textTransform: "none",
+                fontSize: 13,
+              }}
+            >
+              Create ticket
+            </Button>
+          </Stack>
+
           <Button
             fullWidth
             variant="outlined"
             startIcon={
               <NotificationsActiveOutlinedIcon sx={{ fontSize: 18 }} />
             }
-            onClick={handleNotifySupervisor}
+            onClick={onNotify}
             sx={{
               borderRadius: 999,
               textTransform: "none",
@@ -504,7 +584,7 @@ function EmergencyQuickActionsPanel({ isDark, userName, userPhone }) {
             fullWidth
             variant="outlined"
             startIcon={<FlagOutlinedIcon sx={{ fontSize: 18 }} />}
-            onClick={handleFlagAccount}
+            onClick={onFlag}
             sx={{
               borderRadius: 999,
               textTransform: "none",
