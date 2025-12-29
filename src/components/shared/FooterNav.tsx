@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, Stack, IconButton, Divider } from "@mui/material";
+import { Box, Typography, Stack, IconButton, Divider, Badge } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useNavigate, useLocation } from "react-router-dom";
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
@@ -19,14 +19,15 @@ interface FooterNavItem {
     label: string;
     href: string;
     icon: React.ReactNode;
+    badge?: number;
 }
 
 const footerNavItems: FooterNavItem[] = [
     { key: "dashboard", label: "Dashboard", icon: <DashboardOutlinedIcon fontSize="small" />, href: "/agent/dashboard" },
     { key: "analytics", label: "Analytics", icon: <BarChartOutlinedIcon fontSize="small" />, href: "/agent/dashboard/analytics" },
     { key: "live-ops", label: "Live Ops", icon: <MapOutlinedIcon fontSize="small" />, href: "/agent/live-ops" },
-    { key: "dispatch", label: "Dispatch", icon: <LocalShippingOutlinedIcon fontSize="small" />, href: "/agent/dispatch/board" },
-    { key: "support", label: "Support", icon: <SupportAgentOutlinedIcon fontSize="small" />, href: "/agent/support/tickets" },
+    { key: "dispatch", label: "Dispatch", icon: <LocalShippingOutlinedIcon fontSize="small" />, href: "/agent/dispatch/board", badge: 4 },
+    { key: "support", label: "Support", icon: <SupportAgentOutlinedIcon fontSize="small" />, href: "/agent/support/tickets", badge: 8 },
     { key: "safety", label: "Safety", icon: <ReportProblemOutlinedIcon fontSize="small" />, href: "/agent/safety/sos" },
     { key: "training", label: "Training", icon: <SchoolOutlinedIcon fontSize="small" />, href: "/agent/training" },
     { key: "settings", label: "Settings", icon: <SettingsOutlinedIcon fontSize="small" />, href: "/agent/settings/teams" },
@@ -43,7 +44,12 @@ function getActiveKey(pathname: string): string {
     return "dashboard";
 }
 
-export function FooterNav() {
+interface FooterNavProps {
+    dispatchBadge?: number;
+    supportBadge?: number;
+}
+
+export function FooterNav({ dispatchBadge, supportBadge }: FooterNavProps) {
     const theme = useTheme();
     const isDark = theme.palette.mode === "dark";
     const navigate = useNavigate();
@@ -93,6 +99,12 @@ export function FooterNav() {
                     >
                         {footerNavItems.map((item) => {
                             const isActive = activeKey === item.key;
+
+                            // Determine badge count based on item key and props
+                            let badgeCount = item.badge;
+                            if (item.key === "dispatch") badgeCount = dispatchBadge;
+                            if (item.key === "support") badgeCount = supportBadge;
+
                             return (
                                 <Box
                                     key={item.key}
@@ -120,8 +132,10 @@ export function FooterNav() {
                                         },
                                     }}
                                 >
-                                    <Box sx={{ color: isActive ? EVZONE_GREEN : isDark ? "#94a3b8" : "#64748b" }}>
-                                        {item.icon}
+                                    <Box sx={{ color: isActive ? EVZONE_GREEN : isDark ? "#94a3b8" : "#64748b", display: "flex" }}>
+                                        <Badge badgeContent={badgeCount} color="error" variant="standard" sx={{ "& .MuiBadge-badge": { fontSize: 9, height: 14, minWidth: 14, px: 0.5 } }}>
+                                            {item.icon}
+                                        </Badge>
                                     </Box>
                                     <Typography
                                         variant="caption"
@@ -163,7 +177,7 @@ export function FooterNav() {
                         </Typography>
                     </Stack>
                     <Typography variant="caption" sx={{ color: isDark ? "#64748b" : "#94a3b8", mt: 0.5, display: "block" }}>
-                        © 2024 EVzone. All rights reserved.
+                        © 2025 EVzone. All rights reserved.
                     </Typography>
                 </Box>
             </Stack>

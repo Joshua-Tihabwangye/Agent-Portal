@@ -83,7 +83,10 @@ export default function AgentTicketQueuePage() {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const filtered = sampleTickets.filter((t) => {
+  // Initialize tickets with read state (first 3 unread for demo)
+  const [tickets, setTickets] = useState(sampleTickets.map((t, i) => ({ ...t, read: i >= 3 })));
+
+  const filtered = tickets.filter((t) => {
     const matchesQuery =
       !query ||
       t.id.toLowerCase().includes(query.toLowerCase()) ||
@@ -301,16 +304,28 @@ export default function AgentTicketQueuePage() {
                 {filtered.map((ticket) => (
                   <ListItemButton
                     key={ticket.id}
-                    onClick={() => navigate(`/agent/support/tickets/${encodeURIComponent(ticket.id)}`)}
+                    onClick={() => {
+                      // Mark as read
+                      const newTickets = tickets.map((t) => (t.id === ticket.id ? { ...t, read: true } : t));
+                      setTickets(newTickets);
+                      navigate(`/agent/support/tickets/${encodeURIComponent(ticket.id)}`);
+                    }}
                     sx={{
                       borderRadius: 3,
                       mb: 1,
                       px: 1.5,
                       py: 1,
-                      backgroundColor: isDark
-                        ? "rgba(15,23,42,0.9)"
-                        : "rgba(248,250,252,0.95)",
-                      border: "1px solid rgba(203,213,225,0.9)",
+                      backgroundColor: !ticket.read
+                        ? (isDark ? "rgba(3,205,140,0.15)" : "#f0fdf9")
+                        : (isDark ? "rgba(15,23,42,0.9)" : "rgba(248,250,252,0.95)"),
+                      border: !ticket.read
+                        ? `1px solid ${EVZONE_GREEN}40`
+                        : "1px solid rgba(203,213,225,0.9)",
+                      "&:hover": {
+                        backgroundColor: !ticket.read
+                          ? (isDark ? "rgba(3,205,140,0.2)" : "#ecfdf5")
+                          : (isDark ? "rgba(30,41,59,0.5)" : "rgba(241,245,249,1)"),
+                      }
                     }}
                   >
                     <ListItemIcon sx={{ minWidth: 32 }}>
@@ -323,15 +338,20 @@ export default function AgentTicketQueuePage() {
                           justifyContent="space-between"
                           alignItems="center"
                         >
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              fontWeight: 600,
-                              color: isDark ? "#e5e7eb" : "#111827",
-                            }}
-                          >
-                            {ticket.subject}
-                          </Typography>
+                          <Stack direction="row" spacing={1} alignItems="center">
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                fontWeight: !ticket.read ? 700 : 600,
+                                color: isDark ? "#e5e7eb" : "#111827",
+                              }}
+                            >
+                              {ticket.subject}
+                            </Typography>
+                            {!ticket.read && (
+                              <Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: EVZONE_GREEN }} />
+                            )}
+                          </Stack>
                           <Typography
                             variant="caption"
                             sx={{ color: EVZONE_GREY }}

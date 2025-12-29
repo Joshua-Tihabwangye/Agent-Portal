@@ -462,6 +462,9 @@ function EmergencyQuickActionsPanel({
   onNotify: () => void;
   onFlag: () => void;
 }) {
+  const [notified, setNotified] = React.useState(false);
+  const [flagged, setFlagged] = React.useState(false);
+
   return (
     <Card
       elevation={1}
@@ -553,7 +556,11 @@ function EmergencyQuickActionsPanel({
               fullWidth
               variant="outlined"
               startIcon={<ConfirmationNumberOutlinedIcon sx={{ fontSize: 18 }} />}
-              onClick={onAttachToTicket}
+              onClick={() => {
+                // Navigate to create ticket page
+                // In a real app we might pass state/search param
+                window.location.href = `/agent/support/create`;
+              }}
               sx={{
                 borderRadius: 999,
                 textTransform: "none",
@@ -566,38 +573,51 @@ function EmergencyQuickActionsPanel({
 
           <Button
             fullWidth
-            variant="outlined"
+            variant={notified ? "contained" : "outlined"}
             startIcon={
               <NotificationsActiveOutlinedIcon sx={{ fontSize: 18 }} />
             }
-            onClick={onNotify}
+            onClick={() => {
+              setNotified(!notified);
+              onNotify();
+            }}
             sx={{
               borderRadius: 999,
               textTransform: "none",
               fontSize: 14,
+              backgroundColor: notified ? "#0284c7" : "transparent",
+              color: notified ? "#fff" : (isDark ? "#e5e7eb" : "#111827"),
+              borderColor: notified ? "#0284c7" : "rgba(203,213,225,0.9)",
+              "&:hover": {
+                backgroundColor: notified ? "#0369a1" : "rgba(241,245,249,0.5)",
+              }
             }}
           >
-            Notify supervisor
+            {notified ? "Supervisor Notified" : "Notify supervisor"}
           </Button>
 
           <Button
             fullWidth
-            variant="outlined"
+            variant={flagged ? "contained" : "outlined"}
             startIcon={<FlagOutlinedIcon sx={{ fontSize: 18 }} />}
-            onClick={onFlag}
+            onClick={() => {
+              setFlagged(!flagged);
+              onFlag();
+            }}
             sx={{
               borderRadius: 999,
               textTransform: "none",
               fontSize: 14,
-              color: "#b91c1c",
-              borderColor: "rgba(248,113,113,0.7)",
+              color: flagged ? "#fff" : "#b91c1c",
+              backgroundColor: flagged ? "#b91c1c" : "transparent",
+              borderColor: "#b91c1c",
               "&:hover": {
                 borderColor: "#b91c1c",
-                backgroundColor: "rgba(254,226,226,0.6)",
+                backgroundColor: flagged ? "#991b1b" : "rgba(254,226,226,0.6)",
               },
             }}
           >
-            Flag account for review
+            {flagged ? "Account Flagged" : "Flag account for review"}
           </Button>
         </Stack>
       </CardContent>

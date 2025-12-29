@@ -13,6 +13,7 @@ import {
   ListItemText,
   ListItemIcon,
   Avatar,
+  Grid,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
@@ -26,340 +27,270 @@ const EVZONE_GREEN = "#03cd8c";
 const EVZONE_ORANGE = "#f77f00";
 const EVZONE_GREY = "#6b7280";
 
+// Enhanced sample data
 const sampleDrivers = [
   {
-    id: "DRV-102",
-    name: "Kato Robert",
+    id: "DRV-101",
+    name: "Michael K.",
     city: "Kampala",
-    company: "EVzone Fleet",
+    company: "Indep.",
     stage: "Docs pending review",
-    createdAt: "Today · 08:42",
+    status: "Under Review",
+    date: "2025-05-10",
   },
   {
-    id: "DRV-214",
-    name: "Amina Nanyonga",
-    city: "Kampala",
-    company: "City Cabs",
-    stage: "Extra info required",
-    createdAt: "Yesterday · 16:20",
-  },
-  {
-    id: "DRV-305",
-    name: "John Doe",
+    id: "DRV-102",
+    name: "Sarah T.",
     city: "Entebbe",
-    company: "Independent",
+    company: "Fleet A",
+    stage: "Extra info required",
+    status: "Needs Info",
+    date: "2025-05-12",
+  },
+  {
+    id: "DRV-103",
+    name: "John D.",
+    city: "Kampala",
+    company: "Fleet B",
+    stage: "Onboarding complete",
+    status: "Approved",
+    date: "2025-05-08",
+  },
+  {
+    id: "DRV-104",
+    name: "David M.",
+    city: "Jinja",
+    company: "Indep.",
+    stage: "Rejected by safety",
+    status: "Rejected",
+    date: "2025-05-09",
+  },
+  {
+    id: "DRV-105",
+    name: "Grace L.",
+    city: "Kampala",
+    company: "Fleet A",
     stage: "Face match check",
-    createdAt: "2 days ago",
+    status: "Under Review",
+    date: "2025-05-14",
+  },
+  {
+    id: "DRV-106",
+    name: "James P.",
+    city: "Mukono",
+    company: "Indep.",
+    stage: "Docs pending review",
+    status: "Under Review",
+    date: "2025-05-15",
   },
 ];
 
-// Route target: /agent/onboarding/drivers
 export default function AgentDriverOnboardingQueuePage() {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   const navigate = useNavigate();
 
-  const [query, setQuery] = useState("");
-  const [stageFilter, setStageFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const filtered = sampleDrivers.filter((d) => {
-    const matchesQuery =
-      !query ||
-      d.name.toLowerCase().includes(query.toLowerCase()) ||
-      d.id.toLowerCase().includes(query.toLowerCase());
-    const matchesStage =
-      stageFilter === "all" ||
-      (stageFilter === "docs" && d.stage === "Docs pending review") ||
-      (stageFilter === "extra" && d.stage === "Extra info required") ||
-      (stageFilter === "face" && d.stage === "Face match check");
-    return matchesQuery && matchesStage;
+  const filteredDrivers = sampleDrivers.filter((d) => {
+    const matchesStatus =
+      statusFilter === "All" || d.status === statusFilter;
+    const matchesSearch =
+      d.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      d.id.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesStatus && matchesSearch;
   });
 
-  const handleStageClick = (key) => {
-    setStageFilter(key);
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "Approved":
+        return { bg: "rgba(22,163,74,0.12)", text: "#166534", border: "#22c55e" };
+      case "Rejected":
+        return { bg: "rgba(239,68,68,0.12)", text: "#b91c1c", border: "#ef4444" };
+      case "Needs Info":
+        return { bg: "rgba(250,204,21,0.12)", text: "#a16207", border: "#eab308" };
+      case "Under Review":
+      default:
+        return { bg: "rgba(56,189,248,0.12)", text: "#0369a1", border: "#38bdf8" };
+    }
   };
 
   return (
-    <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 md:px-8 py-4">
-      <Box className="max-w-6xl mx-auto">
-        {/* Header */}
-        <Box className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <Box>
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 700,
-                color: isDark ? "#e5e7eb" : "#111827",
-              }}
-            >
-              Driver onboarding queue
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{ color: EVZONE_GREY, maxWidth: 520 }}
-            >
-              Review driver sign-ups that need your attention: document
-              checks, extra information, and face verification.
-            </Typography>
-          </Box>
+    <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 py-4">
+      {/* Header */}
+      <Box className="mb-6">
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: 700,
+            color: isDark ? "#e5e7eb" : "#111827",
+            mb: 1,
+          }}
+        >
+          Driver Onboarding
+        </Typography>
+        <Typography variant="body2" sx={{ color: EVZONE_GREY }}>
+          Manage driver applications, verify documents, and track onboarding status.
+        </Typography>
+      </Box>
 
-          <Chip
-            label="Onboarding agents"
-            size="small"
-            sx={{
-              borderRadius: 999,
-              fontSize: 11,
-              textTransform: "none",
-              backgroundColor: isDark
-                ? "rgba(15,23,42,0.9)"
-                : "rgba(219,234,254,0.9)",
-              border: "1px solid rgba(148,163,184,0.4)",
-              color: isDark ? "#e5e7eb" : "#1e3a8a",
-              fontWeight: 600,
-            }}
+      {/* Filters */}
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        spacing={2}
+        alignItems="center"
+        className="mb-6"
+      >
+        <Box
+          className="flex items-center px-3 py-2 rounded-xl"
+          sx={{
+            backgroundColor: isDark ? "#0f172a" : "#ffffff",
+            border: "1px solid " + (isDark ? "#1e293b" : "#e2e8f0"),
+            minWidth: 280,
+          }}
+        >
+          <IconButton size="small" sx={{ p: 0.5, mr: 0.5 }}>
+            <FilterListOutlinedIcon fontSize="small" />
+          </IconButton>
+          <TextField
+            variant="standard"
+            placeholder="Search drivers"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            InputProps={{ disableUnderline: true }}
+            sx={{ width: "100%" }}
           />
         </Box>
 
-        <Card
-          elevation={1}
-          sx={{
-            borderRadius: 3,
-            backgroundColor: isDark ? "#020617" : "#ffffff",
-            border:
-              "1px solid " +
-              (isDark ? "rgba(30,64,175,0.7)" : "rgba(226,232,240,1)"),
-          }}
-        >
-          <CardContent sx={{ p: 2.4 }}>
-            <Stack spacing={2}>
-              <Stack
-                direction={{ xs: "column", sm: "row" }}
-                spacing={1.5}
-                justifyContent="space-between"
-                alignItems={{ xs: "stretch", sm: "center" }}
+        <Stack direction="row" spacing={1} overflow="auto" sx={{ width: "100%", pb: 0.5 }}>
+          {["All", "Approved", "Under Review", "Needs Info", "Rejected"].map((status) => (
+            <Chip
+              key={status}
+              label={status}
+              onClick={() => setStatusFilter(status)}
+              sx={{
+                fontWeight: 600,
+                borderRadius: 2,
+                backgroundColor:
+                  statusFilter === status
+                    ? isDark
+                      ? "rgba(3,205,140,0.2)"
+                      : "rgba(3,205,140,0.15)"
+                    : "transparent",
+                color:
+                  statusFilter === status
+                    ? EVZONE_GREEN
+                    : EVZONE_GREY,
+                border:
+                  statusFilter === status
+                    ? `1px solid ${EVZONE_GREEN}`
+                    : "1px solid rgba(148,163,184,0.3)",
+                "&:hover": {
+                  backgroundColor:
+                    statusFilter === status
+                      ? isDark
+                        ? "rgba(3,205,140,0.3)"
+                        : "rgba(3,205,140,0.25)"
+                      : "rgba(148,163,184,0.1)",
+                },
+              }}
+            />
+          ))}
+        </Stack>
+      </Stack>
+
+      {/* Driver List */}
+      <Grid container spacing={2}>
+        {filteredDrivers.map((driver) => {
+          const styles = getStatusColor(driver.status);
+          return (
+            <Grid size={{ xs: 12 }} key={driver.id}>
+              <Card
+                elevation={0}
+                onClick={() => navigate(`/agent/onboarding/drivers/${driver.id}`)}
+                sx={{
+                  borderRadius: 3,
+                  backgroundColor: isDark ? "#020617" : "#ffffff",
+                  border: "1px solid " + (isDark ? "#1e293b" : "#e2e8f0"),
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                  "&:hover": {
+                    transform: "translateY(-2px)",
+                    boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+                    borderColor: EVZONE_GREEN,
+                  },
+                }}
               >
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <AssignmentIndOutlinedIcon
-                    sx={{ fontSize: 20, color: EVZONE_GREEN }}
-                  />
-                  <Typography
-                    variant="subtitle2"
-                    sx={{
-                      fontWeight: 700,
-                      color: isDark ? "#e5e7eb" : "#111827",
-                    }}
+                <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
+                  <Stack
+                    direction={{ xs: "column", sm: "row" }}
+                    justifyContent="space-between"
+                    alignItems={{ xs: "flex-start", sm: "center" }}
+                    spacing={2}
                   >
-                    Drivers needing review
-                  </Typography>
-                </Stack>
-
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <TextField
-                    size="small"
-                    placeholder="Search by name or ID"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    variant="outlined"
-                    sx={{
-                      minWidth: 220,
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: 999,
-                      },
-                    }}
-                  />
-                  <IconButton size="small">
-                    <FilterListOutlinedIcon sx={{ fontSize: 18 }} />
-                  </IconButton>
-                  <IconButton size="small">
-                    <RefreshOutlinedIcon sx={{ fontSize: 18 }} />
-                  </IconButton>
-                </Stack>
-              </Stack>
-
-              <Stack direction="row" spacing={1} flexWrap="wrap">
-                <Chip
-                  label="All"
-                  size="small"
-                  onClick={() => handleStageClick("all")}
-                  sx={{
-                    borderRadius: 999,
-                    fontSize: 11,
-                    textTransform: "none",
-                    backgroundColor:
-                      stageFilter === "all"
-                        ? "rgba(3,205,140,0.16)"
-                        : "rgba(248,250,252,1)",
-                    color:
-                      stageFilter === "all" ? "#047857" : EVZONE_GREY,
-                  }}
-                />
-                <Chip
-                  label="Docs pending review"
-                  size="small"
-                  onClick={() => handleStageClick("docs")}
-                  sx={{
-                    borderRadius: 999,
-                    fontSize: 11,
-                    textTransform: "none",
-                    backgroundColor:
-                      stageFilter === "docs"
-                        ? "rgba(56,189,248,0.18)"
-                        : "rgba(248,250,252,1)",
-                    color:
-                      stageFilter === "docs" ? "#0369a1" : EVZONE_GREY,
-                  }}
-                />
-                <Chip
-                  label="Extra info required"
-                  size="small"
-                  onClick={() => handleStageClick("extra")}
-                  sx={{
-                    borderRadius: 999,
-                    fontSize: 11,
-                    textTransform: "none",
-                    backgroundColor:
-                      stageFilter === "extra"
-                        ? "rgba(250,204,21,0.18)"
-                        : "rgba(248,250,252,1)",
-                    color:
-                      stageFilter === "extra" ? "#92400e" : EVZONE_GREY,
-                  }}
-                />
-                <Chip
-                  label="Face match check"
-                  size="small"
-                  onClick={() => handleStageClick("face")}
-                  sx={{
-                    borderRadius: 999,
-                    fontSize: 11,
-                    textTransform: "none",
-                    backgroundColor:
-                      stageFilter === "face"
-                        ? "rgba(129,140,248,0.2)"
-                        : "rgba(248,250,252,1)",
-                    color:
-                      stageFilter === "face" ? "#4f46e5" : EVZONE_GREY,
-                  }}
-                />
-              </Stack>
-
-              <List disablePadding>
-                {filtered.length === 0 && (
-                  <Typography
-                    variant="caption"
-                    sx={{ color: EVZONE_GREY, fontStyle: "italic" }}
-                  >
-                    No drivers match the current filters.
-                  </Typography>
-                )}
-
-                {filtered.map((driver) => (
-                  <ListItemButton
-                    key={driver.id}
-                    onClick={() => navigate(`/agent/onboarding/drivers/${encodeURIComponent(driver.id)}`)}
-                    sx={{
-                      borderRadius: 3,
-                      mb: 1,
-                      px: 1.5,
-                      py: 1,
-                      backgroundColor: isDark
-                        ? "rgba(15,23,42,0.9)"
-                        : "rgba(248,250,252,0.95)",
-                      border: "1px solid rgba(203,213,225,0.9)",
-                    }}
-                  >
-                    <ListItemIcon sx={{ minWidth: 32 }}>
+                    <Stack direction="row" spacing={2} alignItems="center">
                       <Avatar
                         sx={{
-                          width: 28,
-                          height: 28,
-                          backgroundColor: "rgba(3,205,140,0.18)",
-                          color: "#047857",
-                          fontSize: 13,
-                          fontWeight: 700,
+                          width: 48,
+                          height: 48,
+                          bgcolor: isDark ? "#1e293b" : "#f1f5f9",
+                          color: isDark ? "#94a3b8" : "#64748b",
                         }}
                       >
-                        {driver.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
+                        <AssignmentIndOutlinedIcon />
                       </Avatar>
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={
-                        <Stack
-                          direction="row"
-                          justifyContent="space-between"
-                          alignItems="center"
+                      <Box>
+                        <Typography
+                          variant="subtitle1"
+                          sx={{ fontWeight: 700, color: isDark ? "#e5e7eb" : "#111827" }}
                         >
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              fontWeight: 600,
-                              color: isDark ? "#e5e7eb" : "#111827",
-                            }}
-                          >
-                            {driver.name}
-                          </Typography>
-                          <Typography
-                            variant="caption"
-                            sx={{ color: EVZONE_GREY }}
-                          >
-                            {driver.id}
-                          </Typography>
-                        </Stack>
-                      }
-                      secondary={
-                        <Stack spacing={0.2}>
-                          <Typography
-                            variant="caption"
-                            sx={{ color: EVZONE_GREY }}
-                          >
-                            {driver.city} · {driver.company}
-                          </Typography>
-                          <Stack
-                            direction="row"
-                            spacing={0.5}
-                            alignItems="center"
-                          >
-                            {driver.stage === "Docs pending review" && (
-                              <AssignmentIndOutlinedIcon
-                                sx={{ fontSize: 14, color: EVZONE_ORANGE }}
-                              />
-                            )}
-                            {driver.stage === "Extra info required" && (
-                              <WarningAmberOutlinedIcon
-                                sx={{ fontSize: 14, color: "#f97316" }}
-                              />
-                            )}
-                            {driver.stage === "Face match check" && (
-                              <VerifiedUserOutlinedIcon
-                                sx={{ fontSize: 14, color: "#4f46e5" }}
-                              />
-                            )}
-                            <Typography
-                              variant="caption"
-                              sx={{ color: EVZONE_GREY }}
-                            >
-                              {driver.stage}
-                            </Typography>
-                          </Stack>
-                          <Typography
-                            variant="caption"
-                            sx={{ color: EVZONE_GREY }}
-                          >
-                            {driver.createdAt}
-                          </Typography>
-                        </Stack>
-                      }
-                    />
-                  </ListItemButton>
-                ))}
-              </List>
-            </Stack>
-          </CardContent>
-        </Card>
-      </Box>
+                          {driver.name}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: EVZONE_GREY }}>
+                          {driver.id} · {driver.city} · {driver.company}
+                        </Typography>
+                      </Box>
+                    </Stack>
+
+                    <Stack direction="row" spacing={3} alignItems="center">
+                      <Box sx={{ textAlign: "right", display: { xs: "none", md: "block" } }}>
+                        <Typography variant="caption" sx={{ color: EVZONE_GREY, display: "block" }}>
+                          Applied on
+                        </Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                          {driver.date}
+                        </Typography>
+                      </Box>
+
+                      <Chip
+                        label={driver.status}
+                        size="small"
+                        sx={{
+                          borderRadius: 999,
+                          fontWeight: 600,
+                          backgroundColor: styles.bg,
+                          color: styles.text,
+                          border: `1px solid ${styles.border}`,
+                        }}
+                      />
+
+                    </Stack>
+                  </Stack>
+                </CardContent>
+              </Card>
+            </Grid>
+          );
+        })}
+
+        {filteredDrivers.length === 0 && (
+          <Box sx={{ width: "100%", textAlign: "center", py: 8 }}>
+            <Typography variant="body1" sx={{ color: EVZONE_GREY }}>
+              No drivers found matching your criteria.
+            </Typography>
+          </Box>
+        )}
+      </Grid>
     </Box>
   );
 }

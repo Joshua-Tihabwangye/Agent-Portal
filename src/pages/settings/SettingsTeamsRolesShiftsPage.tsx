@@ -35,6 +35,8 @@ const EVZONE_GREEN = "#03cd8c";
 const EVZONE_ORANGE = "#f77f00";
 const EVZONE_GREY = "#6b7280";
 
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+
 // ----------- Sample data -----------
 
 export const teams = [
@@ -727,16 +729,16 @@ export function AgentRolesSettingsPage() {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
 
+  const [isEditing, setIsEditing] = useState(false);
+  const [matrix, setMatrix] = useState(rolePermissionMatrix);
+
   const handleExportMatrix = () => {
-    // Build CSV content
+    // ... existing export logic using matrix state
     const header = ["Permission", ...roles];
     const rows = permissions.map((perm) => {
-      return [perm.label, ...roles.map((role) => rolePermissionMatrix[role][perm.key] || "none")];
+      return [perm.label, ...roles.map((role) => matrix[role][perm.key] || "none")];
     });
-
     const csvContent = [header, ...rows].map((row) => row.join(",")).join("\n");
-
-    // Download as CSV file
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -746,6 +748,32 @@ export function AgentRolesSettingsPage() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+  };
+
+  const handleTogglePermission = (role: string, permKey: string) => {
+    if (!isEditing) return;
+
+    setMatrix((prev) => {
+      const current = prev[role][permKey] || "none";
+      let next = "none";
+      if (current === "none") next = "limited";
+      else if (current === "limited") next = "full";
+      else next = "none";
+
+      return {
+        ...prev,
+        [role]: {
+          ...prev[role],
+          [permKey]: next,
+        },
+      };
+    });
+  };
+
+  const handleSave = () => {
+    setIsEditing(false);
+    // In a real app, you would make an API call here.
+    console.log("Saved matrix:", matrix);
   };
 
   return (
@@ -798,25 +826,40 @@ export function AgentRolesSettingsPage() {
         >
           <CardContent sx={{ p: 2.4 }}>
             <Stack spacing={2}>
-              <Stack direction="row" spacing={1} alignItems="center">
-                <ShieldOutlinedIcon sx={{ fontSize: 20, color: EVZONE_GREEN }} />
-                <Typography
-                  variant="subtitle2"
-                  sx={{
-                    fontWeight: 700,
-                    color: isDark ? "#e5e7eb" : "#111827",
-                  }}
+              <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <ShieldOutlinedIcon sx={{ fontSize: 20, color: EVZONE_GREEN }} />
+                  <Typography
+                    variant="subtitle2"
+                    sx={{
+                      fontWeight: 700,
+                      color: isDark ? "#e5e7eb" : "#111827",
+                    }}
+                  >
+                    Role matrix
+                  </Typography>
+                  {isEditing && (
+                    <Chip size="small" label="Editing Mode" color="warning" sx={{ height: 20, fontSize: 10 }} />
+                  )}
+                </Stack>
+                <Button
+                  size="small"
+                  startIcon={isEditing ? <CheckCircleOutlineIcon /> : <TuneOutlinedIcon />}
+                  onClick={isEditing ? handleSave : () => setIsEditing(true)}
+                  variant={isEditing ? "contained" : "outlined"}
+                  color={isEditing ? "success" : "primary"}
+                  sx={{ borderRadius: 999, textTransform: "none" }}
                 >
-                  Role matrix
-                </Typography>
+                  {isEditing ? "Save Changes" : "Edit Roles"}
+                </Button>
               </Stack>
               <Typography
                 variant="caption"
                 sx={{ color: EVZONE_GREY, maxWidth: 520 }}
               >
-                Use this matrix to keep permissions consistent across
-                regions. For example, some regions may limit fare
-                adjustments or account suspensions.
+                {isEditing
+                  ? "Click on any permission level to cycle through: None → Limited → Full."
+                  : "Use this matrix to keep permissions consistent across regions."}
               </Typography>
 
               <Box sx={{ overflowX: "auto" }}>
@@ -862,10 +905,20 @@ export function AgentRolesSettingsPage() {
                           {perm.label}
                         </TableCell>
                         {roles.map((role) => {
-                          const level =
-                            rolePermissionMatrix[role][perm.key] || "none";
+                          const level = matrix[role][perm.key] || "none";
                           return (
-                            <TableCell key={role + perm.key} align="center">
+                            <TableCell
+                              key={role + perm.key}
+                              align="center"
+                              onClick={() => handleTogglePermission(role, perm.key)}
+                              sx={{
+                                cursor: isEditing ? "pointer" : "default",
+                                opacity: isEditing ? 1 : 0.9,
+                                "&:hover": {
+                                  backgroundColor: isEditing ? (isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.02)") : "transparent"
+                                }
+                              }}
+                            >
                               {permissionChip(level)}
                             </TableCell>
                           );
@@ -892,24 +945,40 @@ export function AgentRolesSettingsPage() {
                   accounts or view sensitive data), make sure you consult
                   with legal / risk teams.
                 </Typography>
-                <Button
-                  size="small"
-                  variant="contained"
-                  startIcon={<TuneOutlinedIcon sx={{ fontSize: 16 }} />}
-                  sx={{
-                    borderRadius: 999,
-                    textTransform: "none",
-                    fontSize: 13,
-                    fontWeight: 600,
-                    backgroundColor: EVZONE_GREEN,
-                    "&:hover": {
-                      backgroundColor: "#059669",
-                    },
-                  }}
-                  onClick={handleExportMatrix}
-                >
-                  Export matrix
-                </Button>
+                <Stack direction="row" spacing={1}>
+                  {isEditing && (
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      color="error"
+                      onClick={() => {
+                        setMatrix(rolePermissionMatrix); // Reset
+                        setIsEditing(false);
+                      }}
+                      sx={{ borderRadius: 999, textTransform: "none" }}
+                    >
+                      Cancel
+                    </Button>
+                  )}
+                  <Button
+                    size="small"
+                    variant="contained"
+                    startIcon={<TuneOutlinedIcon sx={{ fontSize: 16 }} />}
+                    sx={{
+                      borderRadius: 999,
+                      textTransform: "none",
+                      fontSize: 13,
+                      fontWeight: 600,
+                      backgroundColor: EVZONE_GREEN,
+                      "&:hover": {
+                        backgroundColor: "#059669",
+                      },
+                    }}
+                    onClick={handleExportMatrix}
+                  >
+                    Export matrix
+                  </Button>
+                </Stack>
               </Stack>
             </Stack>
           </CardContent>
