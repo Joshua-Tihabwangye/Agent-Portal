@@ -1,16 +1,29 @@
 import React from "react";
-import { Box, Card, CardContent, Typography, Stack, Chip, Button, Divider } from "@mui/material";
+import { Box, Card, CardContent, Typography, Stack, Chip, Button, Divider, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Avatar, IconButton, Tooltip } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useNavigate, useParams } from "react-router-dom";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import QueuePlayNextOutlinedIcon from "@mui/icons-material/QueuePlayNextOutlined";
 import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
+import CheckCircleOutlinedIcon from "@mui/icons-material/CheckCircleOutlined";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import HourglassEmptyOutlinedIcon from "@mui/icons-material/HourglassEmptyOutlined";
 import { teams, shiftPatterns } from "./SettingsTeamsRolesShiftsPage";
 
 const EVZONE_GREEN = "#03cd8c";
 const EVZONE_ORANGE = "#f77f00";
 const EVZONE_GREY = "#6b7280";
+
+type MemberStatus = "Approved" | "Rejected" | "Under Review";
+
+const mockMembers = [
+  { id: 1, name: "Sarah K.", role: "Senior Agent", status: "Approved" as MemberStatus, avatar: "SK" },
+  { id: 2, name: "Mike O.", role: "Agent", status: "Approved" as MemberStatus, avatar: "MO" },
+  { id: 3, name: "John D.", role: "Trainee", status: "Under Review" as MemberStatus, avatar: "JD" },
+  { id: 4, name: "Linda N.", role: "Agent", status: "Rejected" as MemberStatus, avatar: "LN" },
+  { id: 5, name: "Peter M.", role: "Agent", status: "Approved" as MemberStatus, avatar: "PM" },
+];
 
 export default function TeamDetailPage() {
   const { teamId } = useParams();
@@ -20,6 +33,14 @@ export default function TeamDetailPage() {
 
   const team = teams.find((t) => t.id === teamId) || teams[0];
   const pattern = shiftPatterns.find((p) => p.id === team.id);
+
+  const [members, setMembers] = React.useState(mockMembers);
+
+  const handleStatusChange = (id: number, newStatus: MemberStatus) => {
+    setMembers((prev) =>
+      prev.map((m) => (m.id === id ? { ...m, status: newStatus } : m))
+    );
+  };
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 md:px-8 py-4">
@@ -145,8 +166,131 @@ export default function TeamDetailPage() {
             </Stack>
           </CardContent>
         </Card>
+
+        {/* Member List Table */}
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, color: isDark ? "#e5e7eb" : "#0f172a" }}>
+            Team Members
+          </Typography>
+          <Card
+            elevation={0}
+            sx={{
+              borderRadius: 3,
+              border: `1px solid ${isDark ? "rgba(148,163,184,0.1)" : "rgba(226,232,240,1)"}`,
+              bgcolor: isDark ? "rgba(2,6,23,0.6)" : "white",
+            }}
+          >
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ color: EVZONE_GREY, fontWeight: 600 }}>Name</TableCell>
+                    <TableCell sx={{ color: EVZONE_GREY, fontWeight: 600 }}>Role</TableCell>
+                    <TableCell sx={{ color: EVZONE_GREY, fontWeight: 600 }}>Status</TableCell>
+                    <TableCell align="right" sx={{ color: EVZONE_GREY, fontWeight: 600 }}>Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {members.map((member) => (
+                    <TableRow key={member.id} hover>
+                      <TableCell>
+                        <Stack direction="row" spacing={1.5} alignItems="center">
+                          <Avatar sx={{ width: 32, height: 32, fontSize: 13, bgcolor: stringToColor(member.name) }}>
+                            {member.avatar}
+                          </Avatar>
+                          <Typography variant="body2" fontWeight={600} color={isDark ? "#e5e7eb" : "#0f172a"}>
+                            {member.name}
+                          </Typography>
+                        </Stack>
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={member.role}
+                          size="small"
+                          sx={{
+                            borderRadius: 1,
+                            height: 24,
+                            bgcolor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
+                            color: isDark ? "#94a3b8" : "#475569"
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={member.status}
+                          size="small"
+                          sx={{
+                            borderRadius: 1,
+                            height: 24,
+                            fontWeight: 700,
+                            bgcolor:
+                              member.status === "Approved" ? (isDark ? "rgba(3,205,140,0.15)" : "rgba(3,205,140,0.1)") :
+                                member.status === "Rejected" ? (isDark ? "rgba(239,68,68,0.15)" : "rgba(239,68,68,0.1)") :
+                                  (isDark ? "rgba(247,127,0,0.15)" : "rgba(247,127,0,0.1)"),
+                            color:
+                              member.status === "Approved" ? EVZONE_GREEN :
+                                member.status === "Rejected" ? "#ef4444" :
+                                  EVZONE_ORANGE,
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell align="right">
+                        <Stack direction="row" spacing={1} justifyItems="flex-end" justifyContent="flex-end">
+                          <Tooltip title="Approve">
+                            <IconButton
+                              size="small"
+                              onClick={() => handleStatusChange(member.id, "Approved")}
+                              sx={{ color: EVZONE_GREEN, opacity: member.status === "Approved" ? 0.5 : 1 }}
+                              disabled={member.status === "Approved"}
+                            >
+                              <CheckCircleOutlinedIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Reject">
+                            <IconButton
+                              size="small"
+                              onClick={() => handleStatusChange(member.id, "Rejected")}
+                              sx={{ color: "#ef4444", opacity: member.status === "Rejected" ? 0.5 : 1 }}
+                              disabled={member.status === "Rejected"}
+                            >
+                              <CancelOutlinedIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Mark Under Review">
+                            <IconButton
+                              size="small"
+                              onClick={() => handleStatusChange(member.id, "Under Review")}
+                              sx={{ color: EVZONE_ORANGE, opacity: member.status === "Under Review" ? 0.5 : 1 }}
+                              disabled={member.status === "Under Review"}
+                            >
+                              <HourglassEmptyOutlinedIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </Stack>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Card>
+        </Box>
       </Box>
     </Box>
   );
+}
+
+// Helper to generate consistent avatar colors
+function stringToColor(string: string) {
+  let hash = 0;
+  for (let i = 0; i < string.length; i++) {
+    hash = string.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  let color = '#';
+  for (let i = 0; i < 3; i++) {
+    const value = (hash >> (i * 8)) & 0xff;
+    color += `00${value.toString(16)}`.slice(-2);
+  }
+  return color;
 }
 

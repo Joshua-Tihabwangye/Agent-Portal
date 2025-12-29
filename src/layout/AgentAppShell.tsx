@@ -108,6 +108,20 @@ export default function AgentAppShell() {
   const [notificationAnchor, setNotificationAnchor] = useState<null | HTMLElement>(null);
   const [notifications, setNotifications] = useState(sampleNotifications);
 
+  // Badge state management
+  const [dispatchBadge, setDispatchBadge] = useState(4);
+  const [supportBadge, setSupportBadge] = useState(8);
+
+  // Auto-clear badges on navigation
+  useEffect(() => {
+    if (location.pathname.startsWith("/agent/dispatch")) {
+      setDispatchBadge(0);
+    }
+    if (location.pathname.startsWith("/agent/support")) {
+      setSupportBadge(0);
+    }
+  }, [location.pathname]);
+
   const activeKey = useMemo(() => pickActiveKey(location.pathname), [location.pathname]);
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -535,7 +549,7 @@ export default function AgentAppShell() {
           <Box sx={{ flex: 1, width: "100%" }}>
             <Outlet />
           </Box>
-          <FooterNav />
+          <FooterNav dispatchBadge={dispatchBadge} supportBadge={supportBadge} />
         </Box>
       </Box>
     </Box>

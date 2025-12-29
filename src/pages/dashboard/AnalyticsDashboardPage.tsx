@@ -148,10 +148,12 @@ export default function AnalyticsDashboardPage() {
                 </Grid>
             </Grid>
 
+
+
             {/* Main Charts */}
             <Grid container spacing={3}>
                 {/* Revenue Trend */}
-                <Grid size={{ xs: 12, lg: 8 }}>
+                <Grid size={{ xs: 12, lg: 7 }}>
                     <Card
                         elevation={0}
                         sx={{
@@ -172,7 +174,7 @@ export default function AnalyticsDashboardPage() {
                 </Grid>
 
                 {/* Support Distribution */}
-                <Grid size={{ xs: 12, lg: 4 }}>
+                <Grid size={{ xs: 12, lg: 5 }}>
                     <Card
                         elevation={0}
                         sx={{
@@ -190,6 +192,7 @@ export default function AnalyticsDashboardPage() {
                         />
                     </Card>
                 </Grid>
+
 
                 {/* Agent Performance (Mock Table) */}
                 <Grid size={{ xs: 12 }}>

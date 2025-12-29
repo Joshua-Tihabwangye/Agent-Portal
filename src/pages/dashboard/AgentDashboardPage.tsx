@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Card, CardActionArea, CardContent, Typography, Stack, Chip, LinearProgress, Divider, Grid } from "@mui/material";
+import { Box, Card, CardActionArea, CardContent, Typography, Stack, Chip, LinearProgress, Divider, Button, IconButton, Grid } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
@@ -7,6 +7,10 @@ import SupportAgentOutlinedIcon from "@mui/icons-material/SupportAgentOutlined";
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
+import OpenInNewOutlinedIcon from "@mui/icons-material/OpenInNewOutlined";
+import PlayArrowOutlinedIcon from "@mui/icons-material/PlayArrowOutlined";
+import SnoozeOutlinedIcon from "@mui/icons-material/SnoozeOutlined";
+import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
 import PeriodSelector from "../../components/shared/PeriodSelector";
 import type { PeriodValue } from "../../components/shared/PeriodSelector";
 import { RevenuePieChart, TrendLineChart, CHART_COLORS } from "../../components/shared/AnalyticsCharts";
@@ -18,39 +22,51 @@ const EVZONE_GREY = "#6b7280";
 const summaryCards = [
   {
     key: "tickets-open",
-    label: "My open tickets",
+    label: "MY OPEN TICKETS",
     value: 8,
-    chip: "+2 today",
     icon: <SupportAgentOutlinedIcon fontSize="small" />,
     href: "/agent/support/tickets",
     color: CHART_COLORS[2], // Blue
+    details: [
+      { label: "Longest waiting", value: "45m", warning: true },
+      { label: "High priority", value: "3", warning: true }
+    ]
   },
   {
     key: "tickets-due",
-    label: "Due today (SLA)",
+    label: "DUE TODAY (SLA)",
     value: 3,
-    chip: "Within 1 hour",
     icon: <AccessTimeOutlinedIcon fontSize="small" />,
-    href: "/agent/support/tickets",
+    href: "/agent/support/tickets?filter=sla-due",
     color: CHART_COLORS[4], // Red
+    details: [
+      { label: "Next breach in", value: "17m", warning: true },
+      { label: "At risk", value: "2", warning: true }
+    ]
   },
   {
     key: "onboarding",
-    label: "Onboarding cases",
+    label: "ONBOARDING CASES",
     value: 5,
-    chip: "Drivers awaiting review",
     icon: <AssignmentTurnedInOutlinedIcon fontSize="small" />,
     href: "/agent/onboarding/drivers",
     color: CHART_COLORS[5], // Teal
+    details: [
+      { label: "Awaiting review", value: "3", warning: false },
+      { label: "Missing docs", value: "2", warning: true }
+    ]
   },
   {
     key: "dispatch",
-    label: "Active dispatches",
+    label: "ACTIVE DISPATCHES",
     value: 4,
-    chip: "In progress",
     icon: <LocalShippingOutlinedIcon fontSize="small" />,
     href: "/agent/dispatch/board",
     color: CHART_COLORS[1], // Orange
+    details: [
+      { label: "Stuck", value: "1", warning: true },
+      { label: "Longest wait", value: "9m", warning: false }
+    ]
   },
 ];
 
@@ -59,25 +75,33 @@ const todayTimeline = [
     time: "09:00",
     title: "Follow-up on refund ticket",
     meta: "Rider dispute – trip ID 8F21",
-    href: "/agent/support/tickets",
+    href: "/agent/support/tickets/TCK-8F21",
+    status: "at-risk" as const,
+    statusLabel: "At risk"
   },
   {
     time: "10:30",
     title: "Verify driver documents",
     meta: "2 new drivers – Kampala",
     href: "/agent/onboarding/drivers",
+    status: "queued" as const,
+    statusLabel: "Queued"
   },
   {
     time: "12:00",
     title: "Dispatch scheduled school shuttle",
     meta: "Morning school route – 14 students",
     href: "/agent/dispatch/board",
+    status: "at-risk" as const,
+    statusLabel: "At risk"
   },
   {
     time: "15:00",
     title: "Safety check: SOS follow-up",
     meta: "Review incident from last night",
     href: "/agent/safety/sos",
+    status: "queued" as const,
+    statusLabel: "Queued"
   },
 ];
 
@@ -170,8 +194,8 @@ export default function AgentDashboardPage() {
                 },
               }}
             >
-              <CardActionArea onClick={() => navigate(card.href)} sx={{ height: "100%", p: 2 }}>
-                <Stack direction="row" justifyContent="space-between" mb={2}>
+              <CardContent sx={{ p: 2.5 }}>
+                <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={1.5}>
                   <Box
                     sx={{
                       p: 1,
@@ -183,25 +207,68 @@ export default function AgentDashboardPage() {
                   >
                     {card.icon}
                   </Box>
-                  <Chip
-                    label={card.chip}
-                    size="small"
+                  <Typography
+                    variant="caption"
                     sx={{
-                      height: 20,
-                      fontSize: 10,
                       fontWeight: 700,
-                      bgcolor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
-                      color: isDark ? "#94a3b8" : "#64748b"
+                      color: isDark ? "#94a3b8" : "#64748b",
+                      letterSpacing: 0.5
                     }}
-                  />
+                  >
+                    {card.label}
+                  </Typography>
                 </Stack>
-                <Typography variant="h4" fontWeight={800} sx={{ color: isDark ? "#e5e7eb" : "#0f172a", mb: 0.5 }}>
+
+                <Typography variant="h3" fontWeight={800} sx={{ color: isDark ? "#e5e7eb" : "#0f172a", mb: 2 }}>
                   {card.value}
                 </Typography>
-                <Typography variant="body2" sx={{ color: EVZONE_GREY, fontWeight: 500 }}>
-                  {card.label}
-                </Typography>
-              </CardActionArea>
+
+                {/* Detail metrics */}
+                <Stack spacing={1} mb={2}>
+                  {card.details.map((detail, idx) => (
+                    <Stack key={idx} direction="row" justifyContent="space-between" alignItems="center">
+                      <Typography variant="caption" sx={{ color: isDark ? "#94a3b8" : "#64748b" }}>
+                        {detail.label}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        fontWeight={700}
+                        sx={{
+                          color: detail.warning ? EVZONE_ORANGE : (isDark ? "#e5e7eb" : "#374151"),
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 0.5
+                        }}
+                      >
+                        {detail.warning && <WarningAmberOutlinedIcon sx={{ fontSize: 12 }} />}
+                        {detail.value}
+                      </Typography>
+                    </Stack>
+                  ))}
+                </Stack>
+
+                {/* Open button */}
+                <Button
+                  variant="text"
+                  size="small"
+                  endIcon={<OpenInNewOutlinedIcon sx={{ fontSize: 14 }} />}
+                  onClick={() => navigate(card.href)}
+                  sx={{
+                    width: "100%",
+                    justifyContent: "flex-end",
+                    color: card.color,
+                    fontWeight: 600,
+                    fontSize: 12,
+                    p: 0,
+                    "&:hover": {
+                      backgroundColor: "transparent",
+                      textDecoration: "underline"
+                    }
+                  }}
+                >
+                  Open
+                </Button>
+              </CardContent>
             </Card>
           </Grid>
         ))}
@@ -256,6 +323,10 @@ export default function AgentDashboardPage() {
                 <Stack direction="row" justifyContent="space-between">
                   <Typography variant="body2" color="text.secondary">SLA Compliance</Typography>
                   <Typography variant="body2" fontWeight={700} color={EVZONE_GREEN}>98%</Typography>
+                </Stack>
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography variant="body2" color="text.secondary">Oldest pending ticket</Typography>
+                  <Typography variant="body2" fontWeight={700} color={EVZONE_ORANGE}>45m</Typography>
                 </Stack>
               </Stack>
             </CardContent>
@@ -336,13 +407,14 @@ export default function AgentDashboardPage() {
                 {todayTimeline.map((item) => (
                   <Grid size={{ xs: 12, md: 6, lg: 3 }} key={item.time}>
                     <Box
-                      onClick={() => navigate(item.href)}
                       sx={{
                         p: 2,
                         borderRadius: 2,
-                        cursor: "pointer",
                         border: `1px solid ${isDark ? "rgba(148,163,184,0.1)" : "rgba(226,232,240,0.8)"}`,
                         backgroundColor: isDark ? "rgba(15,23,42,0.4)" : "rgba(248,250,252,0.6)",
+                        height: "100%",
+                        display: "flex",
+                        flexDirection: "column",
                         transition: "all 0.2s",
                         "&:hover": {
                           borderColor: EVZONE_GREEN,
@@ -350,7 +422,8 @@ export default function AgentDashboardPage() {
                         }
                       }}
                     >
-                      <Stack direction="row" spacing={1.5}>
+                      {/* Header with time and status */}
+                      <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={1.5}>
                         <Box
                           sx={{
                             px: 1,
@@ -365,14 +438,64 @@ export default function AgentDashboardPage() {
                         >
                           {item.time}
                         </Box>
-                        <Box>
-                          <Typography variant="body2" fontWeight={600} mb={0.5}>
-                            {item.title}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {item.meta}
-                          </Typography>
-                        </Box>
+                        {item.status && (
+                          <Chip
+                            label={item.statusLabel}
+                            size="small"
+                            variant={item.status === "at-risk" ? "filled" : "outlined"}
+                            color={item.status === "at-risk" ? "warning" : "default"}
+                            sx={{
+                              height: 20,
+                              fontSize: 10,
+                              fontWeight: 700,
+                              ...(item.status !== "at-risk" && {
+                                borderColor: isDark ? "rgba(148,163,184,0.2)" : "rgba(203,213,225,1)",
+                                color: isDark ? "#94a3b8" : "#64748b"
+                              })
+                            }}
+                          />
+                        )}
+                      </Stack>
+
+                      {/* Content */}
+                      <Box mb={2} sx={{ flexGrow: 1 }}>
+                        <Typography variant="body2" fontWeight={700} mb={0.5} sx={{ color: isDark ? "#e5e7eb" : "#0f172a" }}>
+                          {item.title}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.4, display: "block" }}>
+                          {item.meta}
+                        </Typography>
+                      </Box>
+
+                      {/* Actions */}
+                      <Stack direction="row" spacing={1} mt="auto">
+                        <Button
+                          variant="contained"
+                          size="small"
+                          startIcon={<PlayArrowOutlinedIcon sx={{ fontSize: 16 }} />}
+                          onClick={() => navigate(item.href)}
+                          sx={{
+                            bgcolor: EVZONE_GREEN,
+                            color: "#0f172a",
+                            fontWeight: 700,
+                            fontSize: 11,
+                            boxShadow: "none",
+                            py: 0.5,
+                            "&:hover": { bgcolor: "#02b57a" }
+                          }}
+                        >
+                          Start
+                        </Button>
+                        <IconButton
+                          size="small"
+                          sx={{
+                            borderRadius: 1,
+                            border: `1px solid ${isDark ? "rgba(148,163,184,0.2)" : "rgba(203,213,225,1)"}`,
+                            color: "text.secondary"
+                          }}
+                        >
+                          <SnoozeOutlinedIcon fontSize="small" sx={{ fontSize: 16 }} />
+                        </IconButton>
                       </Stack>
                     </Box>
                   </Grid>

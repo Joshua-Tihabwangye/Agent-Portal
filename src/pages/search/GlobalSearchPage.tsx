@@ -12,6 +12,7 @@ import {
   Tab,
   Button,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { useTheme } from "@mui/material/styles";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import FilterListOutlinedIcon from "@mui/icons-material/FilterListOutlined";
@@ -134,15 +135,32 @@ function getTypeIcon(type) {
 function SearchResultRow({ entity, onAttachToTicket, onAttachToIncident }) {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
+  const navigate = useNavigate();
 
   const handleAttachTicket = () => {
-    if (onAttachToTicket) onAttachToTicket(entity);
-    else console.log("Attach to current ticket", entity);
+    if (onAttachToTicket) {
+      onAttachToTicket(entity);
+    } else {
+      // Navigate to create ticket with this entity context
+      const params = new URLSearchParams();
+      if (entity.type === 'driver') params.append('driverId', entity.id);
+      else if (entity.type === 'rider') params.append('riderId', entity.id);
+      else if (entity.title) params.append('subject', `Regarding ${entity.title}`);
+
+      navigate(`/agent/support/tickets/new?${params.toString()}`);
+    }
   };
 
   const handleAttachIncident = () => {
-    if (onAttachToIncident) onAttachToIncident(entity);
-    else console.log("Attach to current incident", entity);
+    if (onAttachToIncident) {
+      onAttachToIncident(entity);
+    } else {
+      // Navigate to create incident with this entity context
+      const params = new URLSearchParams();
+      params.append('relatedEntityId', entity.id);
+      params.append('relatedEntityType', entity.type);
+      navigate(`/agent/safety/incidents/new?${params.toString()}`);
+    }
   };
 
   return (

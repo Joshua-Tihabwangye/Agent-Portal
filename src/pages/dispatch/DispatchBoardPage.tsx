@@ -122,18 +122,76 @@ export default function AgentDispatchBoardPage() {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   const navigate = useNavigate();
-  const [columns, setColumns] = useState(initialColumns);
+
+  // Initialize read bookings from session storage
+  const [readBookings, setReadBookings] = useState<Set<string>>(() => {
+    try {
+      const saved = sessionStorage.getItem("dispatchReadBookings");
+      return saved ? new Set(JSON.parse(saved)) : new Set();
+    } catch {
+      return new Set();
+    }
+  });
+
+  // Initialize columns with read state based on history
+  // Note: we want "New" items to be unread unless they are in our history.
+  // For demo: if it's "New" and NOT in readBookings, it's unread.
+  const [columns, setColumns] = useState(() => {
+    // Helper to check if read
+    const isRead = (id: string, colKey: string, idx: number) => {
+      // If explicitly marked read in session
+      if (readBookings.has(id)) return true;
+      // Default logic: only first item in 'new' is unread if not clicked yet
+      if (colKey === "new" && idx === 0) return false;
+      return true;
+    };
+
+    return initialColumns.map(col => ({
+      ...col,
+      bookings: col.bookings.map((b, i) => ({
+        ...b,
+        read: isRead(b.id, col.key, i) // Use local variable, not state yet
+      }))
+    }));
+  });
+
+  // Effect to sync readBookings to session storage
+  React.useEffect(() => {
+    sessionStorage.setItem("dispatchReadBookings", JSON.stringify(Array.from(readBookings)));
+  }, [readBookings]);
+
   const [refreshing, setRefreshing] = useState(false);
 
   const handleRefresh = () => {
     setRefreshing(true);
     setTimeout(() => {
-      setColumns([...initialColumns]);
+      setColumns(prev => {
+        // Re-apply read state to initial columns (simulating refresh)
+        return initialColumns.map(col => ({
+          ...col,
+          bookings: col.bookings.map((b, i) => ({
+            ...b,
+            read: col.key === "new" && i === 0 ? readBookings.has(b.id) : true // Simplistic refresh logic
+          }))
+        }));
+      });
       setRefreshing(false);
     }, 800);
   };
 
   const handleBookingClick = (bookingId: string) => {
+    // Update local set
+    setReadBookings(prev => {
+      const next = new Set(prev);
+      next.add(bookingId);
+      return next;
+    });
+
+    // Mark as read in UI
+    setColumns(prev => prev.map(col => ({
+      ...col,
+      bookings: col.bookings.map(b => b.id === bookingId ? { ...b, read: true } : b)
+    })));
     navigate(`/agent/bookings/${bookingId}`);
   };
 
@@ -297,16 +355,18 @@ export default function AgentDispatchBoardPage() {
                         gap: 1,
                       }}
                     >
-                      {column.bookings.map((booking) => (
+                      {column.bookings.map((booking: any) => (
                         <Box
                           key={booking.id}
                           onClick={() => handleBookingClick(booking.id)}
                           className="rounded-2xl px-3 py-2.5 cursor-pointer"
                           sx={{
-                            backgroundColor: isDark
-                              ? "rgba(15,23,42,0.9)"
-                              : "#ffffff",
-                            border: "1px solid rgba(203,213,225,0.9)",
+                            backgroundColor: !booking.read
+                              ? (isDark ? "rgba(3,205,140,0.15)" : "#f0fdf9")
+                              : (isDark ? "rgba(15,23,42,0.9)" : "#ffffff"),
+                            border: !booking.read
+                              ? `1px solid ${EVZONE_GREEN}40`
+                              : "1px solid rgba(203,213,225,0.9)",
                             transition:
                               "border-color 0.15s ease, box-shadow 0.15s ease",
                             "&:hover": {
@@ -322,15 +382,20 @@ export default function AgentDispatchBoardPage() {
                             alignItems="center"
                             sx={{ mb: 0.4 }}
                           >
-                            <Typography
-                              variant="body2"
-                              sx={{
-                                fontWeight: 600,
-                                color: isDark ? "#e5e7eb" : "#111827",
-                              }}
-                            >
-                              {booking.id}
-                            </Typography>
+                            <Stack direction="row" spacing={1} alignItems="center">
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  fontWeight: !booking.read ? 700 : 600,
+                                  color: isDark ? "#e5e7eb" : "#111827",
+                                }}
+                              >
+                                {booking.id}
+                              </Typography>
+                              {!booking.read && (
+                                <Box sx={{ width: 6, height: 6, borderRadius: "50%", bgcolor: EVZONE_GREEN }} />
+                              )}
+                            </Stack>
                             <Stack
                               direction="row"
                               spacing={0.5}

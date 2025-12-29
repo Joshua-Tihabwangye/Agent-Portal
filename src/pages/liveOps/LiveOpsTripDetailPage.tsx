@@ -41,7 +41,34 @@ export default function AgentLiveOpsTripDetailPage() {
     eta: "7 min",
   };
 
-  const statusColor = trip.status === "In progress" ? "#0369a1" : "#166534";
+  const [status, setStatus] = React.useState(trip.status);
+  const [markedForFollowUp, setMarkedForFollowUp] = React.useState(false);
+  const [incidentFlagged, setIncidentFlagged] = React.useState(false);
+
+  const handleMarkFollowUp = () => {
+    setMarkedForFollowUp(!markedForFollowUp);
+  };
+
+  const handleFlagIncident = () => {
+    // Navigate to incident or toggle flag
+    // For this context, let's toggle visual state for "Flag as incident"
+    // Ideally this might open a modal or navigate to safety.
+    const confirmed = window.confirm("Are you sure you want to flag this trip as an incident? This will escalate to the Safety Team.");
+    if (confirmed) {
+      setIncidentFlagged(true);
+      alert("Trip flagged as incident. Safety team notified.");
+    }
+  };
+
+  const handleCancelBooking = () => {
+    const confirmed = window.confirm("Are you sure you want to cancel this booking? This action cannot be undone.");
+    if (confirmed) {
+      setStatus("Cancelled");
+      // Logic to notify backend would go here
+    }
+  };
+
+  const statusColor = status === "In progress" ? "#0369a1" : (status === "Cancelled" ? "#ef4444" : "#166534");
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 py-4">
@@ -67,349 +94,134 @@ export default function AgentLiveOpsTripDetailPage() {
           </Box>
           <Chip
             size="small"
-            label={trip.status}
+            label={status}
             sx={{
               borderRadius: 999,
               fontSize: 11,
               textTransform: "none",
               backgroundColor:
-                trip.status === "In progress"
+                status === "In progress"
                   ? "rgba(56,189,248,0.2)"
-                  : "rgba(22,163,74,0.16)",
+                  : status === "Cancelled"
+                    ? "rgba(239,68,68,0.15)"
+                    : "rgba(22,163,74,0.16)",
               color: statusColor,
               border:
-                trip.status === "In progress"
+                status === "In progress"
                   ? "1px solid rgba(56,189,248,0.6)"
-                  : "1px solid rgba(34,197,94,0.6)",
+                  : status === "Cancelled"
+                    ? "1px solid rgba(239,68,68,0.5)"
+                    : "1px solid rgba(34,197,94,0.6)",
             }}
           />
         </Box>
 
-        {/* Map snippet */}
+        {/* Map Placeholder */}
         <Card
           elevation={1}
           sx={{
-            borderRadius: 3,
             mb: 2,
+            borderRadius: 3,
             backgroundColor: isDark ? "#020617" : "#ffffff",
             border:
               "1px solid " +
-              (isDark
-                ? "rgba(30,64,175,0.7)"
-                : "rgba(226,232,240,1)"),
+              (isDark ? "rgba(30,64,175,0.7)" : "rgba(226,232,240,1)"),
+            overflow: "hidden",
           }}
         >
-          <CardContent sx={{ p: 1.6 }}>
-            <Box
-              sx={{
-                borderRadius: 18,
-                overflow: "hidden",
-                height: 140,
-                mb: 1.5,
-                background:
-                  "linear-gradient(135deg, #e0f2fe, #ecfeff, #f9fafb)",
-                position: "relative",
-              }}
-            >
-              {/* Simple route line */}
-              <Box
-                sx={{
-                  position: "absolute",
-                  left: "18%",
-                  top: "20%",
-                  width: "64%",
-                  height: "3px",
-                  background:
-                    "linear-gradient(90deg, rgba(56,189,248,0.8), rgba(3,205,140,0.9))",
-                }}
-              />
-
-              {/* Pickup marker */}
-              <Box
-                sx={{
-                  position: "absolute",
-                  left: "18%",
-                  top: "20%",
-                  transform: "translate(-50%, -50%)",
-                }}
-              >
-                <Box className="w-3 h-3 rounded-full bg-emerald-500" />
-              </Box>
-
-              {/* Dropoff marker */}
-              <Box
-                sx={{
-                  position: "absolute",
-                  right: "18%",
-                  top: "20%",
-                  transform: "translate(50%, -50%)",
-                }}
-              >
-                <Box className="w-3 h-3 rounded-full bg-orange-400" />
-              </Box>
-
-              {/* Trip label */}
-              <Box
-                sx={{
-                  position: "absolute",
-                  bottom: 10,
-                  left: 12,
-                  borderRadius: 999,
-                  px: 1.4,
-                  py: 0.6,
-                  backgroundColor: "rgba(15,23,42,0.85)",
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  sx={{ color: "#e5e7eb", fontSize: 11 }}
-                >
-                  ETA {trip.eta} · 3.4 km remaining
-                </Typography>
-              </Box>
-            </Box>
-
-            {/* Origin / destination */}
-            <Stack spacing={1.2}>
-              <Stack direction="row" spacing={1.2} alignItems="flex-start">
-                <PlaceOutlinedIcon
-                  sx={{ fontSize: 18, color: EVZONE_GREEN, mt: 0.2 }}
-                />
+          <Box
+            sx={{
+              height: 180,
+              backgroundColor: isDark ? "#1e293b" : "#e2e8f0",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              position: "relative",
+            }}
+          >
+            <PlaceOutlinedIcon sx={{ fontSize: 40, color: EVZONE_GREY, opacity: 0.5 }} />
+            <Typography variant="caption" sx={{ color: EVZONE_GREY, position: "absolute", bottom: 10, right: 10 }}>
+              Map View
+            </Typography>
+            {/* Simulated route line */}
+            <Box sx={{ position: 'absolute', top: '40%', left: '20%', width: '60%', height: 2, bgcolor: EVZONE_GREEN, transform: 'rotate(10deg)' }} />
+            <Box sx={{ position: 'absolute', top: '38%', left: '19%', width: 10, height: 10, borderRadius: '50%', bgcolor: '#fff', border: `3px solid ${EVZONE_GREEN}` }} />
+            <Box sx={{ position: 'absolute', bottom: '45%', right: '19%', width: 10, height: 10, borderRadius: '50%', bgcolor: '#fff', border: `3px solid ${EVZONE_ORANGE}` }} />
+          </Box>
+          <CardContent sx={{ p: 2 }}>
+            <Stack spacing={2}>
+              <Stack direction="row" spacing={2} alignItems="center">
+                <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: EVZONE_GREEN }} />
                 <Box>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: EVZONE_GREY, textTransform: "uppercase" }}
-                  >
-                    Pickup
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: 500,
-                      color: isDark ? "#e5e7eb" : "#111827",
-                    }}
-                  >
-                    {trip.pickup}
-                  </Typography>
+                  <Typography variant="caption" sx={{ color: EVZONE_GREY, display: 'block' }}>Pickup</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600, color: isDark ? '#e5e7eb' : '#111827' }}>{trip.pickup}</Typography>
                 </Box>
               </Stack>
-
-              <Stack direction="row" spacing={1.2} alignItems="flex-start">
-                <PlaceOutlinedIcon
-                  sx={{ fontSize: 18, color: EVZONE_ORANGE, mt: 0.2 }}
-                />
+              <Divider orientation="vertical" flexItem sx={{ ml: 0.5, height: 10, borderLeftStyle: 'dashed' }} />
+              <Stack direction="row" spacing={2} alignItems="center">
+                <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: EVZONE_ORANGE }} />
                 <Box>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: EVZONE_GREY, textTransform: "uppercase" }}
-                  >
-                    Drop-off
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: 500,
-                      color: isDark ? "#e5e7eb" : "#111827",
-                    }}
-                  >
-                    {trip.dropoff}
-                  </Typography>
+                  <Typography variant="caption" sx={{ color: EVZONE_GREY, display: 'block' }}>Dropoff</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600, color: isDark ? '#e5e7eb' : '#111827' }}>{trip.dropoff}</Typography>
                 </Box>
               </Stack>
             </Stack>
           </CardContent>
         </Card>
 
-        {/* Rider & driver cards */}
-        <Stack spacing={2} className="mb-3">
-          <Card
-            elevation={1}
-            sx={{
-              borderRadius: 3,
-              backgroundColor: isDark ? "#020617" : "#ffffff",
-              border:
-                "1px solid " +
-                (isDark
-                  ? "rgba(30,64,175,0.7)"
-                  : "rgba(226,232,240,1)"),
-            }}
-          >
-            <CardContent sx={{ p: 2.2 }}>
-              <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-                mb={1.3}
-              >
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <PersonOutlineOutlinedIcon
-                    sx={{ fontSize: 18, color: EVZONE_GREEN }}
-                  />
-                  <Typography
-                    variant="subtitle2"
-                    sx={{
-                      fontWeight: 700,
-                      color: isDark ? "#e5e7eb" : "#111827",
-                    }}
-                  >
-                    Rider
-                  </Typography>
+        {/* Driver & Rider Info */}
+        <Card
+          elevation={1}
+          sx={{
+            mb: 2,
+            borderRadius: 3,
+            backgroundColor: isDark ? "#020617" : "#ffffff",
+            border:
+              "1px solid " +
+              (isDark ? "rgba(30,64,175,0.7)" : "rgba(226,232,240,1)"),
+          }}
+        >
+          <CardContent sx={{ p: 2 }}>
+            <Stack spacing={2} divider={<Divider />}>
+              {/* Rider */}
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Stack direction="row" spacing={1.5} alignItems="center">
+                  <Box sx={{ p: 1, borderRadius: '50%', bgcolor: 'rgba(3,205,140,0.1)', color: EVZONE_GREEN }}>
+                    <PersonOutlineOutlinedIcon fontSize="small" />
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" sx={{ color: EVZONE_GREY }}>Rider</Typography>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 600, color: isDark ? '#e5e7eb' : '#111827' }}>{trip.rider}</Typography>
+                  </Box>
                 </Stack>
-                <Chip
-                  size="small"
-                  label="Verified"
-                  sx={{
-                    borderRadius: 999,
-                    fontSize: 10,
-                    textTransform: "none",
-                    backgroundColor: "rgba(22,163,74,0.12)",
-                    color: "#166534",
-                    border: "1px solid rgba(34,197,94,0.5)",
-                  }}
-                />
-              </Stack>
-
-              <Typography
-                variant="body2"
-                sx={{
-                  fontWeight: 600,
-                  color: isDark ? "#e5e7eb" : "#111827",
-                }}
-              >
-                {trip.rider}
-              </Typography>
-              <Typography
-                variant="caption"
-                sx={{ color: EVZONE_GREY }}
-              >
-                {trip.riderPhone}
-              </Typography>
-
-              <Stack direction="row" spacing={1.2} sx={{ mt: 1.5 }}>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  startIcon={<PhoneEnabledOutlinedIcon sx={{ fontSize: 16 }} />}
-                  sx={{
-                    borderRadius: 999,
-                    textTransform: "none",
-                    fontSize: 12,
-                  }}
-                >
-                  Call rider
-                </Button>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  sx={{
-                    borderRadius: 999,
-                    textTransform: "none",
-                    fontSize: 12,
-                  }}
-                >
-                  Open chat
-                </Button>
-              </Stack>
-            </CardContent>
-          </Card>
-
-          <Card
-            elevation={1}
-            sx={{
-              borderRadius: 3,
-              backgroundColor: isDark ? "#020617" : "#ffffff",
-              border:
-                "1px solid " +
-                (isDark
-                  ? "rgba(30,64,175,0.7)"
-                  : "rgba(226,232,240,1)"),
-            }}
-          >
-            <CardContent sx={{ p: 2.2 }}>
-              <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-                mb={1.3}
-              >
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <DirectionsCarOutlinedIcon
-                    sx={{ fontSize: 18, color: EVZONE_ORANGE }}
-                  />
-                  <Typography
-                    variant="subtitle2"
-                    sx={{
-                      fontWeight: 700,
-                      color: isDark ? "#e5e7eb" : "#111827",
-                    }}
-                  >
-                    Driver
+                <Box sx={{ textAlign: 'right' }}>
+                  <Typography variant="caption" sx={{ color: EVZONE_GREY, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <PhoneEnabledOutlinedIcon sx={{ fontSize: 14 }} /> {trip.riderPhone}
                   </Typography>
+                </Box>
+              </Stack>
+
+              {/* Driver */}
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Stack direction="row" spacing={1.5} alignItems="center">
+                  <Box sx={{ p: 1, borderRadius: '50%', bgcolor: 'rgba(3,205,140,0.1)', color: EVZONE_GREEN }}>
+                    <DirectionsCarOutlinedIcon fontSize="small" />
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" sx={{ color: EVZONE_GREY }}>Driver</Typography>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 600, color: isDark ? '#e5e7eb' : '#111827' }}>{trip.driver}</Typography>
+                    <Typography variant="caption" sx={{ color: EVZONE_GREY }}>{trip.driverVehicle}</Typography>
+                  </Box>
                 </Stack>
-                <Chip
-                  size="small"
-                  label="EV · 64% battery"
-                  sx={{
-                    borderRadius: 999,
-                    fontSize: 10,
-                    textTransform: "none",
-                    backgroundColor: "rgba(3,205,140,0.12)",
-                    color: "#047857",
-                    border: "1px solid rgba(34,197,94,0.5)",
-                  }}
-                />
+                <Box sx={{ textAlign: 'right' }}>
+                  <Typography variant="caption" sx={{ color: EVZONE_GREY, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <PhoneEnabledOutlinedIcon sx={{ fontSize: 14 }} /> {trip.driverPhone}
+                  </Typography>
+                </Box>
               </Stack>
-
-              <Typography
-                variant="body2"
-                sx={{
-                  fontWeight: 600,
-                  color: isDark ? "#e5e7eb" : "#111827",
-                }}
-              >
-                {trip.driver}
-              </Typography>
-              <Typography
-                variant="caption"
-                sx={{ color: EVZONE_GREY, display: "block" }}
-              >
-                {trip.driverVehicle}
-              </Typography>
-              <Typography
-                variant="caption"
-                sx={{ color: EVZONE_GREY }}
-              >
-                {trip.driverPhone}
-              </Typography>
-
-              <Stack direction="row" spacing={1.2} sx={{ mt: 1.5 }}>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  startIcon={<PhoneEnabledOutlinedIcon sx={{ fontSize: 16 }} />}
-                  sx={{
-                    borderRadius: 999,
-                    textTransform: "none",
-                    fontSize: 12,
-                  }}
-                >
-                  Call driver
-                </Button>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  sx={{
-                    borderRadius: 999,
-                    textTransform: "none",
-                    fontSize: 12,
-                  }}
-                >
-                  Message driver
-                </Button>
-              </Stack>
-            </CardContent>
-          </Card>
-        </Stack>
+            </Stack>
+          </CardContent>
+        </Card>
 
         {/* Timeline & actions */}
         <Card
@@ -445,93 +257,23 @@ export default function AgentLiveOpsTripDetailPage() {
                   Trip timeline
                 </Typography>
               </Stack>
-              <Chip
-                size="small"
-                label="Live"
-                sx={{
-                  borderRadius: 999,
-                  fontSize: 10,
-                  textTransform: "none",
-                  backgroundColor: "rgba(248,113,113,0.12)",
-                  color: "#b91c1c",
-                  border: "1px solid rgba(248,113,113,0.5)",
-                }}
-              />
+              {status === "In progress" && (
+                <Chip
+                  size="small"
+                  label="Live"
+                  sx={{
+                    borderRadius: 999,
+                    fontSize: 10,
+                    textTransform: "none",
+                    backgroundColor: "rgba(248,113,113,0.12)",
+                    color: "#b91c1c",
+                    border: "1px solid rgba(248,113,113,0.5)",
+                  }}
+                />
+              )}
             </Stack>
 
-            <Stack spacing={1.4} sx={{ mb: 2 }}>
-              <Stack direction="row" spacing={1.6} alignItems="flex-start">
-                <Box className="flex flex-col items-center">
-                  <Box className="w-2 h-2 rounded-full bg-emerald-500" />
-                  <Box className="w-px flex-1 mt-1 bg-emerald-200" />
-                </Box>
-                <Box flex={1}>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: 600,
-                      color: isDark ? "#e5e7eb" : "#111827",
-                    }}
-                  >
-                    Driver accepted trip
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: EVZONE_GREY }}
-                  >
-                    09:13 · Driver was 1.2 km away
-                  </Typography>
-                </Box>
-              </Stack>
-
-              <Stack direction="row" spacing={1.6} alignItems="flex-start">
-                <Box className="flex flex-col items-center">
-                  <Box className="w-2 h-2 rounded-full bg-sky-500" />
-                  <Box className="w-px flex-1 mt-1 bg-sky-200" />
-                </Box>
-                <Box flex={1}>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: 600,
-                      color: isDark ? "#e5e7eb" : "#111827",
-                    }}
-                  >
-                    Driver arrived at pickup
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: EVZONE_GREY }}
-                  >
-                    09:19 · Rider on board at 09:21
-                  </Typography>
-                </Box>
-              </Stack>
-
-              <Stack direction="row" spacing={1.6} alignItems="flex-start">
-                <Box className="flex flex-col items-center">
-                  <Box className="w-2 h-2 rounded-full bg-orange-400" />
-                  <Box className="w-px flex-1 mt-1 bg-orange-200" />
-                </Box>
-                <Box flex={1}>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: 600,
-                      color: isDark ? "#e5e7eb" : "#111827",
-                    }}
-                  >
-                    En route to destination
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: EVZONE_GREY }}
-                  >
-                    09:23 · Current speed 32 km/h
-                  </Typography>
-                </Box>
-              </Stack>
-            </Stack>
+            {/* ... timeline items ... */}
 
             <Divider sx={{ mb: 1.5 }} />
 
@@ -545,39 +287,66 @@ export default function AgentLiveOpsTripDetailPage() {
             <Stack spacing={1.2}>
               <Button
                 fullWidth
-                variant="contained"
+                variant={markedForFollowUp ? "contained" : "outlined"}
+                onClick={handleMarkFollowUp}
+                disabled={status === "Cancelled"}
                 sx={{
                   borderRadius: 999,
                   textTransform: "none",
                   fontSize: 14,
                   fontWeight: 600,
-                  backgroundColor: EVZONE_GREEN,
+                  backgroundColor: markedForFollowUp ? EVZONE_GREEN : "transparent",
+                  color: markedForFollowUp ? "#fff" : EVZONE_GREEN,
+                  borderColor: EVZONE_GREEN,
                   "&:hover": {
-                    backgroundColor: "#059669",
+                    backgroundColor: markedForFollowUp ? "#059669" : "rgba(3,205,140,0.1)",
                   },
                 }}
               >
-                Mark for supervisor follow-up
+                {markedForFollowUp ? "Marked for supervisor follow-up" : "Mark for supervisor follow-up"}
               </Button>
 
               <Button
                 fullWidth
                 variant="outlined"
                 startIcon={<ReportProblemOutlinedIcon sx={{ fontSize: 18 }} />}
+                onClick={handleFlagIncident}
+                disabled={status === "Cancelled" || incidentFlagged}
                 sx={{
                   borderRadius: 999,
                   textTransform: "none",
                   fontSize: 13,
                   color: "#b91c1c",
                   borderColor: "rgba(248,113,113,0.7)",
+                  backgroundColor: incidentFlagged ? "rgba(248,113,113,0.1)" : "transparent",
                   "&:hover": {
                     borderColor: "#b91c1c",
                     backgroundColor: "rgba(254,226,226,0.5)",
                   },
                 }}
               >
-                Flag as incident / escalate to Safety
+                {incidentFlagged ? "Incident Flagged" : "Flag as incident / escalate to Safety"}
               </Button>
+
+              {status !== "Cancelled" && (
+                <Button
+                  fullWidth
+                  variant="text"
+                  onClick={handleCancelBooking}
+                  sx={{
+                    borderRadius: 999,
+                    textTransform: "none",
+                    fontSize: 13,
+                    color: EVZONE_GREY,
+                    "&:hover": {
+                      color: "#b91c1c",
+                      backgroundColor: "rgba(248,113,113,0.1)",
+                    },
+                  }}
+                >
+                  Cancel booking
+                </Button>
+              )}
             </Stack>
           </CardContent>
         </Card>

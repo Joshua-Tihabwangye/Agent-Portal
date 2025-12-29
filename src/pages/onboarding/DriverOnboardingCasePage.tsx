@@ -43,6 +43,7 @@ export default function AgentDriverOnboardingCasePage() {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
 
+  const [driverState, setDriverState] = useState(driver);
   const [tab, setTab] = useState("summary");
   const [decision, setDecision] = useState("pending");
 
@@ -52,7 +53,14 @@ export default function AgentDriverOnboardingCasePage() {
 
   const handleDecision = (value) => {
     setDecision(value);
-    console.log("Decision set", value);
+
+    // Update local driver state to reflect decision immediately
+    let newStatus = driverState.stage;
+    if (value === "approve") newStatus = "Onboarding complete";
+    else if (value === "reject") newStatus = "Rejected by safety";
+    else if (value === "more-info") newStatus = "Extra info required";
+
+    setDriverState({ ...driverState, stage: newStatus });
   };
 
   return (
@@ -81,22 +89,31 @@ export default function AgentDriverOnboardingCasePage() {
 
           <Stack spacing={0.5} alignItems="flex-end">
             <Chip
-              label={driver.stage}
+              label={driverState.stage}
               size="small"
               sx={{
                 borderRadius: 999,
                 fontSize: 11,
                 textTransform: "none",
-                backgroundColor: "rgba(56,189,248,0.18)",
-                color: "#0369a1",
-                border: "1px solid rgba(56,189,248,0.6)",
+                backgroundColor:
+                  driverState.stage === "Onboarding complete" ? "rgba(22,163,74,0.12)" :
+                    driverState.stage === "Rejected by safety" ? "rgba(239,68,68,0.12)" :
+                      "rgba(56,189,248,0.18)",
+                color:
+                  driverState.stage === "Onboarding complete" ? "#166534" :
+                    driverState.stage === "Rejected by safety" ? "#b91c1c" :
+                      "#0369a1",
+                border:
+                  driverState.stage === "Onboarding complete" ? "1px solid rgba(34,197,94,0.6)" :
+                    driverState.stage === "Rejected by safety" ? "1px solid rgba(239,68,68,0.6)" :
+                      "1px solid rgba(56,189,248,0.6)",
               }}
             />
             <Typography
               variant="caption"
               sx={{ color: EVZONE_GREY }}
             >
-              {driver.createdAt}
+              {driverState.createdAt}
             </Typography>
           </Stack>
         </Box>
