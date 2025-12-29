@@ -99,6 +99,31 @@ export function RevenuePieChart({ data, title, height = 280, showLegend = true }
     const isDark = theme.palette.mode === "dark";
     const total = data.reduce((sum, item) => sum + item.value, 0);
 
+    // Custom legend renderer with percentages
+    const renderLegend = (props: { payload?: { value: string; color: string; payload: { value: number } }[] }) => {
+        const { payload } = props;
+        if (!payload) return null;
+
+        return (
+            <Stack spacing={1} sx={{ pl: 2 }}>
+                {payload.map((entry, index) => {
+                    const percent = ((entry.payload.value / total) * 100).toFixed(0);
+                    return (
+                        <Stack key={index} direction="row" spacing={1} alignItems="center">
+                            <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: entry.color, flexShrink: 0 }} />
+                            <Typography variant="caption" sx={{ color: isDark ? "#e5e7eb" : "#374151", fontWeight: 500, minWidth: 60 }}>
+                                {entry.value}
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: entry.color, fontWeight: 700 }}>
+                                {percent}%
+                            </Typography>
+                        </Stack>
+                    );
+                })}
+            </Stack>
+        );
+    };
+
     return (
         <Box>
             {title && (
@@ -147,9 +172,7 @@ export function RevenuePieChart({ data, title, height = 280, showLegend = true }
                             layout="vertical"
                             align="right"
                             verticalAlign="middle"
-                            wrapperStyle={{ fontSize: 11, color: isDark ? "#94a3b8" : "#64748b", paddingLeft: 8 }}
-                            iconType="circle"
-                            iconSize={8}
+                            content={renderLegend}
                         />
                     )}
                 </PieChart>

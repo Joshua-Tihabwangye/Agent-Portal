@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Card,
@@ -8,27 +8,28 @@ import {
   Chip,
   TextField,
   IconButton,
-  List,
-  ListItemButton,
-  ListItemText,
-  ListItemIcon,
   Avatar,
   Grid,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import AssignmentIndOutlinedIcon from "@mui/icons-material/AssignmentIndOutlined";
 import FilterListOutlinedIcon from "@mui/icons-material/FilterListOutlined";
-import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
-import VerifiedUserOutlinedIcon from "@mui/icons-material/VerifiedUserOutlined";
-import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 
 const EVZONE_GREEN = "#03cd8c";
 const EVZONE_ORANGE = "#f77f00";
 const EVZONE_GREY = "#6b7280";
 
-// Enhanced sample data
-const sampleDrivers = [
+// Initial sample data
+const initialDrivers = [
   {
     id: "DRV-101",
     name: "Michael K.",
@@ -85,6 +86,9 @@ const sampleDrivers = [
   },
 ];
 
+// Storage key for syncing status between pages
+const STORAGE_KEY = "evzone_driver_onboarding_status";
+
 export default function AgentDriverOnboardingQueuePage() {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
@@ -93,9 +97,55 @@ export default function AgentDriverOnboardingQueuePage() {
   const [statusFilter, setStatusFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredDrivers = sampleDrivers.filter((d) => {
-    const matchesStatus =
-      statusFilter === "All" || d.status === statusFilter;
+  // Load drivers from sessionStorage or use initial data
+  const [drivers, setDrivers] = useState(() => {
+    try {
+      const stored = sessionStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        // Merge with initial to handle new drivers
+        return initialDrivers.map(d => ({
+          ...d,
+          status: parsed[d.id] || d.status,
+        }));
+      }
+    } catch { /* ignore */ }
+    return initialDrivers;
+  });
+
+  // Sync from sessionStorage on focus (when returning from case page)
+  useEffect(() => {
+    const handleFocus = () => {
+      try {
+        const stored = sessionStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          setDrivers(prev => prev.map(d => ({
+            ...d,
+            status: parsed[d.id] || d.status,
+          })));
+        }
+      } catch { /* ignore */ }
+    };
+
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
+  }, []);
+
+  const updateDriverStatus = (driverId: string, newStatus: string) => {
+    const updated = drivers.map(d =>
+      d.id === driverId ? { ...d, status: newStatus } : d
+    );
+    setDrivers(updated);
+
+    // Save to sessionStorage
+    const statusMap: Record<string, string> = {};
+    updated.forEach(d => { statusMap[d.id] = d.status; });
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(statusMap));
+  };
+
+  const filteredDrivers = drivers.filter((d) => {
+    const matchesStatus = statusFilter === "All" || d.status === statusFilter;
     const matchesSearch =
       d.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       d.id.toLowerCase().includes(searchQuery.toLowerCase());
@@ -200,97 +250,127 @@ export default function AgentDriverOnboardingQueuePage() {
         </Stack>
       </Stack>
 
-      {/* Driver List */}
-      <Grid container spacing={2}>
-        {filteredDrivers.map((driver) => {
-          const styles = getStatusColor(driver.status);
-          return (
-            <Grid size={{ xs: 12 }} key={driver.id}>
-              <Card
-                elevation={0}
-                onClick={() => navigate(`/agent/onboarding/drivers/${driver.id}`)}
-                sx={{
-                  borderRadius: 3,
-                  backgroundColor: isDark ? "#020617" : "#ffffff",
-                  border: "1px solid " + (isDark ? "#1e293b" : "#e2e8f0"),
-                  cursor: "pointer",
-                  transition: "all 0.2s",
-                  "&:hover": {
-                    transform: "translateY(-2px)",
-                    boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
-                    borderColor: EVZONE_GREEN,
-                  },
-                }}
-              >
-                <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
-                  <Stack
-                    direction={{ xs: "column", sm: "row" }}
-                    justifyContent="space-between"
-                    alignItems={{ xs: "flex-start", sm: "center" }}
-                    spacing={2}
-                  >
-                    <Stack direction="row" spacing={2} alignItems="center">
+      {/* Driver Table */}
+      <Card
+        elevation={0}
+        sx={{
+          borderRadius: 3,
+          backgroundColor: isDark ? "#020617" : "#ffffff",
+          border: "1px solid " + (isDark ? "#1e293b" : "#e2e8f0"),
+          overflow: "hidden",
+        }}
+      >
+        <Table>
+          <TableHead>
+            <TableRow sx={{ bgcolor: isDark ? "#0f172a" : "#f8fafc" }}>
+              <TableCell sx={{ fontWeight: 700, color: isDark ? "#94a3b8" : "#64748b" }}>Name</TableCell>
+              <TableCell sx={{ fontWeight: 700, color: isDark ? "#94a3b8" : "#64748b" }}>Role</TableCell>
+              <TableCell sx={{ fontWeight: 700, color: isDark ? "#94a3b8" : "#64748b" }}>Status</TableCell>
+              <TableCell align="center" sx={{ fontWeight: 700, color: isDark ? "#94a3b8" : "#64748b" }}>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {filteredDrivers.map((driver) => {
+              const styles = getStatusColor(driver.status);
+              const initials = driver.name.split(' ').map(n => n[0]).join('');
+
+              return (
+                <TableRow
+                  key={driver.id}
+                  sx={{
+                    "&:hover": { bgcolor: isDark ? "rgba(3,205,140,0.05)" : "rgba(3,205,140,0.02)" },
+                    cursor: "pointer",
+                  }}
+                  onClick={() => navigate(`/agent/onboarding/drivers/${driver.id}`)}
+                >
+                  <TableCell>
+                    <Stack direction="row" spacing={1.5} alignItems="center">
                       <Avatar
                         sx={{
-                          width: 48,
-                          height: 48,
-                          bgcolor: isDark ? "#1e293b" : "#f1f5f9",
-                          color: isDark ? "#94a3b8" : "#64748b",
+                          width: 36,
+                          height: 36,
+                          fontSize: 14,
+                          fontWeight: 700,
+                          bgcolor: driver.status === "Approved" ? EVZONE_GREEN :
+                            driver.status === "Rejected" ? "#ef4444" :
+                              driver.status === "Needs Info" ? EVZONE_ORANGE : "#38bdf8",
+                          color: "#fff",
                         }}
                       >
-                        <AssignmentIndOutlinedIcon />
+                        {initials}
                       </Avatar>
-                      <Box>
-                        <Typography
-                          variant="subtitle1"
-                          sx={{ fontWeight: 700, color: isDark ? "#e5e7eb" : "#111827" }}
-                        >
-                          {driver.name}
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: EVZONE_GREY }}>
-                          {driver.id} · {driver.city} · {driver.company}
-                        </Typography>
-                      </Box>
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: isDark ? "#e5e7eb" : "#111827" }}>
+                        {driver.name}
+                      </Typography>
                     </Stack>
-
-                    <Stack direction="row" spacing={3} alignItems="center">
-                      <Box sx={{ textAlign: "right", display: { xs: "none", md: "block" } }}>
-                        <Typography variant="caption" sx={{ color: EVZONE_GREY, display: "block" }}>
-                          Applied on
-                        </Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                          {driver.date}
-                        </Typography>
-                      </Box>
-
-                      <Chip
-                        label={driver.status}
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="body2" sx={{ color: EVZONE_GREY }}>
+                      {driver.company === "Indep." ? "Independent" : driver.company}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: 600,
+                        color: styles.text,
+                      }}
+                    >
+                      {driver.status}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center" onClick={(e) => e.stopPropagation()}>
+                    <Stack direction="row" spacing={0.5} justifyContent="center">
+                      <IconButton
                         size="small"
+                        onClick={() => updateDriverStatus(driver.id, "Approved")}
                         sx={{
-                          borderRadius: 999,
-                          fontWeight: 600,
-                          backgroundColor: styles.bg,
-                          color: styles.text,
-                          border: `1px solid ${styles.border}`,
+                          color: driver.status === "Approved" ? EVZONE_GREEN : EVZONE_GREY,
+                          bgcolor: driver.status === "Approved" ? "rgba(3,205,140,0.15)" : "transparent",
+                          "&:hover": { bgcolor: "rgba(3,205,140,0.2)" },
                         }}
-                      />
-
+                      >
+                        <CheckCircleOutlineIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() => updateDriverStatus(driver.id, "Rejected")}
+                        sx={{
+                          color: driver.status === "Rejected" ? "#ef4444" : EVZONE_GREY,
+                          bgcolor: driver.status === "Rejected" ? "rgba(239,68,68,0.15)" : "transparent",
+                          "&:hover": { bgcolor: "rgba(239,68,68,0.2)" },
+                        }}
+                      >
+                        <CancelOutlinedIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() => updateDriverStatus(driver.id, "Needs Info")}
+                        sx={{
+                          color: driver.status === "Needs Info" ? EVZONE_ORANGE : EVZONE_GREY,
+                          bgcolor: driver.status === "Needs Info" ? "rgba(247,127,0,0.15)" : "transparent",
+                          "&:hover": { bgcolor: "rgba(247,127,0,0.2)" },
+                        }}
+                      >
+                        <HelpOutlineOutlinedIcon fontSize="small" />
+                      </IconButton>
                     </Stack>
-                  </Stack>
-                </CardContent>
-              </Card>
-            </Grid>
-          );
-        })}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
 
         {filteredDrivers.length === 0 && (
-          <Box sx={{ width: "100%", textAlign: "center", py: 8 }}>
+          <Box sx={{ textAlign: "center", py: 8 }}>
             <Typography variant="body1" sx={{ color: EVZONE_GREY }}>
               No drivers found matching your criteria.
             </Typography>
           </Box>
         )}
-      </Grid>
+      </Card>
     </Box>
   );
 }
