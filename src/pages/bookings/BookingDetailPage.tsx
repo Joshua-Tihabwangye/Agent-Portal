@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Card,
@@ -9,6 +9,8 @@ import {
   Button,
   Grid,
   Divider,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import DirectionsCarOutlinedIcon from "@mui/icons-material/DirectionsCarOutlined";
@@ -32,6 +34,11 @@ export default function AgentBookingDetailPage() {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
 
+  // Snackbar state for in-UI feedback
+  const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: "success" | "error" | "info" }>({ open: false, message: "", severity: "success" });
+  const [markedForFollowUp, setMarkedForFollowUp] = useState(false);
+  const [cancelled, setCancelled] = useState(false);
+
   const stored = (() => {
     try {
       const raw = window.localStorage.getItem("evzone_agent_bookings");
@@ -49,7 +56,7 @@ export default function AgentBookingDetailPage() {
       type: stored.summary.type,
       clientType: stored.summary.clientType,
       createdAt: stored.createdAt ? new Date(stored.createdAt).toLocaleString() : "—",
-      status: stored.status || "New",
+      status: cancelled ? "Cancelled" : (stored.status || "New"),
       riderName: stored.summary.riderName,
       riderPhone: stored.summary.riderPhone,
       pickup: stored.summary.pickup,
@@ -67,7 +74,7 @@ export default function AgentBookingDetailPage() {
       type: "Ride",
       clientType: "Rider",
       createdAt: "Today · 09:12",
-      status: "In progress",
+      status: cancelled ? "Cancelled" : "In progress",
       riderName: "Sarah K.",
       riderPhone: "+256 700 200 168",
       pickup: "Nakasero Hill Road",
@@ -80,6 +87,16 @@ export default function AgentBookingDetailPage() {
       driverPhone: "+256 704 000 111",
       driverBattery: 72,
     };
+
+  const handleMarkFollowUp = () => {
+    setMarkedForFollowUp(true);
+    setSnackbar({ open: true, message: "Marked for follow-up", severity: "success" });
+  };
+
+  const handleCancelBooking = () => {
+    setCancelled(true);
+    setSnackbar({ open: true, message: "Booking cancelled", severity: "error" });
+  };
 
   const timeline = [
     {
@@ -113,6 +130,12 @@ export default function AgentBookingDetailPage() {
       <LocalHospitalOutlinedIcon sx={{ fontSize: 20, color: "#b91c1c" }} />
     );
 
+  const statusColor = booking.status === "Cancelled"
+    ? { bg: "rgba(239,68,68,0.15)", text: "#b91c1c", border: "rgba(239,68,68,0.5)" }
+    : booking.status === "In progress"
+      ? { bg: "rgba(56,189,248,0.2)", text: "#0369a1", border: "rgba(56,189,248,0.6)" }
+      : { bg: "rgba(22,163,74,0.16)", text: "#166534", border: "rgba(34,197,94,0.6)" };
+
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 py-4">
       <Box className="max-w-3xl mx-auto">
@@ -145,16 +168,9 @@ export default function AgentBookingDetailPage() {
                 borderRadius: 999,
                 fontSize: 11,
                 textTransform: "none",
-                backgroundColor:
-                  booking.status === "In progress"
-                    ? "rgba(56,189,248,0.2)"
-                    : "rgba(22,163,74,0.16)",
-                color:
-                  booking.status === "In progress" ? "#0369a1" : "#166534",
-                border:
-                  booking.status === "In progress"
-                    ? "1px solid rgba(56,189,248,0.6)"
-                    : "1px solid rgba(34,197,94,0.6)",
+                backgroundColor: statusColor.bg,
+                color: statusColor.text,
+                border: `1px solid ${statusColor.border}`,
               }}
             />
             <Typography
@@ -496,45 +512,62 @@ export default function AgentBookingDetailPage() {
 
               <Stack direction="row" spacing={1.5}>
                 <Button
-                  variant="outlined"
+                  variant={markedForFollowUp ? "contained" : "outlined"}
                   size="small"
-                  onClick={() => {
-                    console.log("Mark for follow-up", booking.id);
-                    window.alert("Marked for follow-up (demo)");
-                  }}
+                  disabled={cancelled}
+                  onClick={handleMarkFollowUp}
                   sx={{
                     borderRadius: 999,
                     textTransform: "none",
                     fontSize: 13,
-                  }}
-                >
-                  Mark for follow-up
-                </Button>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  onClick={() => {
-                    console.log("Cancel booking", booking.id);
-                    window.alert("Cancel requested (demo)");
-                  }}
-                  sx={{
-                    borderRadius: 999,
-                    textTransform: "none",
-                    fontSize: 13,
-                    color: "#b91c1c",
-                    borderColor: "rgba(248,113,113,0.7)",
+                    backgroundColor: markedForFollowUp ? EVZONE_GREEN : "transparent",
+                    color: markedForFollowUp ? "#fff" : undefined,
+                    borderColor: markedForFollowUp ? EVZONE_GREEN : undefined,
                     "&:hover": {
-                      borderColor: "#b91c1c",
+                      backgroundColor: markedForFollowUp ? "#02b57a" : undefined,
                     },
                   }}
                 >
-                  Cancel booking
+                  {markedForFollowUp ? "Marked for follow-up ✓" : "Mark for follow-up"}
+                </Button>
+                <Button
+                  variant={cancelled ? "contained" : "outlined"}
+                  size="small"
+                  disabled={cancelled}
+                  onClick={handleCancelBooking}
+                  sx={{
+                    borderRadius: 999,
+                    textTransform: "none",
+                    fontSize: 13,
+                    color: cancelled ? "#fff" : "#b91c1c",
+                    backgroundColor: cancelled ? "#b91c1c" : "transparent",
+                    borderColor: "rgba(248,113,113,0.7)",
+                    "&:hover": {
+                      borderColor: "#b91c1c",
+                      backgroundColor: cancelled ? "#b91c1c" : undefined,
+                    },
+                  }}
+                >
+                  {cancelled ? "Booking Cancelled" : "Cancel booking"}
                 </Button>
               </Stack>
             </Stack>
           </CardContent>
         </Card>
       </Box>
+
+      {/* Snackbar for in-UI feedback */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert severity={snackbar.severity} onClose={() => setSnackbar({ ...snackbar, open: false })} sx={{ width: "100%" }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
+

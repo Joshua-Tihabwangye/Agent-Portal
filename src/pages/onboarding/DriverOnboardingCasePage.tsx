@@ -14,6 +14,7 @@ import {
   Alert,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import { useParams } from "react-router-dom";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import VerifiedUserOutlinedIcon from "@mui/icons-material/VerifiedUserOutlined";
@@ -23,6 +24,9 @@ import GavelOutlinedIcon from "@mui/icons-material/GavelOutlined";
 const EVZONE_GREEN = "#03cd8c";
 const EVZONE_ORANGE = "#f77f00";
 const EVZONE_GREY = "#6b7280";
+
+// Storage key for syncing status between pages
+const STORAGE_KEY = "evzone_driver_onboarding_status";
 
 // Route target: /agent/onboarding/drivers/:driverId
 // Placeholder data; in real app load via driverId.
@@ -42,6 +46,7 @@ const driver = {
 export default function AgentDriverOnboardingCasePage() {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
+  const { driverId } = useParams();
 
   const [driverState, setDriverState] = useState(driver);
   const [tab, setTab] = useState("summary");
@@ -51,16 +56,38 @@ export default function AgentDriverOnboardingCasePage() {
     if (value) setTab(value);
   };
 
+  // Sync status to sessionStorage so queue page can pick it up
+  const syncStatusToStorage = (dId: string, status: string) => {
+    try {
+      const stored = sessionStorage.getItem(STORAGE_KEY);
+      const parsed = stored ? JSON.parse(stored) : {};
+      parsed[dId] = status;
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+    } catch { /* ignore */ }
+  };
+
   const handleDecision = (value) => {
     setDecision(value);
 
     // Update local driver state to reflect decision immediately
-    let newStatus = driverState.stage;
-    if (value === "approve") newStatus = "Onboarding complete";
-    else if (value === "reject") newStatus = "Rejected by safety";
-    else if (value === "more-info") newStatus = "Extra info required";
+    let newStatus = "Under Review";
+    let newStage = driverState.stage;
+    if (value === "approve") {
+      newStatus = "Approved";
+      newStage = "Onboarding complete";
+    } else if (value === "reject") {
+      newStatus = "Rejected";
+      newStage = "Rejected by safety";
+    } else if (value === "more-info") {
+      newStatus = "Needs Info";
+      newStage = "Extra info required";
+    }
 
-    setDriverState({ ...driverState, stage: newStatus });
+    setDriverState({ ...driverState, stage: newStage });
+
+    // Sync to sessionStorage using the driver ID from URL or fallback
+    const effectiveId = driverId || driverState.id;
+    syncStatusToStorage(effectiveId, newStatus);
   };
 
   return (

@@ -46,6 +46,7 @@ import CompanyProfilePage from "../pages/profiles/CompanyProfilePage";
 // Support
 import TicketQueuePage from "../pages/support/TicketQueuePage";
 import TicketDetailPage from "../pages/support/TicketDetailPage";
+import SupportCreateTicketPage from "../pages/support/SupportCreateTicketPage";
 
 // Safety
 import SOSQueuePage from "../pages/safety/SOSQueuePage";
@@ -133,10 +134,13 @@ export default function App() {
 
           {/* Support tickets */}
           <Route path="/agent/support/tickets" element={<TicketQueuePage />} />
+          <Route path="/agent/support/tickets/new" element={<SupportCreateTicketPage />} />
+          <Route path="/agent/support/create" element={<SupportCreateTicketPage />} />
           <Route path="/agent/support/tickets/:ticketId" element={<TicketDetailPage />} />
 
           {/* Safety */}
           <Route path="/agent/safety/sos" element={<SOSQueuePage />} />
+          <Route path="/agent/safety/incidents/new" element={<IncidentDetailPage />} />
           <Route path="/agent/safety/incidents/:incidentId" element={<IncidentDetailPage />} />
 
           {/* Search */}
