@@ -16,6 +16,7 @@ import {
   Divider,
   Slider,
 } from "@mui/material";
+import PageBreadcrumb from "../../components/shared/PageBreadcrumb";
 import { useTheme } from "@mui/material/styles";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import FilterListOutlinedIcon from "@mui/icons-material/FilterListOutlined";
@@ -94,7 +95,12 @@ export function AgentQAReviewsListPage() {
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 py-4">
-      <Box className="max-w-4xl mx-auto">
+      <Box className="w-full">
+        {/* Breadcrumb Navigation */}
+        <PageBreadcrumb
+          items={[]}
+          current="QA Reviews"
+        />
         {/* Header */}
         <Box className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <Box>
@@ -349,14 +355,14 @@ export function AgentQAReviewsListPage() {
                             review.status === "Completed"
                               ? "rgba(22,163,74,0.16)"
                               : review.status === "In review"
-                              ? "rgba(56,189,248,0.18)"
-                              : "rgba(250,204,21,0.18)",
+                                ? "rgba(56,189,248,0.18)"
+                                : "rgba(250,204,21,0.18)",
                           color:
                             review.status === "Completed"
                               ? "#166534"
                               : review.status === "In review"
-                              ? "#0369a1"
-                              : "#92400e",
+                                ? "#0369a1"
+                                : "#92400e",
                         }}
                       />
                     </Stack>
@@ -403,7 +409,12 @@ export function AgentQAReviewDetailPage() {
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 py-4">
-      <Box className="max-w-4xl mx-auto">
+      <Box className="w-full">
+        {/* Breadcrumb Navigation */}
+        <PageBreadcrumb
+          items={[{ label: "QA", href: "/agent/qa" }]}
+          current="Review Detail"
+        />
         {/* Header */}
         <Box className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <Box>
@@ -703,34 +714,37 @@ export default function AgentQAPreviewPage() {
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 py-4">
-      <Box className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <Box className="lg:col-span-2">
-          <AgentQAReviewsListPage />
-        </Box>
-        <Box className="space-y-4">
-          <AgentMyFeedbackMiniView agentName="Amina K." />
-          <Card
-            elevation={1}
-            sx={{
-              borderRadius: 3,
-              backgroundColor: isDark ? "#020617" : "#ffffff",
-              border:
-                "1px solid " +
-                (isDark ? "rgba(30,64,175,0.7)" : "rgba(226,232,240,1)"),
-            }}
-          >
-            <CardContent sx={{ p: 1.6 }}>
-              <Typography
-                variant="caption"
-                sx={{ color: EVZONE_GREY }}
-              >
-                For full scoring, open a specific review from the list.
-                Below is a condensed example of the scoring form.
-              </Typography>
-            </CardContent>
-          </Card>
-          <Box>
-            <AgentQAReviewDetailPage />
+      <Box className="w-full">
+        <PageBreadcrumb items={[]} current="QA Preview" />
+        <Box className="w-full grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <Box className="lg:col-span-2">
+            <AgentQAReviewsListPage />
+          </Box>
+          <Box className="space-y-4">
+            <AgentMyFeedbackMiniView agentName="Amina K." />
+            <Card
+              elevation={1}
+              sx={{
+                borderRadius: 3,
+                backgroundColor: isDark ? "#020617" : "#ffffff",
+                border:
+                  "1px solid " +
+                  (isDark ? "rgba(30,64,175,0.7)" : "rgba(226,232,240,1)"),
+              }}
+            >
+              <CardContent sx={{ p: 1.6 }}>
+                <Typography
+                  variant="caption"
+                  sx={{ color: EVZONE_GREY }}
+                >
+                  For full scoring, open a specific review from the list.
+                  Below is a condensed example of the scoring form.
+                </Typography>
+              </CardContent>
+            </Card>
+            <Box>
+              <AgentQAReviewDetailPage />
+            </Box>
           </Box>
         </Box>
       </Box>

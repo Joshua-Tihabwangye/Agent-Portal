@@ -87,7 +87,7 @@ export default function AnalyticsDashboardPage() {
     const data = mockData[period];
 
     return (
-        <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 md:px-8 py-6">
+        <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 md:px-8 py-6 w-full">
             {/* Header */}
             <Box className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <Box>

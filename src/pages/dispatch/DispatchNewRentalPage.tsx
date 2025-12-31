@@ -22,6 +22,7 @@ import { useNavigate } from "react-router-dom";
 import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
+import PageBreadcrumb from "../../components/shared/PageBreadcrumb";
 
 const EVZONE_GREEN = "#03cd8c";
 const EVZONE_ORANGE = "#f77f00";
@@ -43,6 +44,7 @@ export default function AgentDispatchNewRentalPage() {
   const [vehicleClass, setVehicleClass] = useState("ev-sedan");
   const [driverOption, setDriverOption] = useState("with-driver");
   const [notes, setNotes] = useState("");
+  const [numberOfDays, setNumberOfDays] = useState("");
 
   const isValid =
     customerName.trim().length > 0 &&
@@ -79,7 +81,15 @@ export default function AgentDispatchNewRentalPage() {
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 py-4">
-      <Box className="max-w-3xl mx-auto">
+      <Box className="w-full">
+        {/* Breadcrumb Navigation */}
+        <PageBreadcrumb
+          items={[
+            { label: "Dispatch", href: "/agent/dispatch" },
+            { label: "New Booking", href: "/agent/dispatch/new" }
+          ]}
+          current="Car Rental"
+        />
         {/* Header */}
         <Box className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <Box>
@@ -193,6 +203,23 @@ export default function AgentDispatchNewRentalPage() {
                         <MenuItem value="multi-day">Multi-day</MenuItem>
                       </Select>
                     </FormControl>
+
+                    {rentalType === "multi-day" && (
+                      <TextField
+                        label="Number of days"
+                        placeholder="e.g. 3"
+                        variant="outlined"
+                        size="small"
+                        fullWidth
+                        type="number"
+                        value={numberOfDays}
+                        onChange={(e) => setNumberOfDays(e.target.value)}
+                        InputLabelProps={{ sx: { color: EVZONE_GREY } }}
+                        InputProps={{ sx: { borderRadius: 3 }, inputProps: { min: 1 } }}
+                        helperText="How many days is this rental for?"
+                        FormHelperTextProps={{ sx: { color: EVZONE_GREY } }}
+                      />
+                    )}
 
                     <FormControl size="small" fullWidth>
                       <InputLabel sx={{ color: EVZONE_GREY }}>

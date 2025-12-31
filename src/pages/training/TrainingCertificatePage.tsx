@@ -11,6 +11,7 @@ import { useAuth } from "../../providers/AuthProvider";
 const EVZONE_GREEN = "#03cd8c";
 const EVZONE_ORANGE = "#f77f00";
 const EVZONE_GREY = "#6b7280";
+import PageBreadcrumb from "../../components/shared/PageBreadcrumb";
 
 export default function TrainingCertificatePage() {
   const { moduleId } = useParams();
@@ -61,7 +62,12 @@ EVzone Agent Training
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 py-4">
-      <Box className="max-w-3xl mx-auto">
+      <Box className="w-full">
+        {/* Breadcrumb Navigation */}
+        <PageBreadcrumb
+          items={[{ label: "Training", href: "/agent/training" }]}
+          current="Certificate"
+        />
         <Box className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <Box>
             <Typography variant="h6" sx={{ fontWeight: 800, color: isDark ? "#e5e7eb" : "#0f172a" }}>

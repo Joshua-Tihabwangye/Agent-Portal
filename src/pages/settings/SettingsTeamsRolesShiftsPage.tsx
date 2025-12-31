@@ -19,6 +19,7 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
+import PageBreadcrumb from "../../components/shared/PageBreadcrumb";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import SupervisorAccountOutlinedIcon from "@mui/icons-material/SupervisorAccountOutlined";
 import ViewQuiltOutlinedIcon from "@mui/icons-material/ViewQuiltOutlined";
@@ -251,7 +252,12 @@ export function AgentTeamsSettingsPage() {
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 md:px-8 py-4">
-      <Box className="max-w-6xl mx-auto">
+      <Box className="w-full">
+        {/* Breadcrumb Navigation */}
+        <PageBreadcrumb
+          items={[{ label: "Settings", href: "/agent/settings" }]}
+          current="Teams & Queues"
+        />
         {/* Header */}
         <Box className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <Box>
@@ -528,7 +534,12 @@ export function AgentShiftsSettingsPage() {
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 md:px-8 py-4">
-      <Box className="max-w-6xl mx-auto">
+      <Box className="w-full">
+        {/* Breadcrumb Navigation */}
+        <PageBreadcrumb
+          items={[{ label: "Settings", href: "/agent/settings" }]}
+          current="Working Hours"
+        />
         {/* Header */}
         <Box className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <Box>
@@ -778,7 +789,12 @@ export function AgentRolesSettingsPage() {
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 md:px-8 py-4">
-      <Box className="max-w-6xl mx-auto">
+      <Box className="w-full">
+        {/* Breadcrumb Navigation */}
+        <PageBreadcrumb
+          items={[{ label: "Settings", href: "/agent/settings" }]}
+          current="Roles & Permissions"
+        />
         {/* Header */}
         <Box className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <Box>

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Box, Card, CardContent, Typography, Stack, Chip, LinearProgress, Button, Tabs, Tab } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
+import PageBreadcrumb from "../../components/shared/PageBreadcrumb";
 import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
 import ChecklistOutlinedIcon from "@mui/icons-material/ChecklistOutlined";
 import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
@@ -103,7 +104,12 @@ export default function AgentTrainingCentrePage() {
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 py-4">
-      <Box className="max-w-4xl mx-auto">
+      <Box className="w-full">
+        {/* Breadcrumb Navigation */}
+        <PageBreadcrumb
+          items={[]}
+          current="Training Centre"
+        />
         {/* Header */}
         <Box className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <Box>

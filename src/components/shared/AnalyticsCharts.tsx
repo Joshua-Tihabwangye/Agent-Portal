@@ -43,6 +43,7 @@ interface PieChartComponentProps {
     title?: string;
     height?: number;
     showLegend?: boolean;
+    showChartLabels?: boolean;
 }
 
 interface BarChartComponentProps {
@@ -94,35 +95,35 @@ const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?:
     return null;
 };
 
-export function RevenuePieChart({ data, title, height = 280, showLegend = true }: PieChartComponentProps) {
+export function RevenuePieChart({ data, title, height = 280, showLegend = true, showChartLabels = true }: PieChartComponentProps) {
     const theme = useTheme();
     const isDark = theme.palette.mode === "dark";
     const total = data.reduce((sum, item) => sum + item.value, 0);
 
-    // Custom legend renderer with percentages
+    // Custom legend renderer with percentages - Updated for horizontal layout
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const renderLegend = (props: any) => {
         const { payload } = props;
         if (!payload) return null;
 
         return (
-            <Stack spacing={1} sx={{ pl: 2 }}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 2, mt: 1, px: 2 }}>
                 {payload.map((entry: { value?: string; color?: string; payload?: { value?: number } }, index: number) => {
                     const entryValue = entry.payload?.value ?? 0;
                     const percent = ((entryValue / total) * 100).toFixed(0);
                     return (
-                        <Stack key={index} direction="row" spacing={1} alignItems="center">
-                            <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: entry.color || "#ccc", flexShrink: 0 }} />
-                            <Typography variant="caption" sx={{ color: isDark ? "#e5e7eb" : "#374151", fontWeight: 500, minWidth: 60 }}>
+                        <Stack key={index} direction="row" spacing={0.5} alignItems="center">
+                            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: entry.color || "#ccc", flexShrink: 0 }} />
+                            <Typography variant="caption" sx={{ color: isDark ? "#e5e7eb" : "#374151", fontWeight: 500 }}>
                                 {entry.value || ""}
                             </Typography>
                             <Typography variant="caption" sx={{ color: entry.color || "#6b7280", fontWeight: 700 }}>
-                                {percent}%
+                                ({percent}%)
                             </Typography>
                         </Stack>
                     );
                 })}
-            </Stack>
+            </Box>
         );
     };
 
@@ -137,17 +138,21 @@ export function RevenuePieChart({ data, title, height = 280, showLegend = true }
                 <PieChart>
                     <Pie
                         data={data}
-                        cx="35%"
-                        cy="50%"
-                        innerRadius={45}
-                        outerRadius={65}
+                        cx="50%" // Centered
+                        cy="45%" // Slightly higher to leave room for legend
+                        innerRadius={45} // Slightly larger
+                        outerRadius={70} // Slightly larger
                         paddingAngle={3}
                         dataKey="value"
-                        label={({ cx, cy, midAngle, outerRadius, name, percent }) => {
+                        label={showChartLabels ? ({ cx, cy, midAngle, outerRadius, value, percent }) => {
+                            // Only show labels for slices > 5% to avoid clutter
+                            if (percent < 0.05) return null;
+
                             const RADIAN = Math.PI / 180;
-                            const radius = outerRadius + 25;
+                            const radius = outerRadius + 15;
                             const x = cx + radius * Math.cos(-midAngle * RADIAN);
                             const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
                             return (
                                 <text
                                     x={x}
@@ -155,14 +160,14 @@ export function RevenuePieChart({ data, title, height = 280, showLegend = true }
                                     fill={isDark ? "#e5e7eb" : "#374151"}
                                     textAnchor={x > cx ? "start" : "end"}
                                     dominantBaseline="central"
-                                    fontSize={11}
+                                    fontSize={10}
                                     fontWeight={600}
                                 >
-                                    {`${name} ${(percent * 100).toFixed(0)}%`}
+                                    {`${(percent * 100).toFixed(0)}%`}
                                 </text>
                             );
-                        }}
-                        labelLine={{ stroke: isDark ? "#94a3b8" : "#64748b", strokeWidth: 1 }}
+                        } : undefined}
+                        labelLine={showChartLabels ? { stroke: isDark ? "#94a3b8" : "#64748b", strokeWidth: 1 } : false}
                     >
                         {data.map((_, index) => (
                             <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
@@ -171,16 +176,16 @@ export function RevenuePieChart({ data, title, height = 280, showLegend = true }
                     <Tooltip content={<CustomTooltip />} />
                     {showLegend && (
                         <Legend
-                            layout="vertical"
-                            align="right"
-                            verticalAlign="middle"
                             content={renderLegend}
+                            verticalAlign="bottom"
+                            align="center"
+                            height={undefined} // Let it auto-size
                         />
                     )}
                 </PieChart>
             </ResponsiveContainer>
-            <Box className="text-center mt-2">
-                <Typography variant="body2" sx={{ color: isDark ? "#94a3b8" : "#64748b" }}>
+            <Box className="text-center mt-1">
+                <Typography variant="caption" sx={{ color: isDark ? "#94a3b8" : "#64748b" }}>
                     Total: <strong style={{ color: EVZONE_GREEN }}>{total.toLocaleString()}</strong>
                 </Typography>
             </Box>

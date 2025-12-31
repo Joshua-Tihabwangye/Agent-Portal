@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
+import PageBreadcrumb from "../../components/shared/PageBreadcrumb";
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
 import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
@@ -54,7 +55,12 @@ export default function AgentIncidentDetailPage() {
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 py-4">
-      <Box className="max-w-4xl mx-auto">
+      <Box className="w-full">
+        {/* Breadcrumb Navigation */}
+        <PageBreadcrumb
+          items={[{ label: "Safety", href: "/agent/safety" }]}
+          current={`Incident ${incident.id}`}
+        />
         {/* Header */}
         <Box className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <Box>

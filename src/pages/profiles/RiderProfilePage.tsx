@@ -11,6 +11,7 @@ import {
   TextField,
   Button,
 } from "@mui/material";
+import PageBreadcrumb from "../../components/shared/PageBreadcrumb";
 import { useTheme } from "@mui/material/styles";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import PhoneEnabledOutlinedIcon from "@mui/icons-material/PhoneEnabledOutlined";
@@ -44,7 +45,12 @@ export default function AgentRiderProfilePage() {
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 py-4">
-      <Box className="max-w-4xl mx-auto">
+      <Box className="w-full">
+        {/* Breadcrumb Navigation */}
+        <PageBreadcrumb
+          items={[{ label: "Profiles", href: "/agent/profiles" }]}
+          current={riderProfile.name}
+        />
         {/* Header */}
         <Box className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <Box className="flex items-center gap-2">

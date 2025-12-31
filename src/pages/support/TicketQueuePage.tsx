@@ -22,6 +22,7 @@ import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import ReportProblemOutlinedIcon from "@mui/icons-material/ReportProblemOutlined";
 import PaymentsOutlinedIcon from "@mui/icons-material/PaymentsOutlined";
 import BugReportOutlinedIcon from "@mui/icons-material/BugReportOutlined";
+import PageBreadcrumb from "../../components/shared/PageBreadcrumb";
 
 const EVZONE_GREEN = "#03cd8c";
 const EVZONE_ORANGE = "#f77f00";
@@ -103,7 +104,12 @@ export default function AgentTicketQueuePage() {
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 md:px-8 py-4">
-      <Box className="max-w-6xl mx-auto">
+      <Box className="w-full">
+        {/* Breadcrumb Navigation */}
+        <PageBreadcrumb
+          items={[]}
+          current="Support Tickets"
+        />
         {/* Header */}
         <Box className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <Box>

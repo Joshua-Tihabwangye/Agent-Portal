@@ -19,6 +19,7 @@ import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
 import { useNavigate } from "react-router-dom";
+import PageBreadcrumb from "../../components/shared/PageBreadcrumb";
 
 const EVZONE_GREEN = "#03cd8c";
 const EVZONE_ORANGE = "#f77f00";
@@ -71,7 +72,15 @@ export default function AgentDispatchNewRidePage() {
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 py-4">
-      <Box className="max-w-3xl mx-auto">
+      <Box className="w-full">
+        {/* Breadcrumb Navigation */}
+        <PageBreadcrumb
+          items={[
+            { label: "Dispatch", href: "/agent/dispatch" },
+            { label: "New Booking", href: "/agent/dispatch/new" }
+          ]}
+          current="Ride"
+        />
         {/* Header */}
         <Box className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <Box>

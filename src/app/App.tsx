@@ -19,6 +19,8 @@ import LiveOpsTripDetailPage from "../pages/liveOps/LiveOpsTripDetailPage";
 import LiveOpsDriverDetailPage from "../pages/liveOps/LiveOpsDriverDetailPage";
 
 // Dispatch
+import DispatchHubPage from "../pages/dispatch/DispatchHubPage";
+import DispatchDetailPage from "../pages/dispatch/DispatchDetailPage";
 import DispatchNewStartPage from "../pages/dispatch/DispatchNewStartPage";
 import DispatchNewRidePage from "../pages/dispatch/DispatchNewRidePage";
 import DispatchNewDeliveryPage from "../pages/dispatch/DispatchNewDeliveryPage";
@@ -107,6 +109,8 @@ export default function App() {
           <Route path="/agent/live-ops/drivers/:driverId" element={<LiveOpsDriverDetailPage />} />
 
           {/* Manual Dispatch */}
+          <Route path="/agent/dispatch" element={<DispatchHubPage />} />
+          <Route path="/agent/dispatch/:dispatchId" element={<DispatchDetailPage />} />
           <Route path="/agent/dispatch/new" element={<DispatchNewStartPage />} />
           <Route path="/agent/dispatch/new/ride" element={<DispatchNewRidePage />} />
           <Route path="/agent/dispatch/new/delivery" element={<DispatchNewDeliveryPage />} />

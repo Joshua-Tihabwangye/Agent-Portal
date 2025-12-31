@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Card, CardContent, Typography, Stack, Chip, Button, LinearProgress } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useNavigate, useParams } from "react-router-dom";
+import PageBreadcrumb from "../../components/shared/PageBreadcrumb";
 import QuizOutlinedIcon from "@mui/icons-material/QuizOutlined";
 import EmojiEventsOutlinedIcon from "@mui/icons-material/EmojiEventsOutlined";
 import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
@@ -51,12 +52,17 @@ export default function TrainingAssessmentPage() {
     assessment.status === "Due"
       ? "#b91c1c"
       : assessment.status === "Upcoming"
-      ? "#1d4ed8"
-      : "#166534";
+        ? "#1d4ed8"
+        : "#166534";
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 py-4">
-      <Box className="max-w-3xl mx-auto">
+      <Box className="w-full">
+        {/* Breadcrumb Navigation */}
+        <PageBreadcrumb
+          items={[{ label: "Training", href: "/agent/training" }]}
+          current="Assessment"
+        />
         <Box className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <Box>
             <Typography

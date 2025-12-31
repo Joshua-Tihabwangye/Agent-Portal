@@ -19,6 +19,7 @@ import DirectionsBusOutlinedIcon from "@mui/icons-material/DirectionsBusOutlined
 import TourOutlinedIcon from "@mui/icons-material/TourOutlined";
 import LocalHospitalOutlinedIcon from "@mui/icons-material/LocalHospitalOutlined";
 import { useNavigate } from "react-router-dom";
+import PageBreadcrumb from "../../components/shared/PageBreadcrumb";
 
 const EVZONE_GREEN = "#03cd8c";
 const EVZONE_ORANGE = "#f77f00";
@@ -65,28 +66,28 @@ const SERVICE_TYPES = [
     label: "Car rental",
     description: "Longer bookings, hourly or daily.",
     icon: <DirectionsCarOutlinedIcon sx={{ fontSize: 20 }} />,
-    primary: false,
+    primary: true,
   },
   {
     key: "school-shuttle",
     label: "School shuttle",
     description: "Seats on school routes.",
     icon: <DirectionsBusOutlinedIcon sx={{ fontSize: 20 }} />,
-    primary: false,
+    primary: true,
   },
   {
     key: "tour",
     label: "Tour",
     description: "Pre-defined tour packages.",
     icon: <TourOutlinedIcon sx={{ fontSize: 20 }} />,
-    primary: false,
+    primary: true,
   },
   {
     key: "ems",
     label: "Ambulance / EMS",
     description: "Emergency medical response.",
     icon: <LocalHospitalOutlinedIcon sx={{ fontSize: 20 }} />,
-    primary: false,
+    primary: true,
   },
 ];
 
@@ -109,7 +110,12 @@ export default function AgentDispatchNewStartPage() {
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 py-4">
-      <Box className="max-w-4xl mx-auto">
+      <Box className="w-full">
+        {/* Breadcrumb Navigation */}
+        <PageBreadcrumb
+          items={[{ label: "Dispatch", href: "/agent/dispatch" }]}
+          current="New Booking"
+        />
         {/* Header */}
         <Box className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <Box>

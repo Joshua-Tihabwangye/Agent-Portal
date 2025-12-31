@@ -23,6 +23,7 @@ import FilterListOutlinedIcon from "@mui/icons-material/FilterListOutlined";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
+import PageBreadcrumb from "../../components/shared/PageBreadcrumb";
 
 const EVZONE_GREEN = "#03cd8c";
 const EVZONE_ORANGE = "#f77f00";
@@ -168,6 +169,11 @@ export default function AgentDriverOnboardingQueuePage() {
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 py-4">
+      {/* Breadcrumb Navigation */}
+      <PageBreadcrumb
+        items={[]}
+        current="Driver Onboarding"
+      />
       {/* Header */}
       <Box className="mb-6">
         <Typography
