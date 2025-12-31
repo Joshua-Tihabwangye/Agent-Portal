@@ -20,6 +20,7 @@ import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined
 import DirectionsBusOutlinedIcon from "@mui/icons-material/DirectionsBusOutlined";
 import TourOutlinedIcon from "@mui/icons-material/TourOutlined";
 import LocalHospitalOutlinedIcon from "@mui/icons-material/LocalHospitalOutlined";
+import PageBreadcrumb from "../../components/shared/PageBreadcrumb";
 
 const EVZONE_GREEN = "#03cd8c";
 const EVZONE_ORANGE = "#f77f00";
@@ -111,12 +112,12 @@ export default function AgentMyBookingsPage() {
         const key = st.includes("delivery")
           ? "deliveries"
           : st.includes("rental")
-          ? "rentals"
-          : st.includes("tour")
-          ? "tours"
-          : st.includes("ems")
-          ? "ems"
-          : "rides";
+            ? "rentals"
+            : st.includes("tour")
+              ? "tours"
+              : st.includes("ems")
+                ? "ems"
+                : "rides";
 
         const summary = b?.summary || {};
         const subtitle = summary.pickup && summary.dropoff ? `${summary.pickup} → ${summary.dropoff}` : (b?.pickup || b?.dropoff ? `${b?.pickup || ""} → ${b?.dropoff || ""}` : "—");
@@ -166,7 +167,12 @@ export default function AgentMyBookingsPage() {
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 py-4">
-      <Box className="max-w-3xl mx-auto">
+      <Box className="w-full">
+        {/* Breadcrumb Navigation */}
+        <PageBreadcrumb
+          items={[]}
+          current="My Bookings"
+        />
         {/* Header */}
         <Box className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <Box>
@@ -362,19 +368,19 @@ export default function AgentMyBookingsPage() {
                               ? "rgba(56,189,248,0.15)"
                               : b.status === "Assigned" ||
                                 b.status === "Scheduled"
-                              ? "rgba(22,163,74,0.12)"
-                              : b.status === "Draft"
-                              ? "rgba(148,163,184,0.18)"
-                              : "rgba(248,250,252,1)",
+                                ? "rgba(22,163,74,0.12)"
+                                : b.status === "Draft"
+                                  ? "rgba(148,163,184,0.18)"
+                                  : "rgba(248,250,252,1)",
                           color:
                             b.status === "In progress"
                               ? "#0369a1"
                               : b.status === "Assigned" ||
                                 b.status === "Scheduled"
-                              ? "#166534"
-                              : b.status === "Draft"
-                              ? "#4b5563"
-                              : EVZONE_GREY,
+                                ? "#166534"
+                                : b.status === "Draft"
+                                  ? "#4b5563"
+                                  : EVZONE_GREY,
                         }}
                       />
                     </ListItemButton>

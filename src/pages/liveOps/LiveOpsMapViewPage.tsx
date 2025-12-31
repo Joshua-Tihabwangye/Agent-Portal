@@ -19,6 +19,7 @@ import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined
 import ReportProblemOutlinedIcon from "@mui/icons-material/ReportProblemOutlined";
 import { useNavigate } from "react-router-dom";
 import { LiveOpsBatteryOverlay } from "../../components/ev/LiveOpsBatteryOverlay";
+import PageBreadcrumb from "../../components/shared/PageBreadcrumb";
 
 const EVZONE_GREEN = "#03cd8c";
 const EVZONE_ORANGE = "#f77f00";
@@ -88,6 +89,11 @@ export default function AgentLiveOpsPage() {
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 py-4">
+      {/* Breadcrumb Navigation */}
+      <PageBreadcrumb
+        items={[]}
+        current="Live Operations"
+      />
       {/* Header */}
       <Box className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <Box>

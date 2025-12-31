@@ -63,7 +63,7 @@ const navItems: NavItem[] = [
   { key: "dashboard", label: "Dashboard", icon: <DashboardOutlinedIcon fontSize="small" />, href: "/agent/dashboard" },
   { key: "analytics", label: "Analytics", icon: <BarChartOutlinedIcon fontSize="small" />, href: "/agent/dashboard/analytics" },
   { key: "live-ops", label: "Live Ops & Map", icon: <MapOutlinedIcon fontSize="small" />, href: "/agent/live-ops" },
-  { key: "dispatch", label: "Manual Dispatch", icon: <LocalShippingOutlinedIcon fontSize="small" />, href: "/agent/dispatch/board" },
+  { key: "dispatch", label: "Manual Dispatch", icon: <LocalShippingOutlinedIcon fontSize="small" />, href: "/agent/dispatch" },
   { key: "onboarding", label: "Driver Onboarding", icon: <AssignmentIndOutlinedIcon fontSize="small" />, href: "/agent/onboarding/drivers" },
   { key: "support", label: "Support & Tickets", icon: <SupportAgentOutlinedIcon fontSize="small" />, href: "/agent/support/tickets" },
   { key: "safety", label: "Safety & Incidents", icon: <ReportProblemOutlinedIcon fontSize="small" />, href: "/agent/safety/sos" },
@@ -364,6 +364,9 @@ export default function AgentAppShell() {
         <Box
           className="ev-gradient text-white shadow-sm"
           sx={{
+            position: "sticky",
+            top: 0,
+            zIndex: 1100,
             px: { xs: 1.5, sm: 3 },
             py: { xs: 1.25, md: 1.5 },
             borderBottom: isDark ? "1px solid rgba(148,163,184,0.18)" : "1px solid rgba(255,255,255,0.25)",

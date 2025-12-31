@@ -16,6 +16,7 @@ import PhoneEnabledOutlinedIcon from "@mui/icons-material/PhoneEnabledOutlined";
 import ReportProblemOutlinedIcon from "@mui/icons-material/ReportProblemOutlined";
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
+import PageBreadcrumb from "../../components/shared/PageBreadcrumb";
 
 const EVZONE_GREEN = "#03cd8c";
 const EVZONE_ORANGE = "#f77f00";
@@ -72,7 +73,12 @@ export default function AgentLiveOpsTripDetailPage() {
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 py-4">
-      <Box className="max-w-xl mx-auto">
+      <Box className="w-full">
+        {/* Breadcrumb Navigation */}
+        <PageBreadcrumb
+          items={[{ label: "Live Ops", href: "/agent/live-ops" }]}
+          current={`Trip ${trip.code}`}
+        />
         {/* Header */}
         <Box className="mb-3 flex items-center justify-between gap-2">
           <Box>

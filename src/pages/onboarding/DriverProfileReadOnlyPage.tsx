@@ -9,6 +9,7 @@ import {
   Grid,
   Divider,
 } from "@mui/material";
+import PageBreadcrumb from "../../components/shared/PageBreadcrumb";
 import { useTheme } from "@mui/material/styles";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import DirectionsCarOutlinedIcon from "@mui/icons-material/DirectionsCarOutlined";
@@ -58,7 +59,12 @@ export default function AgentDriverProfilePage() {
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 py-4">
-      <Box className="max-w-4xl mx-auto">
+      <Box className="w-full">
+        {/* Breadcrumb Navigation */}
+        <PageBreadcrumb
+          items={[{ label: "Drivers", href: "/agent/drivers" }]}
+          current={driverProfile.name}
+        />
         {/* Header */}
         <Box className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <Box className="flex items-center gap-2">

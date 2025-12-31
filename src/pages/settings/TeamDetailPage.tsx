@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Card, CardContent, Typography, Stack, Chip, Button, Divider, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Avatar, IconButton, Tooltip } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useNavigate, useParams } from "react-router-dom";
+import PageBreadcrumb from "../../components/shared/PageBreadcrumb";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import QueuePlayNextOutlinedIcon from "@mui/icons-material/QueuePlayNextOutlined";
@@ -44,7 +45,12 @@ export default function TeamDetailPage() {
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 md:px-8 py-4">
-      <Box className="max-w-6xl mx-auto">
+      <Box className="w-full">
+        {/* Breadcrumb Navigation */}
+        <PageBreadcrumb
+          items={[{ label: "Settings", href: "/agent/settings" }, { label: "Teams", href: "/agent/settings/teams" }]}
+          current={team.name}
+        />
         <Box className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <Box>
             <Typography variant="h6" sx={{ fontWeight: 800, color: isDark ? "#e5e7eb" : "#0f172a" }}>

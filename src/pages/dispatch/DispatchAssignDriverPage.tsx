@@ -19,6 +19,7 @@ import DirectionsCarOutlinedIcon from "@mui/icons-material/DirectionsCarOutlined
 import ElectricBoltOutlinedIcon from "@mui/icons-material/ElectricBoltOutlined";
 import { useNavigate } from "react-router-dom";
 import { DispatchEVSuitabilityHelper } from "../../components/ev/DispatchEVSuitabilityHelper";
+import PageBreadcrumb from "../../components/shared/PageBreadcrumb";
 
 const EVZONE_GREEN = "#03cd8c";
 const EVZONE_ORANGE = "#f77f00";
@@ -99,7 +100,15 @@ export default function AgentDispatchAssignDriverPage() {
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 py-4">
-      <Box className="max-w-5xl mx-auto">
+      <Box className="w-full">
+        {/* Breadcrumb Navigation */}
+        <PageBreadcrumb
+          items={[
+            { label: "Dispatch", href: "/agent/dispatch" },
+            { label: "New Booking", href: "/agent/dispatch/new" }
+          ]}
+          current="Assign Driver"
+        />
         {/* Header */}
         <Box className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <Box>

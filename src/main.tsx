@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
+import { HashRouter } from "react-router-dom";
 import App from "./app/App";
 import "./index.css";
 import { ThemeModeProvider } from "./providers/ThemeModeProvider";
@@ -10,9 +10,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ThemeModeProvider>
       <AuthProvider>
-        <BrowserRouter>
+        <HashRouter>
           <App />
-        </BrowserRouter>
+        </HashRouter>
       </AuthProvider>
     </ThemeModeProvider>
   </React.StrictMode>

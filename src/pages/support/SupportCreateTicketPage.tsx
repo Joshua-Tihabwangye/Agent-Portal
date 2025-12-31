@@ -17,6 +17,7 @@ import { useTheme } from "@mui/material/styles";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SendIcon from "@mui/icons-material/Send";
+import PageBreadcrumb from "../../components/shared/PageBreadcrumb";
 
 const EVZONE_GREEN = "#03cd8c";
 const EVZONE_GREY = "#6b7280";
@@ -48,14 +49,12 @@ export default function SupportCreateTicketPage() {
 
     return (
         <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 py-4">
-            <Box className="max-w-2xl mx-auto">
-                <Button
-                    startIcon={<ArrowBackIcon />}
-                    onClick={() => navigate(-1)}
-                    sx={{ mb: 2, color: EVZONE_GREY }}
-                >
-                    Back
-                </Button>
+            <Box className="w-full">
+                {/* Breadcrumb Navigation */}
+                <PageBreadcrumb
+                    items={[{ label: "Support", href: "/agent/support" }]}
+                    current="Create Ticket"
+                />
 
                 <Typography
                     variant="h5"
