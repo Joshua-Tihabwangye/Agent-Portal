@@ -107,18 +107,18 @@ export function RevenuePieChart({ data, title, height = 280, showLegend = true, 
         if (!payload) return null;
 
         return (
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 2, mt: 1, px: 2 }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5, mt: 2, px: 1, width: '100%', maxWidth: 200, mx: 'auto' }}>
                 {payload.map((entry: { value?: string; color?: string; payload?: { value?: number } }, index: number) => {
                     const entryValue = entry.payload?.value ?? 0;
                     const percent = ((entryValue / total) * 100).toFixed(0);
                     return (
                         <Stack key={index} direction="row" spacing={0.5} alignItems="center">
                             <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: entry.color || "#ccc", flexShrink: 0 }} />
-                            <Typography variant="caption" sx={{ color: isDark ? "#e5e7eb" : "#374151", fontWeight: 500 }}>
+                            <Typography variant="caption" sx={{ color: isDark ? "#e5e7eb" : "#374151", fontWeight: 500, fontSize: 10 }}>
                                 {entry.value || ""}
                             </Typography>
-                            <Typography variant="caption" sx={{ color: entry.color || "#6b7280", fontWeight: 700 }}>
-                                ({percent}%)
+                            <Typography variant="caption" sx={{ color: entry.color || "#6b7280", fontWeight: 700, fontSize: 10 }}>
+                                {percent}%
                             </Typography>
                         </Stack>
                     );
