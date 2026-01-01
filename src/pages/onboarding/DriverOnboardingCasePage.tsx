@@ -82,6 +82,9 @@ export default function AgentDriverOnboardingCasePage() {
     } else if (value === "more-info") {
       newStatus = "Needs Info";
       newStage = "Extra info required";
+    } else if (value === "pending") {
+      newStatus = "Awaiting Review";
+      newStage = "Docs pending review";
     }
 
     setDriverState({ ...driverState, stage: newStage });
@@ -826,6 +829,24 @@ export default function AgentDriverOnboardingCasePage() {
                         }}
                       >
                         Request more info
+                      </Button>
+                      <Button
+                        variant={
+                          decision === "pending" ? "contained" : "outlined"
+                        }
+                        size="small"
+                        onClick={() => handleDecision("pending")}
+                        sx={{
+                          borderRadius: 999,
+                          textTransform: "none",
+                          fontSize: 13,
+                          fontWeight: 600,
+                          color: decision === "pending" ? "#fff" : "inherit", // visual feedback
+                          backgroundColor: decision === "pending" ? EVZONE_GREY : "transparent",
+                          borderColor: EVZONE_GREY,
+                        }}
+                      >
+                        Mark Pending
                       </Button>
                       <Button
                         variant={
