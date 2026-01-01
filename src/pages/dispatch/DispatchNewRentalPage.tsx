@@ -15,7 +15,10 @@ import {
   Select,
   InputLabel,
   FormControl,
+  InputAdornment,
 } from "@mui/material";
+import { DateTimePicker } from "@mui/x-date-pickers";
+import dayjs from "dayjs";
 import { useTheme } from "@mui/material/styles";
 import DirectionsCarOutlinedIcon from "@mui/icons-material/DirectionsCarOutlined";
 import { useNavigate } from "react-router-dom";
@@ -329,7 +332,14 @@ export default function AgentDispatchNewRentalPage() {
                       value={pickupBranch}
                       onChange={(e) => setPickupBranch(e.target.value)}
                       InputLabelProps={{ sx: { color: EVZONE_GREY } }}
-                      InputProps={{ sx: { borderRadius: 3 } }}
+                      InputProps={{
+                        sx: { borderRadius: 3 },
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <PlaceOutlinedIcon sx={{ fontSize: 18, color: EVZONE_GREEN }} />
+                          </InputAdornment>
+                        ),
+                      }}
                     />
 
                     <TextField
@@ -341,7 +351,14 @@ export default function AgentDispatchNewRentalPage() {
                       value={dropoffBranch}
                       onChange={(e) => setDropoffBranch(e.target.value)}
                       InputLabelProps={{ sx: { color: EVZONE_GREY } }}
-                      InputProps={{ sx: { borderRadius: 3 } }}
+                      InputProps={{
+                        sx: { borderRadius: 3 },
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <PlaceOutlinedIcon sx={{ fontSize: 18, color: "error.main" }} />
+                          </InputAdornment>
+                        ),
+                      }}
                     />
 
                     <Stack spacing={1.2}>
@@ -362,29 +379,31 @@ export default function AgentDispatchNewRentalPage() {
 
                       <Grid container spacing={1.5}>
                         <Grid size={{ xs: 12, sm: 6 }}>
-                          <TextField
+                          <DateTimePicker
                             label="Start date & time"
-                            placeholder="e.g. Today 10:00"
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            value={startDateTime}
-                            onChange={(e) => setStartDateTime(e.target.value)}
-                            InputLabelProps={{ sx: { color: EVZONE_GREY } }}
-                            InputProps={{ sx: { borderRadius: 3 } }}
+                            value={startDateTime ? dayjs(startDateTime) : null}
+                            onChange={(newValue) => setStartDateTime(newValue ? newValue.toISOString() : "")}
+                            slotProps={{
+                              textField: {
+                                size: 'small',
+                                fullWidth: true,
+                                InputProps: { sx: { borderRadius: 3 } }
+                              }
+                            }}
                           />
                         </Grid>
                         <Grid size={{ xs: 12, sm: 6 }}>
-                          <TextField
+                          <DateTimePicker
                             label="End date & time"
-                            placeholder="e.g. Tomorrow 18:00"
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            value={endDateTime}
-                            onChange={(e) => setEndDateTime(e.target.value)}
-                            InputLabelProps={{ sx: { color: EVZONE_GREY } }}
-                            InputProps={{ sx: { borderRadius: 3 } }}
+                            value={endDateTime ? dayjs(endDateTime) : null}
+                            onChange={(newValue) => setEndDateTime(newValue ? newValue.toISOString() : "")}
+                            slotProps={{
+                              textField: {
+                                size: 'small',
+                                fullWidth: true,
+                                InputProps: { sx: { borderRadius: 3 } }
+                              }
+                            }}
                           />
                         </Grid>
                       </Grid>

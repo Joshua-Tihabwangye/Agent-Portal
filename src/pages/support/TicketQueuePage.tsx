@@ -8,6 +8,7 @@ import {
   Chip,
   TextField,
   IconButton,
+  Button,
   List,
   ListItemButton,
   ListItemText,
@@ -32,7 +33,6 @@ const sampleTickets = [
   {
     id: "TCK-9012",
     type: "Trip issue",
-    icon: <SupportAgentOutlinedIcon fontSize="small" />,
     subject: "Driver arrived very late",
     user: "Rider · Sarah K.",
     status: "New",
@@ -43,7 +43,6 @@ const sampleTickets = [
   {
     id: "TCK-9013",
     type: "Payment",
-    icon: <PaymentsOutlinedIcon fontSize="small" />,
     subject: "Double charge on last trip",
     user: "Rider · Brian O.",
     status: "In progress",
@@ -54,7 +53,6 @@ const sampleTickets = [
   {
     id: "TCK-9014",
     type: "App bug",
-    icon: <BugReportOutlinedIcon fontSize="small" />,
     subject: "Driver app keeps freezing",
     user: "Driver · Kato R.",
     status: "Waiting",
@@ -65,7 +63,6 @@ const sampleTickets = [
   {
     id: "TCK-9015",
     type: "Safety",
-    icon: <ReportProblemOutlinedIcon fontSize="small" />,
     subject: "Uncomfortable behaviour from rider",
     user: "Driver · Linda N.",
     status: "Escalated",
@@ -74,6 +71,15 @@ const sampleTickets = [
     sla: "Escalated",
   },
 ];
+
+const getTicketTypeIcon = (type: string) => {
+  switch (type) {
+    case "Payment": return <PaymentsOutlinedIcon fontSize="small" />;
+    case "App bug": return <BugReportOutlinedIcon fontSize="small" />;
+    case "Safety": return <ReportProblemOutlinedIcon fontSize="small" />;
+    case "Trip issue": default: return <SupportAgentOutlinedIcon fontSize="small" />;
+  }
+};
 
 // Route target: /agent/support/tickets
 export default function AgentTicketQueuePage() {
@@ -84,8 +90,21 @@ export default function AgentTicketQueuePage() {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  // Initialize tickets with read state (first 3 unread for demo)
-  const [tickets, setTickets] = useState(sampleTickets.map((t, i) => ({ ...t, read: i >= 3 })));
+  // Initialize tickets from storage or defaults
+  const [tickets, setTickets] = useState(() => {
+    try {
+      const stored = window.sessionStorage.getItem("evzone_tickets");
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (e) {
+      console.error("Failed to parse tickets", e);
+    }
+    // Fallback and init storage
+    const defaults = sampleTickets.map((t, i) => ({ ...t, read: i >= 3 }));
+    window.sessionStorage.setItem("evzone_tickets", JSON.stringify(defaults));
+    return defaults;
+  });
 
   const filtered = tickets.filter((t) => {
     const matchesQuery =
@@ -131,21 +150,38 @@ export default function AgentTicketQueuePage() {
             </Typography>
           </Box>
 
-          <Chip
-            label="Support agents"
-            size="small"
-            sx={{
-              borderRadius: 999,
-              fontSize: 11,
-              textTransform: "none",
-              backgroundColor: isDark
-                ? "rgba(15,23,42,0.9)"
-                : "rgba(219,234,254,0.9)",
-              border: "1px solid rgba(148,163,184,0.4)",
-              color: isDark ? "#e5e7eb" : "#1e3a8a",
-              fontWeight: 600,
-            }}
-          />
+          <Stack direction="row" spacing={1.5} alignItems="center">
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => navigate("/agent/support/create")}
+              sx={{
+                borderRadius: 999,
+                textTransform: "none",
+                fontSize: 12,
+                fontWeight: 600,
+                backgroundColor: EVZONE_GREEN,
+                "&:hover": { backgroundColor: "#059669" }
+              }}
+            >
+              Create ticket
+            </Button>
+            <Chip
+              label="Support agents"
+              size="small"
+              sx={{
+                borderRadius: 999,
+                fontSize: 11,
+                textTransform: "none",
+                backgroundColor: isDark
+                  ? "rgba(15,23,42,0.9)"
+                  : "rgba(219,234,254,0.9)",
+                border: "1px solid rgba(148,163,184,0.4)",
+                color: isDark ? "#e5e7eb" : "#1e3a8a",
+                fontWeight: 600,
+              }}
+            />
+          </Stack>
         </Box>
 
         <Card
@@ -335,9 +371,11 @@ export default function AgentTicketQueuePage() {
                     }}
                   >
                     <ListItemIcon sx={{ minWidth: 32 }}>
-                      {ticket.icon}
+                      {getTicketTypeIcon(ticket.type)}
                     </ListItemIcon>
                     <ListItemText
+                      primaryTypographyProps={{ component: "div" }}
+                      secondaryTypographyProps={{ component: "div" }}
                       primary={
                         <Stack
                           direction="row"

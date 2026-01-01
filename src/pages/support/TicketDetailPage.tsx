@@ -21,7 +21,7 @@ import {
   Grid,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import SupportAgentOutlinedIcon from "@mui/icons-material/SupportAgentOutlined";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import DirectionsCarOutlinedIcon from "@mui/icons-material/DirectionsCarOutlined";
@@ -45,7 +45,8 @@ const macros = [
 ];
 
 // Placeholder ticket; in a real app load via ticketId.
-const ticket = {
+// Default ticket for fallback
+const defaultTicket = {
   id: "TCK-9012",
   type: "Trip issue",
   channel: "In-app",
@@ -59,6 +60,26 @@ const ticket = {
   subject: "Driver arrived very late",
   summary:
     "Rider reports that the driver took more than 20 minutes to arrive at pickup despite being nearby.",
+};
+
+const getTicketStatusColor = (status: string, isDark: boolean) => {
+  switch (status) {
+    case "In progress": return isDark ? "#38bdf8" : "#0284c7";
+    case "Resolved": return "#16a34a";
+    case "Rejected": return "#dc2626";
+    case "Pending": return "#f59e0b";
+    default: return isDark ? "#94a3b8" : "#64748b";
+  }
+};
+
+const getTicketStatusBg = (status: string) => {
+  switch (status) {
+    case "In progress": return "rgba(56,189,248,0.2)";
+    case "Resolved": return "rgba(22,163,74,0.16)";
+    case "Rejected": return "rgba(220,38,38,0.16)";
+    case "Pending": return "rgba(245,158,11,0.16)";
+    default: return "rgba(148,163,184,0.16)";
+  }
 };
 
 interface ChatMessage {
@@ -80,6 +101,63 @@ export default function AgentTicketDetailPage() {
     { sender: "rider", text: "Driver kept changing the pickup point and arrived very late. I almost missed my appointment.", time: "09:22" },
     { sender: "agent", text: "Thanks for explaining. I will review the trip timeline and get back to you with an update.", time: "09:25" },
   ]);
+
+  const { ticketId } = useParams();
+  const [ticket, setTicket] = useState(defaultTicket);
+  const [status, setStatus] = useState(defaultTicket.status);
+
+  // Load ticket from storage
+  React.useEffect(() => {
+    if (ticketId) {
+      try {
+        const stored = window.sessionStorage.getItem("evzone_tickets");
+        if (stored) {
+          const tickets = JSON.parse(stored);
+          const found = tickets.find((t: any) => t.id === ticketId);
+          if (found) {
+            setTicket(found);
+            setStatus(found.status);
+            // Ensure defaults for missing fields if coming from queue
+            if (!found.userName) {
+              setTicket(prev => ({
+                ...prev,
+                // polyfill missing fields for demo
+                channel: "In-app",
+                userType: "Rider",
+                userName: found.user ? found.user.split("·")[1]?.trim() || found.user : "Sarah K.",
+                userPhone: "+256 700 200 168",
+                tripId: "BK-2048",
+                summary: found.summary || found.subject,
+                ...found
+              }));
+            }
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }, [ticketId]);
+
+  // Helper to persist standard status changes
+  const updateTicketStatus = (newStatus: string) => {
+    setStatus(newStatus);
+
+    // Update in storage
+    try {
+      const stored = window.sessionStorage.getItem("evzone_tickets");
+      if (stored) {
+        const tickets = JSON.parse(stored);
+        const updated = tickets.map((t: any) => t.id === ticket.id ? { ...t, status: newStatus } : t);
+        window.sessionStorage.setItem("evzone_tickets", JSON.stringify(updated));
+      }
+    } catch (e) {
+      console.error("Failed to update ticket", e);
+    }
+
+    setSnackbar({ open: true, message: `Ticket marked as ${newStatus}`, severity: "success" });
+  };
+  const [snackbar, setSnackbar] = useState<{ open: boolean, message: string, severity: "success" | "info" }>({ open: false, message: "", severity: "info" });
 
   const handleSendReply = () => {
     if (!reply.trim()) return;
@@ -137,23 +215,42 @@ export default function AgentTicketDetailPage() {
           </Box>
 
           <Stack spacing={0.5} alignItems="flex-end">
+            <Stack direction="row" spacing={1} mb={0.5}>
+              {status !== "Resolved" && status !== "Rejected" && (
+                <>
+                  <Button size="small" variant="outlined" color="warning" onClick={() => updateTicketStatus("Pending")} sx={{ borderRadius: 999, fontSize: 11, py: 0.1 }}>
+                    Pending
+                  </Button>
+                  {/* Approve button for New tickets */}
+                  {status === "New" && (
+                    <Button size="small" variant="contained" onClick={() => updateTicketStatus("In progress")} sx={{ borderRadius: 999, fontSize: 11, py: 0.1, bgcolor: EVZONE_GREEN, "&:hover": { bgcolor: "#059669" } }}>
+                      Approve
+                    </Button>
+                  )}
+                  <Button size="small" variant="outlined" color="error" onClick={() => updateTicketStatus("Rejected")} sx={{ borderRadius: 999, fontSize: 11, py: 0.1 }}>
+                    Reject
+                  </Button>
+                  <Button size="small" variant="contained" onClick={() => updateTicketStatus("Resolved")} sx={{ borderRadius: 999, fontSize: 11, py: 0.1, bgcolor: EVZONE_GREEN, "&:hover": { bgcolor: "#059669" } }}>
+                    Resolve
+                  </Button>
+                </>
+              )}
+              {status === "Resolved" && (
+                <Button size="small" variant="outlined" onClick={() => updateTicketStatus("In progress")} sx={{ borderRadius: 999, fontSize: 11 }}>
+                  Re-open
+                </Button>
+              )}
+            </Stack>
             <Chip
-              label={ticket.status}
+              label={status}
               size="small"
               sx={{
                 borderRadius: 999,
                 fontSize: 11,
                 textTransform: "none",
-                backgroundColor:
-                  ticket.status === "In progress"
-                    ? "rgba(56,189,248,0.2)"
-                    : "rgba(22,163,74,0.16)",
-                color:
-                  ticket.status === "In progress" ? "#0369a1" : "#166534",
-                border:
-                  ticket.status === "In progress"
-                    ? "1px solid rgba(56,189,248,0.6)"
-                    : "1px solid rgba(34,197,94,0.6)",
+                backgroundColor: getTicketStatusBg(status),
+                color: getTicketStatusColor(status, isDark),
+                border: `1px solid ${getTicketStatusColor(status, isDark)}60`,
               }}
             />
             <Typography variant="caption" sx={{ color: EVZONE_GREY }}>
@@ -675,6 +772,17 @@ export default function AgentTicketDetailPage() {
       >
         <Alert severity="success" onClose={() => setCallSnackbar(false)} sx={{ width: "100%" }}>
           Initiating call to {ticket.userPhone}...
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert severity={snackbar.severity} onClose={() => setSnackbar({ ...snackbar, open: false })} sx={{ width: "100%" }}>
+          {snackbar.message}
         </Alert>
       </Snackbar>
     </Box>

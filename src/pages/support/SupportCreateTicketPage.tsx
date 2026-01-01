@@ -40,7 +40,53 @@ export default function SupportCreateTicketPage() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log("Submitting ticket:", formData);
+
+        // 1. Construct new ticket
+        const newTicket = {
+            id: `TCK-${Math.floor(1000 + Math.random() * 9000)}`,
+            type: formData.category === "Billing" ? "Payment" : formData.category === "Safety" ? "Safety" : formData.category === "Technical" ? "App bug" : "Trip issue",
+            subject: formData.subject,
+            user: "Agent Created", // Placeholder as form doesn't have user selection
+            status: "New",
+            priority: formData.isHighPriority ? "High" : "Medium",
+            createdAt: "Just now",
+            sla: formData.isHighPriority ? "4h" : "24h",
+            summary: formData.description,
+            // Add read state for queue
+            read: true,
+        };
+
+        // 2. Get existing or init
+        let currentTickets = [];
+        try {
+            const stored = window.sessionStorage.getItem("evzone_tickets");
+            if (stored) {
+                currentTickets = JSON.parse(stored);
+            } else {
+                // If not initialized, we shouldn't overwrite the queue page's opportunity to init defaults.
+                // However, to ensure this ticket shows up WITH defaults, we should init defaults here if missing.
+                // We'll use a minimal set or empty if we prefer, but let's try to be consistent.
+                // Ideally we'd import sampleTickets, but let's just make a fresh array if empty.
+                // actually, let's just push to array. Queue page handles "if stored exists, return it".
+                // So if we save JUST this ticket, the Queue page will only show this ticket.
+                // That's acceptable for now, or we can duplicate the sample data here. 
+                // Let's duplicate strictly necessary sample data to emulate the "demo" feel if user starts here.
+                currentTickets = [
+                    { id: "TCK-9012", type: "Trip issue", subject: "Driver arrived very late", user: "Rider · Sarah K.", status: "New", priority: "High", createdAt: "Today · 09:22", sla: "15 min", read: false },
+                    { id: "TCK-9013", type: "Payment", subject: "Double charge on last trip", user: "Rider · Brian O.", status: "In progress", priority: "Medium", createdAt: "Today · 08:47", sla: "32 min", read: false },
+                    { id: "TCK-9014", type: "App bug", subject: "Driver app keeps freezing", user: "Driver · Kato R.", status: "Waiting", priority: "Medium", createdAt: "Today · 08:15", sla: "1 h 10 min", read: true },
+                    { id: "TCK-9015", type: "Safety", subject: "Uncomfortable behaviour from rider", user: "Driver · Linda N.", status: "Escalated", priority: "High", createdAt: "Yesterday · 21:04", sla: "Escalated", read: true },
+                ];
+            }
+        } catch (err) {
+            console.error(err);
+            currentTickets = [];
+        }
+
+        // 3. Append
+        const updated = [newTicket, ...currentTickets];
+        window.sessionStorage.setItem("evzone_tickets", JSON.stringify(updated));
+
         setSnackbar(true);
         setTimeout(() => {
             navigate("/agent/support");

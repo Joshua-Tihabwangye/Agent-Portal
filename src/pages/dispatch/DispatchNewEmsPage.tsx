@@ -11,6 +11,7 @@ import {
   Grid,
   ToggleButton,
   ToggleButtonGroup,
+  InputAdornment,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import LocalHospitalOutlinedIcon from "@mui/icons-material/LocalHospitalOutlined";
@@ -349,7 +350,14 @@ export default function AgentDispatchNewEMSPage() {
                       value={pickupLocation}
                       onChange={(e) => setPickupLocation(e.target.value)}
                       InputLabelProps={{ sx: { color: EVZONE_GREY } }}
-                      InputProps={{ sx: { borderRadius: 3 } }}
+                      InputProps={{
+                        sx: { borderRadius: 3 },
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <PlaceOutlinedIcon sx={{ fontSize: 18, color: "error.main" }} />
+                          </InputAdornment>
+                        ),
+                      }}
                     />
 
                     <TextField
@@ -361,7 +369,14 @@ export default function AgentDispatchNewEMSPage() {
                       value={destinationFacility}
                       onChange={(e) => setDestinationFacility(e.target.value)}
                       InputLabelProps={{ sx: { color: EVZONE_GREY } }}
-                      InputProps={{ sx: { borderRadius: 3 } }}
+                      InputProps={{
+                        sx: { borderRadius: 3 },
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <LocalHospitalOutlinedIcon sx={{ fontSize: 18, color: EVZONE_GREEN }} />
+                          </InputAdornment>
+                        ),
+                      }}
                     />
 
                     <Stack spacing={0.6}>
