@@ -56,6 +56,7 @@ import SupportCreateTicketPage from "../pages/support/SupportCreateTicketPage";
 // Safety
 import SOSQueuePage from "../pages/safety/SOSQueuePage";
 import IncidentDetailPage from "../pages/safety/IncidentDetailPage";
+import SafetyAgentProfilePage from "../pages/safety/SafetyAgentProfilePage"; // [NEW]
 
 // Search
 import GlobalSearchPage from "../pages/search/GlobalSearchPage";

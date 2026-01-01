@@ -11,7 +11,10 @@ import {
   Grid,
   ToggleButton,
   ToggleButtonGroup,
+  InputAdornment,
 } from "@mui/material";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import dayjs from "dayjs";
 import { useTheme } from "@mui/material/styles";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import PhoneEnabledOutlinedIcon from "@mui/icons-material/PhoneEnabledOutlined";
@@ -288,9 +291,12 @@ export default function AgentDispatchNewRidePage() {
                       onChange={(e) => setPickup(e.target.value)}
                       InputLabelProps={{ sx: { color: EVZONE_GREY } }}
                       InputProps={{
-                        sx: {
-                          borderRadius: 3,
-                        },
+                        sx: { borderRadius: 3 },
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <PlaceOutlinedIcon sx={{ fontSize: 18, color: EVZONE_GREEN }} />
+                          </InputAdornment>
+                        ),
                       }}
                     />
 
@@ -304,9 +310,12 @@ export default function AgentDispatchNewRidePage() {
                       onChange={(e) => setDropoff(e.target.value)}
                       InputLabelProps={{ sx: { color: EVZONE_GREY } }}
                       InputProps={{
-                        sx: {
-                          borderRadius: 3,
-                        },
+                        sx: { borderRadius: 3 },
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <PlaceOutlinedIcon sx={{ fontSize: 18, color: "error.main" }} />
+                          </InputAdornment>
+                        ),
                       }}
                     />
 
@@ -372,19 +381,16 @@ export default function AgentDispatchNewRidePage() {
 
                       {timeMode === "later" && (
                         <Stack direction="row" spacing={1.5}>
-                          <TextField
+                          <DateTimePicker
                             label="Date & time"
-                            placeholder="e.g. Today 19:30"
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            value={scheduledTime}
-                            onChange={(e) => setScheduledTime(e.target.value)}
-                            InputLabelProps={{ sx: { color: EVZONE_GREY } }}
-                            InputProps={{
-                              sx: {
-                                borderRadius: 3,
-                              },
+                            value={scheduledTime ? dayjs(scheduledTime) : null}
+                            onChange={(newValue) => setScheduledTime(newValue ? newValue.toISOString() : "")}
+                            slotProps={{
+                              textField: {
+                                size: 'small',
+                                fullWidth: true,
+                                InputProps: { sx: { borderRadius: 3 } }
+                              }
                             }}
                           />
                         </Stack>

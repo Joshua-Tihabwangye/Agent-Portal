@@ -283,7 +283,7 @@ export default function AgentDashboardPage() {
 
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 md:px-8 py-4">
-      <Box className="max-w-7xl mx-auto">
+      <Box className="w-full">
         {/* Time Selection Popover */}
         <Popover
           open={Boolean(anchorEl)}

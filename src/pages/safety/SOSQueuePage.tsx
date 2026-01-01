@@ -446,6 +446,7 @@ export default function AgentSafetySOSQueuePage() {
             {safetyAgents.map((agent, index) => (
               <Box
                 key={index}
+                onClick={() => navigate(`/agent/safety/agents/${encodeURIComponent(agent.name)}`)}
                 sx={{
                   display: "flex",
                   justifyContent: "space-between",
@@ -454,6 +455,12 @@ export default function AgentSafetySOSQueuePage() {
                   borderRadius: 2,
                   backgroundColor: isDark ? "rgba(15,23,42,0.5)" : "rgba(248,250,252,1)",
                   border: "1px solid rgba(203,213,225,0.5)",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                  "&:hover": {
+                    backgroundColor: isDark ? "rgba(30,41,59,0.8)" : "rgba(241,245,249,1)",
+                    borderColor: EVZONE_GREEN
+                  }
                 }}
               >
                 <Box>
