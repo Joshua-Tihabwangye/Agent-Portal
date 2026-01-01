@@ -9,9 +9,11 @@ import AgentForgotPasswordPage from "../pages/auth/AgentForgotPasswordPage";
 import AgentWelcomeTrainingGatePage from "../pages/auth/AgentWelcomeTrainingGatePage";
 
 // Dashboards
+// Dashboards
 import AgentDashboardPage from "../pages/dashboard/AgentDashboardPage";
 import SupervisorDashboardPage from "../pages/dashboard/SupervisorDashboardPage";
 import AnalyticsDashboardPage from "../pages/dashboard/AnalyticsDashboardPage";
+import TasksPage from "../pages/dashboard/TasksPage";  // [NEW]
 
 // Live ops
 import LiveOpsMapViewPage from "../pages/liveOps/LiveOpsMapViewPage";
@@ -40,6 +42,7 @@ import BookingDetailPage from "../pages/bookings/BookingDetailPage";
 import DriverOnboardingQueuePage from "../pages/onboarding/DriverOnboardingQueuePage";
 import DriverOnboardingCasePage from "../pages/onboarding/DriverOnboardingCasePage";
 import DriverProfileReadOnlyPage from "../pages/onboarding/DriverProfileReadOnlyPage";
+import OnboardingCasesPage from "../pages/onboarding/OnboardingCasesPage"; // [NEW]
 
 // Profiles
 import RiderProfilePage from "../pages/profiles/RiderProfilePage";
@@ -102,6 +105,7 @@ export default function App() {
           <Route path="/agent/dashboard" element={<AgentDashboardPage />} />
           <Route path="/agent/dashboard/analytics" element={<AnalyticsDashboardPage />} />
           <Route path="/agent/dashboard/supervisor" element={<SupervisorDashboardPage />} />
+          <Route path="/agent/dashboard/tasks" element={<TasksPage />} />
 
           {/* Live Ops */}
           <Route path="/agent/live-ops" element={<LiveOpsMapViewPage />} />
@@ -129,6 +133,7 @@ export default function App() {
 
           {/* Driver onboarding */}
           <Route path="/agent/onboarding/drivers" element={<DriverOnboardingQueuePage />} />
+          <Route path="/agent/onboarding/cases" element={<OnboardingCasesPage />} />
           <Route path="/agent/onboarding/drivers/:driverId" element={<DriverOnboardingCasePage />} />
           <Route path="/agent/drivers/:driverId" element={<DriverProfileReadOnlyPage />} />
 
@@ -137,6 +142,7 @@ export default function App() {
           <Route path="/agent/companies/:companyId" element={<CompanyProfilePage />} />
 
           {/* Support tickets */}
+          <Route path="/agent/support" element={<Navigate to="/agent/support/tickets" replace />} />
           <Route path="/agent/support/tickets" element={<TicketQueuePage />} />
           <Route path="/agent/support/tickets/new" element={<SupportCreateTicketPage />} />
           <Route path="/agent/support/create" element={<SupportCreateTicketPage />} />

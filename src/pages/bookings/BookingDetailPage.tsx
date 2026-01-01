@@ -38,7 +38,34 @@ export default function AgentBookingDetailPage() {
   // Snackbar state for in-UI feedback
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: "success" | "error" | "info" }>({ open: false, message: "", severity: "success" });
   const [markedForFollowUp, setMarkedForFollowUp] = useState(false);
-  const [cancelled, setCancelled] = useState(false);
+  const [cancelled, setCancelled] = useState(false); // Local state fallback if not in storage
+
+  // Helper to persist updates to localStorage
+  const updateBookingStorage = (updates: any) => {
+    try {
+      const raw = window.localStorage.getItem("evzone_agent_bookings");
+      const list = raw ? JSON.parse(raw) : [];
+      const index = list.findIndex((b: any) => String(b.id) === String(bookingId));
+
+      if (index >= 0) {
+        list[index] = { ...list[index], ...updates };
+        window.localStorage.setItem("evzone_agent_bookings", JSON.stringify(list));
+      } else {
+        // If it's a mock booking not in storage yet, create it from fallback + updates
+        // For this demo, we can just save it.
+        const newBooking = {
+          id: bookingId,
+          ...booking, // Use current booking details
+          ...updates
+        };
+        // Remove derived props that shouldn't be saved if they key off others, 
+        // but for simplicity we save what we have.
+        window.localStorage.setItem("evzone_agent_bookings", JSON.stringify([newBooking, ...list]));
+      }
+    } catch (e) {
+      console.error("Failed to update booking storage", e);
+    }
+  };
 
   const stored = (() => {
     try {
@@ -57,7 +84,7 @@ export default function AgentBookingDetailPage() {
       type: stored.summary.type,
       clientType: stored.summary.clientType,
       createdAt: stored.createdAt ? new Date(stored.createdAt).toLocaleString() : "—",
-      status: cancelled ? "Cancelled" : (stored.status || "New"),
+      status: stored.status || "New",
       riderName: stored.summary.riderName,
       riderPhone: stored.summary.riderPhone,
       pickup: stored.summary.pickup,
@@ -75,7 +102,7 @@ export default function AgentBookingDetailPage() {
       type: "Ride",
       clientType: "Rider",
       createdAt: "Today · 09:12",
-      status: cancelled ? "Cancelled" : "In progress",
+      status: "In progress",
       riderName: "Sarah K.",
       riderPhone: "+256 700 200 168",
       pickup: "Nakasero Hill Road",
@@ -89,13 +116,28 @@ export default function AgentBookingDetailPage() {
       driverBattery: 72,
     };
 
+  // Initialize state from storage if available
+  React.useEffect(() => {
+    if (stored) {
+      if (stored.markedForFollowUp) setMarkedForFollowUp(true);
+      if (stored.status === "Cancelled") setCancelled(true);
+    }
+  }, [stored?.markedForFollowUp, stored?.status]);
+
   const handleMarkFollowUp = () => {
-    setMarkedForFollowUp(true);
-    setSnackbar({ open: true, message: "Marked for follow-up", severity: "success" });
+    const newState = !markedForFollowUp;
+    setMarkedForFollowUp(newState);
+    updateBookingStorage({ markedForFollowUp: newState });
+    setSnackbar({
+      open: true,
+      message: newState ? "Marked for follow-up" : "Unmarked for follow-up",
+      severity: "success"
+    });
   };
 
   const handleCancelBooking = () => {
     setCancelled(true);
+    updateBookingStorage({ status: "Cancelled" });
     setSnackbar({ open: true, message: "Booking cancelled", severity: "error" });
   };
 

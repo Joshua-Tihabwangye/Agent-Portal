@@ -64,6 +64,23 @@ export default function AgentDispatchConfirmBookingPage() {
     navigate(`/agent/bookings/${encodeURIComponent(bookingId)}`);
   };
 
+  const handleSaveDraft = () => {
+    const draftRaw = window.sessionStorage.getItem("evzone_dispatch_draft");
+    if (draftRaw) {
+      const draft = JSON.parse(draftRaw);
+      const savedDraftsRaw = window.localStorage.getItem("evzone_saved_drafts");
+      const savedDrafts = savedDraftsRaw ? JSON.parse(savedDraftsRaw) : [];
+      const newDraft = {
+        id: `DRAFT-${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        ...draft
+      };
+      window.localStorage.setItem("evzone_saved_drafts", JSON.stringify([newDraft, ...savedDrafts]));
+      window.sessionStorage.removeItem("evzone_dispatch_draft");
+      navigate("/agent/dispatch"); // Navigate back to dispatch hub
+    }
+  };
+
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 py-4">
       <Box className="w-full">
@@ -451,29 +468,13 @@ export default function AgentDispatchConfirmBookingPage() {
 
               <Stack direction="row" spacing={1.5}>
                 <Button
+                  onClick={handleSaveDraft}
                   variant="outlined"
                   size="small"
                   sx={{
                     borderRadius: 999,
                     textTransform: "none",
                     fontSize: 13,
-                  }}
-                >
-                  Save as draft
-                </Button>
-                <Button
-                  onClick={handleCreateBooking}
-                  variant="contained"
-                  size="small"
-                  sx={{
-                    borderRadius: 999,
-                    textTransform: "none",
-                    fontSize: 13,
-                    fontWeight: 600,
-                    backgroundColor: EVZONE_GREEN,
-                    "&:hover": {
-                      backgroundColor: "#059669",
-                    },
                   }}
                 >
                   Create booking
@@ -486,6 +487,24 @@ export default function AgentDispatchConfirmBookingPage() {
     </Box>
   );
 }
+
+const handleSaveDraft = () => {
+  const draftRaw = window.sessionStorage.getItem("evzone_dispatch_draft");
+  if (draftRaw) {
+    const draft = JSON.parse(draftRaw);
+    const savedDraftsRaw = window.localStorage.getItem("evzone_saved_drafts");
+    const savedDrafts = savedDraftsRaw ? JSON.parse(savedDraftsRaw) : [];
+    const newDraft = {
+      id: `DRAFT-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      ...draft
+    };
+    window.localStorage.setItem("evzone_saved_drafts", JSON.stringify([newDraft, ...savedDrafts]));
+    window.sessionStorage.removeItem("evzone_dispatch_draft");
+    // We'd ideally need a navigate/snackbar here but this function is outside the component.
+    // Moving logic inside component...
+  }
+};
 
 // Basic usage test cases (pseudo-code, to be placed in a separate test file):
 // - Render <AgentDispatchConfirmBookingPage /> and assert that summary.riderName appears.

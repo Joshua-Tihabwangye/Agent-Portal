@@ -139,7 +139,7 @@ export function RevenuePieChart({ data, title, height = 280, showLegend = true, 
                     <Pie
                         data={data}
                         cx="50%" // Centered
-                        cy="45%" // Slightly higher to leave room for legend
+                        cy="50%" // Centered
                         innerRadius={45} // Slightly larger
                         outerRadius={70} // Slightly larger
                         paddingAngle={3}
