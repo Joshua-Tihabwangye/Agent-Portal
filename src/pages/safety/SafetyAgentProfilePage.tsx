@@ -58,7 +58,7 @@ export default function SafetyAgentProfilePage() {
                 >
                     <CardContent sx={{ p: 4 }}>
                         <Grid container spacing={4} alignItems="center">
-                            <Grid item xs={12} md={8}>
+                            <Grid size={{ xs: 12, md: 8 }}>
                                 <Stack direction="row" spacing={3} alignItems="center">
                                     <Avatar
                                         sx={{
@@ -93,7 +93,7 @@ export default function SafetyAgentProfilePage() {
                                     </Box>
                                 </Stack>
                             </Grid>
-                            <Grid item xs={12} md={4}>
+                            <Grid size={{ xs: 12, md: 4 }}>
                                 <Stack direction="row" spacing={1} justifyContent={{ md: "flex-end" }}>
                                     <Box sx={{ textAlign: "center", p: 2, bgcolor: isDark ? "rgba(0,0,0,0.2)" : "rgba(241,245,249,0.5)", borderRadius: 3 }}>
                                         <Typography variant="h6" fontWeight={800} color={EVZONE_GREEN}>{agent.rating}</Typography>
@@ -111,7 +111,7 @@ export default function SafetyAgentProfilePage() {
 
                 <Grid container spacing={3}>
                     {/* Left: Stats */}
-                    <Grid item xs={12} md={4}>
+                    <Grid size={{ xs: 12, md: 4 }}>
                         <Card sx={{
                             height: "100%",
                             borderRadius: 3,
@@ -148,7 +148,7 @@ export default function SafetyAgentProfilePage() {
                     </Grid>
 
                     {/* Right: Activity Log */}
-                    <Grid item xs={12} md={8}>
+                    <Grid size={{ xs: 12, md: 8 }}>
                         <Card sx={{
                             height: "100%",
                             borderRadius: 3,
