@@ -62,6 +62,7 @@ export default function AgentDispatchAssignDriverPage() {
   const isDark = theme.palette.mode === "dark";
 
   const [selectedDriverId, setSelectedDriverId] = useState("DRV-102");
+  const [isOverrideMode, setIsOverrideMode] = useState(false);
 
   const draftRaw = window.sessionStorage.getItem("evzone_dispatch_draft");
   const draft = draftRaw ? JSON.parse(draftRaw) : {};
@@ -81,6 +82,14 @@ export default function AgentDispatchAssignDriverPage() {
       distanceKm: d.distanceKm,
       reason: d.battery < 30 ? "Battery too low for requested distance" : "Limited buffer for return trip",
     }));
+
+  // Filter candidates: if NOT override mode, exclude those with low battery.
+  // If override mode is ON, show everyone (or at least include the excluded ones back).
+  // The original list 'candidateDrivers' has everyone.
+  // We want to HIDE the excluded ones from the main list unless override is true.
+  const visibleDrivers = isOverrideMode
+    ? candidateDrivers
+    : candidateDrivers.filter(d => !excludedDrivers.find(ex => ex.id === d.id));
 
   const handleAssign = () => {
     if (!selectedDriverId) return;
@@ -198,7 +207,7 @@ export default function AgentDispatchAssignDriverPage() {
                 <Box
                   sx={{
                     mt: 0.5,
-                    borderRadius: 18,
+                    borderRadius: 3, // Rectangular shape
                     overflow: "hidden",
                     position: "relative",
                     height: { xs: 180, md: 220 },
@@ -335,9 +344,9 @@ export default function AgentDispatchAssignDriverPage() {
             <Stack spacing={2}>
               <DispatchEVSuitabilityHelper
                 request={request}
-                excludedDrivers={excludedDrivers}
+                excludedDrivers={!isOverrideMode ? excludedDrivers : []}
                 onViewGuidelines={() => navigate("/agent/training")}
-                onOverride={() => console.log("Override EV filter for this trip")}
+                onOverride={() => setIsOverrideMode(true)}
               />
               <Card
                 elevation={1}
@@ -389,7 +398,7 @@ export default function AgentDispatchAssignDriverPage() {
                   </Stack>
 
                   <Stack spacing={1.2}>
-                    {candidateDrivers.map((driver) => {
+                    {visibleDrivers.map((driver) => {
                       const isSelected = driver.id === selectedDriverId;
                       const batteryColor =
                         driver.battery >= 60
