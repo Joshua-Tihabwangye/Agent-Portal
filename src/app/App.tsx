@@ -133,6 +133,7 @@ export default function App() {
           <Route path="/agent/bookings/:bookingId" element={<BookingDetailPage />} />
 
           {/* Driver onboarding */}
+          <Route path="/agent/onboarding" element={<Navigate to="/agent/onboarding/cases" replace />} />
           <Route path="/agent/onboarding/drivers" element={<DriverOnboardingQueuePage />} />
           <Route path="/agent/onboarding/cases" element={<OnboardingCasesPage />} />
           <Route path="/agent/onboarding/drivers/:driverId" element={<DriverOnboardingCasePage />} />
