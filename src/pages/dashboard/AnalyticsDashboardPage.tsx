@@ -207,7 +207,7 @@ export default function AnalyticsDashboardPage() {
                             border: `1px solid ${isDark ? "rgba(148,163,184,0.1)" : "rgba(226,232,240,1)"}`,
                         }}
                     >
-                        <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
+                        <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" alignItems={{ xs: "flex-start", sm: "center" }} mb={3} spacing={1}>
                             <Typography variant="subtitle1" sx={{ fontWeight: 700, color: isDark ? "#e5e7eb" : "#111827" }}>
                                 Top Performing Agents
                             </Typography>

@@ -158,9 +158,10 @@ export default function AgentLiveOpsPage() {
           >
             <CardContent sx={{ p: 2, height: "100%", display: "flex", flexDirection: "column" }}>
               <Stack
-                direction="row"
+                direction={{ xs: "column", sm: "row" }}
                 justifyContent="space-between"
-                alignItems="center"
+                alignItems={{ xs: "flex-start", sm: "center" }}
+                spacing={1}
                 sx={{ mb: 1.5 }}
               >
                 <Stack direction="row" spacing={1} alignItems="center">
@@ -229,7 +230,7 @@ export default function AgentLiveOpsPage() {
                     top: 12,
                     right: 12,
                     zIndex: 3,
-                    maxWidth: 340,
+                    maxWidth: { xs: "90%", sm: 340 },
                   }}
                 >
                   <LiveOpsBatteryOverlay

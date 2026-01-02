@@ -420,11 +420,7 @@ export default function AgentDispatchNewRentalPage() {
                 </Grid>
               </Grid>
 
-              <Stack
-                direction="row"
-                justifyContent="space-between"
-                sx={{ mt: 3 }}
-              >
+              <Stack direction={{ xs: "column-reverse", sm: "row" }} justifyContent="space-between" sx={{ mt: 3 }} spacing={2}>
                 <Button
                   variant="text"
                   size="small"
