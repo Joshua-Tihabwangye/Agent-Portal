@@ -15,6 +15,8 @@ import SupervisorDashboardPage from "../pages/dashboard/SupervisorDashboardPage"
 import AnalyticsDashboardPage from "../pages/dashboard/AnalyticsDashboardPage";
 import TasksPage from "../pages/dashboard/TasksPage";  // [NEW]
 import DraftsPage from "../pages/drafts/DraftsPage";  // [NEW]
+import AgentProfilePage from "../pages/safety/AgentProfilePage";
+import AgentChatPage from "../pages/support/AgentChatPage";
 // Live ops
 import LiveOpsMapViewPage from "../pages/liveOps/LiveOpsMapViewPage";
 import LiveOpsTripDetailPage from "../pages/liveOps/LiveOpsTripDetailPage";
@@ -177,6 +179,8 @@ export default function App() {
 
           {/* Profile */}
           <Route path="/agent/profile" element={<AgentProfilePreferencesPage />} />
+          <Route path="/agent/safety/agents/:agentId" element={<AgentProfilePage />} />
+          <Route path="/agent/support/chat/:agentId" element={<AgentChatPage />} />
 
           {/* Catch-all inside shell */}
           <Route path="/agent/*" element={<AgentNotFoundPage onGoHome={() => window.location.href = '/agent/dashboard'} onGoBack={() => window.history.back()} />} />

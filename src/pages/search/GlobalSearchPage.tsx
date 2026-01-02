@@ -172,8 +172,9 @@ function SearchResultRow({ entity, onAttachToTicket, onAttachToIncident }: { ent
           ? "rgba(15,23,42,0.9)"
           : "rgba(248,250,252,0.95)",
         border: "1px solid rgba(203,213,225,0.9)",
-        display: "d-flex",
-        alignItems: "flex-start",
+        display: "flex",
+        flexDirection: { xs: "column", sm: "row" },
+        alignItems: { xs: "stretch", sm: "flex-start" },
         justifyContent: "space-between",
         gap: 1.5,
         "&:hover": {
@@ -234,7 +235,13 @@ function SearchResultRow({ entity, onAttachToTicket, onAttachToIncident }: { ent
         </Box>
       </Box>
 
-      <Stack spacing={0.5} alignItems="flex-end" mt={0.5}>
+      <Stack
+        spacing={0.5}
+        direction="row"
+        alignItems="center"
+        justifyContent={{ xs: "flex-end", sm: "flex-end" }}
+        mt={{ xs: 1, sm: 0.5 }}
+      >
         <Button
           size="small"
           variant="outlined"

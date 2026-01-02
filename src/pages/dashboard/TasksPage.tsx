@@ -97,7 +97,7 @@ export default function TasksPage() {
 
     return (
         <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 py-4">
-            <Box className="max-w-5xl mx-auto">
+            <Box className="w-full">
                 <PageBreadcrumb
                     items={[{ label: "Dashboard", href: "/agent/dashboard" }]}
                     current="My Tasks"
@@ -131,7 +131,7 @@ export default function TasksPage() {
                             >
                                 <CardActionArea onClick={() => handleTaskClick(task)}>
                                     <CardContent sx={{ p: 2 }}>
-                                        <Stack direction="row" justifyContent="space-between" alignItems="center">
+                                        <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" alignItems={{ xs: "flex-start", sm: "center" }} spacing={1.5}>
                                             <Stack direction="row" spacing={2} alignItems="center">
                                                 <AssignmentOutlinedIcon sx={{ color: EVZONE_GREY }} />
                                                 <Box>
@@ -156,6 +156,8 @@ export default function TasksPage() {
                                                     backgroundColor: priorityStyle.bg,
                                                     color: priorityStyle.color,
                                                     border: `1px solid ${priorityStyle.border}`,
+                                                    alignSelf: { xs: "flex-start", sm: "center" },
+                                                    ml: { xs: 5.5, sm: 0 } // Align with text on mobile
                                                 }}
                                             />
                                         </Stack>
