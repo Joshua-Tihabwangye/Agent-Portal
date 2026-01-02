@@ -133,7 +133,7 @@ function getTypeIcon(type) {
   }
 }
 
-function SearchResultRow({ entity, onAttachToTicket, onAttachToIncident }) {
+function SearchResultRow({ entity, onAttachToTicket, onAttachToIncident }: { entity: any; onAttachToTicket?: (e: any) => void; onAttachToIncident?: (e: any) => void }) {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   const navigate = useNavigate();
@@ -498,12 +498,6 @@ export default function AgentGlobalSearchPage() {
                     <SearchResultRow
                       key={entity.id}
                       entity={entity}
-                      onAttachToTicket={(e) =>
-                        console.log("Attach to current ticket", e.id)
-                      }
-                      onAttachToIncident={(e) =>
-                        console.log("Attach to current incident", e.id)
-                      }
                     />
                   ))
                 )}

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Box, Typography, Card, CardContent, Chip, Stack, useTheme, Grid } from "@mui/material";
+import { Box, Typography, Card, CardContent, Chip, Stack, useTheme, Grid, Button, IconButton } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import PeriodSelector from "../../components/shared/PeriodSelector";
 import type { PeriodValue } from "../../components/shared/PeriodSelector";
 import {
@@ -82,6 +83,7 @@ export default function AnalyticsDashboardPage() {
     const theme = useTheme();
     const isDark = theme.palette.mode === "dark";
     const [period, setPeriod] = useState<PeriodValue>("week");
+    const navigate = useNavigate();
 
     // Get data for selected period
     const data = mockData[period];
@@ -216,11 +218,18 @@ export default function AnalyticsDashboardPage() {
                             {["Alex Johnson", "Sarah Williams", "Michael Chen", "Emily Davis"].map((agent, i) => (
                                 <Grid size={{ xs: 12, sm: 6, md: 3 }} key={agent}>
                                     <Box
+                                        onClick={() => navigate(`/agent/safety/agents/${encodeURIComponent(agent)}`)}
                                         sx={{
                                             p: 2,
                                             borderRadius: 2,
                                             bgcolor: isDark ? "rgba(15,23,42,0.5)" : "rgba(241,245,249,0.5)",
-                                            border: `1px solid ${isDark ? "rgba(148,163,184,0.1)" : "rgba(226,232,240,1)"}`
+                                            border: `1px solid ${isDark ? "rgba(148,163,184,0.1)" : "rgba(226,232,240,1)"}`,
+                                            cursor: "pointer",
+                                            transition: "all 0.2s",
+                                            "&:hover": {
+                                                bgcolor: isDark ? "rgba(15,23,42,0.8)" : "rgba(241,245,249,1)",
+                                                borderColor: "#03cd8c",
+                                            }
                                         }}
                                     >
                                         <Typography variant="subtitle2" fontWeight={700}>{agent}</Typography>
@@ -235,6 +244,24 @@ export default function AnalyticsDashboardPage() {
                                                 <Typography variant="body2" fontWeight={600} color={CHART_COLORS[0]}>{4.9 - (i * 0.1)}</Typography>
                                             </Box>
                                         </Stack>
+                                        <Button
+                                            size="small"
+                                            variant="outlined"
+                                            fullWidth
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                // Navigate to chat/conversation with this agent
+                                                navigate(`/agent/support/chat/${encodeURIComponent(agent)}`);
+                                            }}
+                                            sx={{
+                                                mt: 1.5,
+                                                borderRadius: 999,
+                                                textTransform: "none",
+                                                fontSize: 12,
+                                            }}
+                                        >
+                                            Open Chat
+                                        </Button>
                                     </Box>
                                 </Grid>
                             ))}
