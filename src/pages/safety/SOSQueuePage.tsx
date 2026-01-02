@@ -170,6 +170,30 @@ export default function AgentSafetySOSQueuePage() {
     );
   };
 
+  const getStatusChip = (status: string) => {
+    const statusStyles: Record<string, { bg: string; color: string }> = {
+      "New": { bg: "rgba(248,113,113,0.2)", color: "#b91c1c" },
+      "Under review": { bg: "rgba(56,189,248,0.18)", color: "#0369a1" },
+      "Escalated": { bg: "rgba(129,140,248,0.2)", color: "#4f46e5" },
+      "Resolved": { bg: "rgba(22,163,74,0.12)", color: "#166534" },
+    };
+    const style = statusStyles[status] || { bg: "rgba(148,163,184,0.2)", color: EVZONE_GREY };
+    return (
+      <Chip
+        size="small"
+        label={status}
+        sx={{
+          borderRadius: 999,
+          fontSize: 10,
+          textTransform: "none",
+          backgroundColor: style.bg,
+          color: style.color,
+          ml: 0.5,
+        }}
+      />
+    );
+  };
+
   return (
     <Box className="min-h-screen bg-slate-50 dark:bg-slate-950 px-3 sm:px-6 md:px-8 py-4">
       <Box className="w-full">
@@ -387,7 +411,10 @@ export default function AgentSafetySOSQueuePage() {
                           >
                             {inc.id} · {inc.location}
                           </Typography>
-                          {getSeverityChip(inc.severity)}
+                          <Stack direction="row" spacing={0.5}>
+                            {getSeverityChip(inc.severity)}
+                            {getStatusChip(inc.status)}
+                          </Stack>
                         </Stack>
                       }
                       secondary={

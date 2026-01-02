@@ -14,7 +14,7 @@ import AgentDashboardPage from "../pages/dashboard/AgentDashboardPage";
 import SupervisorDashboardPage from "../pages/dashboard/SupervisorDashboardPage";
 import AnalyticsDashboardPage from "../pages/dashboard/AnalyticsDashboardPage";
 import TasksPage from "../pages/dashboard/TasksPage";  // [NEW]
-
+import DraftsPage from "../pages/drafts/DraftsPage";  // [NEW]
 // Live ops
 import LiveOpsMapViewPage from "../pages/liveOps/LiveOpsMapViewPage";
 import LiveOpsTripDetailPage from "../pages/liveOps/LiveOpsTripDetailPage";
@@ -107,6 +107,7 @@ export default function App() {
           <Route path="/agent/dashboard/analytics" element={<AnalyticsDashboardPage />} />
           <Route path="/agent/dashboard/supervisor" element={<SupervisorDashboardPage />} />
           <Route path="/agent/dashboard/tasks" element={<TasksPage />} />
+          <Route path="/agent/drafts" element={<DraftsPage />} />
 
           {/* Live Ops */}
           <Route path="/agent/live-ops" element={<LiveOpsMapViewPage />} />

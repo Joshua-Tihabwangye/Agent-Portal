@@ -562,11 +562,7 @@ function EmergencyQuickActionsPanel({
               fullWidth
               variant="outlined"
               startIcon={<ConfirmationNumberOutlinedIcon sx={{ fontSize: 18 }} />}
-              onClick={() => {
-                // Navigate to create ticket page
-                // In a real app we might pass state/search param
-                window.location.href = `/agent/support/create`;
-              }}
+              onClick={onAttachToTicket}
               sx={{
                 borderRadius: 999,
                 textTransform: "none",
