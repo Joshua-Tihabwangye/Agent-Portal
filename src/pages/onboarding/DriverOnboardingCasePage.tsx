@@ -8,7 +8,6 @@ import {
   Chip,
   Button,
   Grid,
-  Divider,
   Tabs,
   Tab,
   Alert,
@@ -21,9 +20,9 @@ import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import VerifiedUserOutlinedIcon from "@mui/icons-material/VerifiedUserOutlined";
 import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
 import GavelOutlinedIcon from "@mui/icons-material/GavelOutlined";
+import VehicleDocumentsPanel from "../../components/onboarding/VehicleDocumentsPanel";
 
 const EVZONE_GREEN = "#03cd8c";
-const EVZONE_ORANGE = "#f77f00";
 const EVZONE_GREY = "#6b7280";
 
 // Storage key for syncing status between pages
@@ -462,88 +461,13 @@ export default function AgentDriverOnboardingCasePage() {
                   </Grid>
 
                   <Grid size={{ xs: 12, md: 6 }}>
-                    <Typography
-                      variant="subtitle2"
-                      sx={{
-                        fontWeight: 700,
-                        color: isDark ? "#e5e7eb" : "#111827",
-                        mb: 1,
-                      }}
-                    >
-                      Vehicle documents
-                    </Typography>
-                    <Stack spacing={1}>
-                      <Stack
-                        direction="row"
-                        justifyContent="space-between"
-                        alignItems="center"
-                      >
-                        <Box>
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              fontWeight: 500,
-                              color: isDark ? "#e5e7eb" : "#111827",
-                            }}
-                          >
-                            Logbook / registration
-                          </Typography>
-                          <Typography
-                            variant="caption"
-                            sx={{ color: EVZONE_GREY }}
-                          >
-                            EV confirmed (no ICE)
-                          </Typography>
-                        </Box>
-                        <Chip
-                          size="small"
-                          label="EV only"
-                          sx={{
-                            borderRadius: 999,
-                            fontSize: 11,
-                            textTransform: "none",
-                            backgroundColor: "rgba(240,253,250,1)",
-                            color: "#047857",
-                            border: "1px solid rgba(34,197,94,0.6)",
-                          }}
-                        />
-                      </Stack>
-                      <Stack
-                        direction="row"
-                        justifyContent="space-between"
-                        alignItems="center"
-                      >
-                        <Box>
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              fontWeight: 500,
-                              color: isDark ? "#e5e7eb" : "#111827",
-                            }}
-                          >
-                            Insurance
-                          </Typography>
-                          <Typography
-                            variant="caption"
-                            sx={{ color: EVZONE_GREY }}
-                          >
-                            Comprehensive · valid
-                          </Typography>
-                        </Box>
-                        <Chip
-                          size="small"
-                          label="Clear"
-                          sx={{
-                            borderRadius: 999,
-                            fontSize: 11,
-                            textTransform: "none",
-                            backgroundColor: "rgba(22,163,74,0.12)",
-                            color: "#166534",
-                            border: "1px solid rgba(34,197,94,0.6)",
-                          }}
-                        />
-                      </Stack>
-                    </Stack>
+                    <VehicleDocumentsPanel
+                      vehicleId={driverId || driverState.id}
+                      driverId={driverId || driverState.id}
+                      title="Vehicle documents"
+                      description="Upload the vehicle ownership files here. They stay available after refresh."
+                      editable
+                    />
                   </Grid>
                 </Grid>
               )}

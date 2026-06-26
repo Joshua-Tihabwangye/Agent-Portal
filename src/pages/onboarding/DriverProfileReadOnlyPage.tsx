@@ -13,12 +13,10 @@ import PageBreadcrumb from "../../components/shared/PageBreadcrumb";
 import { useTheme } from "@mui/material/styles";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import DirectionsCarOutlinedIcon from "@mui/icons-material/DirectionsCarOutlined";
-import AssignmentIndOutlinedIcon from "@mui/icons-material/AssignmentIndOutlined";
-import VerifiedUserOutlinedIcon from "@mui/icons-material/VerifiedUserOutlined";
 import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
+import VehicleDocumentsPanel from "../../components/onboarding/VehicleDocumentsPanel";
 
 const EVZONE_GREEN = "#03cd8c";
-const EVZONE_ORANGE = "#f77f00";
 const EVZONE_GREY = "#6b7280";
 
 // Route target: /agent/drivers/:driverId
@@ -40,11 +38,6 @@ const driverProfile = {
     year: 2022,
     color: "White",
     isEV: true,
-  },
-  documents: {
-    nationalId: "Verified",
-    licence: "Valid to 2027-03-12",
-    insurance: "Comprehensive",
   },
   training: {
     coreModules: "100%",
@@ -353,95 +346,15 @@ export default function AgentDriverProfilePage() {
               </CardContent>
             </Card>
 
-            <Card
-              elevation={1}
-              sx={{
-                borderRadius: 3,
-                backgroundColor: isDark ? "#020617" : "#ffffff",
-                border:
-                  "1px solid " +
-                  (isDark
-                    ? "rgba(30,64,175,0.7)"
-                    : "rgba(226,232,240,1)"),
-                mb: 2,
-              }}
-            >
-              <CardContent sx={{ p: 2.2 }}>
-                <Stack
-                  direction="row"
-                  spacing={1}
-                  alignItems="center"
-                  mb={1}
-                >
-                  <AssignmentIndOutlinedIcon
-                    sx={{ fontSize: 18, color: EVZONE_ORANGE }}
-                  />
-                  <Typography
-                    variant="subtitle2"
-                    sx={{
-                      fontWeight: 700,
-                      color: isDark ? "#e5e7eb" : "#111827",
-                    }}
-                  >
-                    Documents
-                  </Typography>
-                </Stack>
-
-                <Stack spacing={0.8}>
-                  <Stack spacing={0.3}>
-                    <Typography
-                      variant="caption"
-                      sx={{ color: EVZONE_GREY }}
-                    >
-                      National ID
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        fontWeight: 500,
-                        color: isDark ? "#e5e7eb" : "#111827",
-                      }}
-                    >
-                      {driverProfile.documents.nationalId}
-                    </Typography>
-                  </Stack>
-                  <Stack spacing={0.3}>
-                    <Typography
-                      variant="caption"
-                      sx={{ color: EVZONE_GREY }}
-                    >
-                      Driver licence
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        fontWeight: 500,
-                        color: isDark ? "#e5e7eb" : "#111827",
-                      }}
-                    >
-                      {driverProfile.documents.licence}
-                    </Typography>
-                  </Stack>
-                  <Stack spacing={0.3}>
-                    <Typography
-                      variant="caption"
-                      sx={{ color: EVZONE_GREY }}
-                    >
-                      Insurance
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        fontWeight: 500,
-                        color: isDark ? "#e5e7eb" : "#111827",
-                      }}
-                    >
-                      {driverProfile.documents.insurance}
-                    </Typography>
-                  </Stack>
-                </Stack>
-              </CardContent>
-            </Card>
+            <Box sx={{ mb: 2 }}>
+              <VehicleDocumentsPanel
+                vehicleId={driverProfile.id}
+                driverId={driverProfile.id}
+                title="Documents"
+                description="Uploaded vehicle documents are persisted locally for this driver profile."
+                editable={false}
+              />
+            </Box>
 
             <Card
               elevation={1}
