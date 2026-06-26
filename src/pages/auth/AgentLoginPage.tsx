@@ -11,6 +11,8 @@ import {
   Checkbox,
   Stack,
   Divider,
+  Alert,
+  CircularProgress,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -24,7 +26,7 @@ const EVZONE_GREY = "#a6a6a6";
 export default function AgentLoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, trainingGateComplete } = useAuth();
+  const { login, trainingGateComplete, isLoading, error, clearError } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(true);
@@ -34,17 +36,22 @@ export default function AgentLoginPage() {
 
   const isValid = email.trim().length > 0 && password.trim().length > 0;
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!isValid) return;
-    await login(email, password);
+    if (!isValid || isLoading) return;
+    clearError?.();
+    try {
+      await login(email, password);
 
-    const from = (location.state as any)?.from?.pathname as string | undefined;
-    if (!trainingGateComplete) {
-      navigate("/agent/welcome", { replace: true });
-      return;
+      const from = (location.state as { from?: { pathname?: string } })?.from?.pathname;
+      if (!trainingGateComplete) {
+        navigate("/agent/welcome", { replace: true });
+        return;
+      }
+      navigate(from || "/agent/dashboard", { replace: true });
+    } catch {
+      // Error is surfaced via the auth context; no extra action needed here.
     }
-    navigate(from || "/agent/dashboard", { replace: true });
   };
 
   return (
@@ -258,10 +265,17 @@ export default function AgentLoginPage() {
                   </Link>
                 </Stack>
 
+                {error && (
+                  <Alert severity="error" sx={{ borderRadius: 2, fontSize: 13 }}>
+                    {error}
+                  </Alert>
+                )}
+
                 <Button
                   type="submit"
-                  disabled={!isValid}
+                  disabled={!isValid || isLoading}
                   fullWidth
+                  startIcon={isLoading ? <CircularProgress size={18} color="inherit" /> : undefined}
                   sx={{
                     mt: 1,
                     py: 1.4,
